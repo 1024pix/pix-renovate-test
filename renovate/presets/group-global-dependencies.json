@@ -1,0 +1,22 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",  
+    "packageRules": [
+        {
+            "matchPackagePatterns": ["eslint"],
+            "groupName": "eslint"
+        },
+        {
+            "matchPackagePatterns": ["node"],
+            "groupName": "node"
+        },
+        {
+            "matchPackagePatterns": ["redis"],
+            "groupName": "redis",
+            "addLabels": ["global-pr"]
+        },
+        {
+            "matchPackagePatterns": ["postgres"],
+            "groupName": "postgres"
+        }
+    ]
+}
