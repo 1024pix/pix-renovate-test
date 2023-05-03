@@ -1,0 +1,11 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "additionalBranchPrefix": "{{parentDir}}-",
+    "commitMessageSuffix": "{{#if parentDir}}({{parentDir}}){{/if}}",
+    "packageRules": [
+        {
+          "matchPackagePatterns": ["node"],
+          "enabled": false
+        }
+      ]
+}
