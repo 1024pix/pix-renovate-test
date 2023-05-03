@@ -1,11 +1,5 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "packageRules": [
-        {
-            "excludePackagePatterns": ["(node|eslint|redis|postgres)"],
-            "addLabels": ["dir-specific-pr"],
-            "additionalBranchPrefix": "{{#if parentDir}}{{parentDir}}{{else}}global{{/if}}-",
-            "commitMessageSuffix": "{{#if parentDir}}({{parentDir}}){{else}}(global){{/if}}"
-        }
-    ]
+    "additionalBranchPrefix": "{{#if parentDir}}{{parentDir}}{{else}}dossier-racine{{/if}}-",
+    "commitMessageSuffix": "{{#if parentDir}}({{parentDir}}){{else}}(dossier racine){{/if}}"
 }
