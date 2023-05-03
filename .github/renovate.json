@@ -6,6 +6,7 @@
     ":preserveSemverRanges",
     ":semanticCommits",
     "schedule:earlyMondays",
+    "local>1024pix/pix-renovate-test//renovate/presets/group-global-dependencies",
     "local>1024pix/pix-renovate-test//renovate/presets/group-dependencies-non-major",
     "local>1024pix/pix-renovate-test//renovate/presets/group-by-directory"
   ],
