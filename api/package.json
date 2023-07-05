@@ -6,8 +6,8 @@
   "license": "AGPL-3.0",
   "author": "GIP Pix",
   "engines": {
-    "node": "^16.19.0",
-    "npm": "^8.13.2"
+    "node": "^v16.20.1",
+    "npm": "^8.19.4"
   },
   "type": "module",
   "repository": {
@@ -109,7 +109,7 @@
     "mocha-junit-reporter": "^2.0.2",
     "mockdate": "^3.0.5",
     "nock": "^13.2.7",
-    "nodemon": "^2.0.16",
+    "nodemon": "^2.0.22",
     "prettier": "^2.7.1",
     "sinon": "^15.0.0",
     "sinon-chai": "^3.7.0",
