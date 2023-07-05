@@ -1,7 +1,9 @@
-const _ = require('lodash');
-const datasource = require('./datasource.js');
+import _ from 'lodash';
+import * as datasource from './datasource.js';
+import { LearningContentResourceNotFound } from './LearningContentResourceNotFound.js';
 
 const VALIDATED_CHALLENGE = 'validé';
+const OBSOLETE_CHALLENGE = 'périmé';
 const OPERATIVE_CHALLENGES = [VALIDATED_CHALLENGE, 'archivé'];
 
 const challengeDatasource = datasource.extend({
@@ -40,29 +42,41 @@ const challengeDatasource = datasource.extend({
     return validatedChallenges.filter((challenge) => challenge.skillId === id);
   },
 
-  async findActiveFlashCompatible(locale) {
+  async getBySkillId(skillId) {
     const challenges = await this.list();
-    return challenges.filter(
-      (challengeData) =>
-        challengeData.status === VALIDATED_CHALLENGE &&
-        challengeData.skillId &&
-        _.includes(challengeData.locales, locale) &&
-        challengeData.alpha != null &&
-        challengeData.delta != null
-    );
+    const challenge = _.find(challenges, { skillId });
+    if (!challenge) {
+      throw new LearningContentResourceNotFound();
+    }
+    return challenge;
+  },
+
+  async findActiveFlashCompatible(locale) {
+    const flashChallenges = await this.findFlashCompatible({ locale });
+    return flashChallenges.filter((challengeData) => challengeData.status === VALIDATED_CHALLENGE);
   },
 
   async findOperativeFlashCompatible(locale) {
+    const flashChallenges = await this.findFlashCompatible({ locale });
+    return flashChallenges.filter((challengeData) => _.includes(OPERATIVE_CHALLENGES, challengeData.status));
+  },
+
+  async findFlashCompatible({ locale, useObsoleteChallenges }) {
     const challenges = await this.list();
+
+    const acceptedStatuses = useObsoleteChallenges
+      ? [OBSOLETE_CHALLENGE, ...OPERATIVE_CHALLENGES]
+      : OPERATIVE_CHALLENGES;
+
     return challenges.filter(
       (challengeData) =>
-        _.includes(OPERATIVE_CHALLENGES, challengeData.status) &&
-        challengeData.skillId &&
         _.includes(challengeData.locales, locale) &&
         challengeData.alpha != null &&
-        challengeData.delta != null
+        challengeData.delta != null &&
+        challengeData.skillId &&
+        acceptedStatuses.includes(challengeData.status)
     );
   },
 });
 
-module.exports = { challengeDatasource };
+export { challengeDatasource };

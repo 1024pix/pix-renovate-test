@@ -1,9 +1,9 @@
 // eslint-disable-next-line no-restricted-imports
-import { click, find, findAll, currentURL, fillIn, triggerEvent, visit } from '@ember/test-helpers';
+import { click, find, findAll, currentURL, fillIn, triggerEvent } from '@ember/test-helpers';
 import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
 import { setupMirage } from 'ember-cli-mirage/test-support';
-import { clickByName, visit as visitScreen } from '@1024pix/ember-testing-library';
+import { clickByName, visit } from '@1024pix/ember-testing-library';
 
 module('Acceptance | Displaying a QROC challenge', function (hooks) {
   setupApplicationTest(hooks);
@@ -205,10 +205,11 @@ module('Acceptance | Displaying a QROC challenge', function (hooks) {
         );
 
         const goodAnswer = find('.comparison-window-solution__text');
-        const badAnswerFromUserResult = find('.correction-qroc-box-answer');
+        const badAnswerFromUserResultContainer = find('.correction-qroc-box-answer');
+        const badAnswerFromUserResultInput = find('.correction-qroc-box-answer--input');
         assert.strictEqual(goodAnswer.textContent.trim(), 'Mangue');
-        assert.ok(badAnswerFromUserResult.className.includes('correction-qroc-box-answer--wrong'));
-        assert.strictEqual(badAnswerFromUserResult.value, 'Banane');
+        assert.ok(badAnswerFromUserResultContainer.className.includes('correction-qroc-box-answer--wrong'));
+        assert.strictEqual(badAnswerFromUserResultInput.value, 'Banane');
         assert.ok(find('.tutorial-panel__hint-container').textContent.includes(correction.hint));
 
         const tutorialToSuccess = findAll('.tutorial-panel__tutorials-container .tutorial-card')[0];
@@ -359,10 +360,11 @@ module('Acceptance | Displaying a QROC challenge', function (hooks) {
         );
 
         const goodAnswer = find('.comparison-window-solution__text');
-        const badAnswerFromUserResult = find('.correction-qroc-box-answer');
+        const badAnswerFromUserResultContainer = find('.correction-qroc-box-answer');
+        const badAnswerFromUserResultInput = find('.correction-qroc-box-answer--paragraph');
         assert.strictEqual(goodAnswer.textContent.trim(), 'Mangue');
-        assert.ok(badAnswerFromUserResult.className.includes('correction-qroc-box-answer--wrong'));
-        assert.strictEqual(badAnswerFromUserResult.value, 'Banane');
+        assert.ok(badAnswerFromUserResultContainer.className.includes('correction-qroc-box-answer--wrong'));
+        assert.strictEqual(badAnswerFromUserResultInput.value, 'Banane');
         assert.ok(find('.tutorial-panel__hint-container').textContent.includes(correction.hint));
 
         const tutorialToSuccess = findAll('.tutorial-panel__tutorials-container .tutorial-card')[0];
@@ -384,7 +386,7 @@ module('Acceptance | Displaying a QROC challenge', function (hooks) {
     module('When challenge is not already answered', function () {
       test('should render challenge information and question', async function (assert) {
         // given
-        await visitScreen(`/assessments/${assessment.id}/challenges/0`);
+        await visit(`/assessments/${assessment.id}/challenges/0`);
 
         // then
         assert.strictEqual(
@@ -396,9 +398,23 @@ module('Acceptance | Displaying a QROC challenge', function (hooks) {
         assert.dom('.challenge-response__alert').doesNotExist();
       });
 
+      test('should allow selecting a value', async function (assert) {
+        // given
+        const screen = await visit(`/assessments/${assessment.id}/challenges/0`);
+        await click('.challenge-actions__action-validate');
+
+        // when
+        await clickByName('saladAriaLabel');
+        await screen.findByRole('listbox');
+        await click(screen.getByRole('option', { name: 'mango' }));
+
+        // then
+        assert.dom('.pix-select-button').hasText('mango');
+      });
+
       test('should hide the alert error after the user interact with input text', async function (assert) {
         // given
-        const screen = await visitScreen(`/assessments/${assessment.id}/challenges/0`);
+        const screen = await visit(`/assessments/${assessment.id}/challenges/0`);
         await click('.challenge-actions__action-validate');
         assert.dom('.challenge-response__alert').exists();
 
@@ -413,7 +429,7 @@ module('Acceptance | Displaying a QROC challenge', function (hooks) {
 
       test('should go to checkpoint when user validated', async function (assert) {
         // given
-        const screen = await visitScreen(`/assessments/${assessment.id}/challenges/0`);
+        const screen = await visit(`/assessments/${assessment.id}/challenges/0`);
 
         // when
         await clickByName('saladAriaLabel');
@@ -469,10 +485,12 @@ module('Acceptance | Displaying a QROC challenge', function (hooks) {
         );
 
         const goodAnswer = find('.comparison-window-solution__text');
-        const badAnswerFromUserResult = find('.correction-qroc-box-answer');
+        const badAnswerFromUserResultContainer = find('.correction-qroc-box-answer');
+        const badAnswerFromUserResultInput = find('.correction-qroc-box-answer--input');
+
         assert.strictEqual(goodAnswer.textContent.trim(), 'Mangue');
-        assert.ok(badAnswerFromUserResult.className.includes('correction-qroc-box-answer--wrong'));
-        assert.strictEqual(badAnswerFromUserResult.value, 'Banane');
+        assert.ok(badAnswerFromUserResultContainer.className.includes('correction-qroc-box-answer--wrong'));
+        assert.strictEqual(badAnswerFromUserResultInput.value, 'Banane');
         assert.ok(find('.tutorial-panel__hint-container').textContent.includes(correction.hint));
 
         const tutorialToSuccess = findAll('.tutorial-panel__tutorials-container .tutorial-card')[0];

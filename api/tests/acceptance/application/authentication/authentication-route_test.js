@@ -1,10 +1,12 @@
-const querystring = require('querystring');
-const { expect, databaseBuilder, knex } = require('../../../test-helper');
-const tokenService = require('../../../../lib/domain/services/token-service');
-const AuthenticationMethod = require('../../../../lib/domain/models/AuthenticationMethod');
-const { ROLES } = require('../../../../lib/domain/constants').PIX_ADMIN;
+import querystring from 'querystring';
+import { expect, databaseBuilder, knex } from '../../../test-helper.js';
+import { tokenService } from '../../../../lib/domain/services/token-service.js';
+import { NON_OIDC_IDENTITY_PROVIDERS } from '../../../../lib/domain/constants/identity-providers.js';
+import { PIX_ADMIN } from '../../../../lib/domain/constants.js';
 
-const createServer = require('../../../../server');
+const { ROLES } = PIX_ADMIN;
+
+import { createServer } from '../../../../server.js';
 
 describe('Acceptance | Controller | authentication-controller', function () {
   afterEach(async function () {
@@ -439,7 +441,7 @@ describe('Acceptance | Controller | authentication-controller', function () {
 
         // then
         const authenticationMethods = await knex('authentication-methods').where({
-          identityProvider: AuthenticationMethod.identityProviders.GAR,
+          identityProvider: NON_OIDC_IDENTITY_PROVIDERS.GAR.code,
           userId: user.id,
           externalIdentifier: 'SAMLJACKSONID',
         });
@@ -545,8 +547,8 @@ describe('Acceptance | Controller | authentication-controller', function () {
   describe('POST /api/application/token', function () {
     let server;
     let options;
-    const OSMOSE_CLIENT_ID = 'graviteeOsmoseClientId';
-    const OSMOSE_CLIENT_SECRET = 'graviteeOsmoseClientSecret';
+    const OSMOSE_CLIENT_ID = 'apimOsmoseClientId';
+    const OSMOSE_CLIENT_SECRET = 'apimOsmoseClientSecret';
     const SCOPE = 'organizations-certifications-result';
 
     beforeEach(async function () {

@@ -1,29 +1,38 @@
+import * as localeService from '../services/locale-service.js';
+
 class UserDetailsForAdmin {
-  constructor({
-    id,
-    cgu,
-    username,
-    firstName,
-    lastName,
-    email,
-    pixOrgaTermsOfServiceAccepted,
-    pixCertifTermsOfServiceAccepted,
-    organizationLearners,
-    authenticationMethods,
-    createdAt,
-    updatedAt,
-    lang,
-    locale,
-    lastTermsOfServiceValidatedAt,
-    lastPixOrgaTermsOfServiceValidatedAt,
-    lastPixCertifTermsOfServiceValidatedAt,
-    lastLoggedAt,
-    emailConfirmedAt,
-    userLogin,
-    hasBeenAnonymised,
-    anonymisedByFirstName,
-    anonymisedByLastName,
-  } = {}) {
+  constructor(
+    {
+      id,
+      cgu,
+      username,
+      firstName,
+      lastName,
+      email,
+      pixOrgaTermsOfServiceAccepted,
+      pixCertifTermsOfServiceAccepted,
+      organizationLearners,
+      authenticationMethods,
+      createdAt,
+      updatedAt,
+      lang,
+      locale,
+      lastTermsOfServiceValidatedAt,
+      lastPixOrgaTermsOfServiceValidatedAt,
+      lastPixCertifTermsOfServiceValidatedAt,
+      lastLoggedAt,
+      emailConfirmedAt,
+      userLogin,
+      hasBeenAnonymised,
+      anonymisedByFirstName,
+      anonymisedByLastName,
+    } = {},
+    dependencies = { localeService }
+  ) {
+    if (locale) {
+      locale = dependencies.localeService.getCanonicalLocale(locale);
+    }
+
     this.id = id;
     this.cgu = cgu;
     this.firstName = firstName;
@@ -56,4 +65,4 @@ class UserDetailsForAdmin {
   }
 }
 
-module.exports = UserDetailsForAdmin;
+export { UserDetailsForAdmin };

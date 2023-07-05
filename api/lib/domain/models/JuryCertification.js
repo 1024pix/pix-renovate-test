@@ -1,4 +1,4 @@
-const CompetenceMark = require('./CompetenceMark.js');
+import { CompetenceMark } from './CompetenceMark.js';
 
 class JuryCertification {
   constructor({
@@ -26,8 +26,8 @@ class JuryCertification {
     commentForOrganization,
     commentForJury,
     certificationIssueReports,
-    complementaryCertificationCourseResultsWithExternal,
-    commonComplementaryCertificationCourseResults,
+    complementaryCertificationCourseResultWithExternal,
+    commonComplementaryCertificationCourseResult,
   }) {
     this.certificationCourseId = certificationCourseId;
     this.sessionId = sessionId;
@@ -53,16 +53,16 @@ class JuryCertification {
     this.commentForOrganization = commentForOrganization;
     this.commentForJury = commentForJury;
     this.certificationIssueReports = certificationIssueReports;
-    this.complementaryCertificationCourseResultsWithExternal = complementaryCertificationCourseResultsWithExternal;
-    this.commonComplementaryCertificationCourseResults = commonComplementaryCertificationCourseResults;
+    this.complementaryCertificationCourseResultWithExternal = complementaryCertificationCourseResultWithExternal;
+    this.commonComplementaryCertificationCourseResult = commonComplementaryCertificationCourseResult;
   }
 
   static from({
     juryCertificationDTO,
     certificationIssueReports,
     competenceMarkDTOs,
-    complementaryCertificationCourseResultsWithExternal,
-    commonComplementaryCertificationCourseResults,
+    complementaryCertificationCourseResultWithExternal,
+    commonComplementaryCertificationCourseResult,
   }) {
     const competenceMarks = competenceMarkDTOs.map(
       (competenceMarkDTO) =>
@@ -96,10 +96,10 @@ class JuryCertification {
       commentForOrganization: juryCertificationDTO.commentForOrganization,
       commentForJury: juryCertificationDTO.commentForJury,
       certificationIssueReports,
-      complementaryCertificationCourseResultsWithExternal,
-      commonComplementaryCertificationCourseResults,
+      complementaryCertificationCourseResultWithExternal,
+      commonComplementaryCertificationCourseResult,
     });
   }
 }
 
-module.exports = JuryCertification;
+export { JuryCertification };

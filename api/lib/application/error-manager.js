@@ -1,15 +1,19 @@
-const _ = require('lodash');
-const JSONAPIError = require('jsonapi-serializer').Error;
-const { HttpErrors } = require('./http-errors.js');
-const DomainErrors = require('../domain/errors.js');
-const errorSerializer = require('../infrastructure/serializers/jsonapi/error-serializer.js');
-const { extractLocaleFromRequest } = require('../infrastructure/utils/request-response-utils.js');
-const translations = require('../../translations/index.js');
+import _ from 'lodash';
+import jsonapiSerializer from 'jsonapi-serializer';
+import { HttpErrors } from './http-errors.js';
+import * as DomainErrors from '../domain/errors.js';
+import * as errorSerializer from '../infrastructure/serializers/jsonapi/error-serializer.js';
+import { extractLocaleFromRequest } from '../infrastructure/utils/request-response-utils.js';
+import * as translations from '../../translations/index.js';
+
+const { Error: JSONAPIError } = jsonapiSerializer;
 
 const NOT_VALID_RELATIONSHIPS = ['externalId', 'participantExternalId'];
 
 function translateMessage(locale, key) {
+  // eslint-disable-next-line import/namespace
   if (translations[locale]['entity-validation-errors'][key]) {
+    // eslint-disable-next-line import/namespace
     return translations[locale]['entity-validation-errors'][key];
   }
   return key;
@@ -154,9 +158,6 @@ function _mapToHttpError(error) {
   if (error instanceof DomainErrors.UserNotAuthorizedToCreateCampaignError) {
     return new HttpErrors.ForbiddenError(error.message);
   }
-  if (error instanceof DomainErrors.UserNotAuthorizedToGetCertificationCoursesError) {
-    return new HttpErrors.ForbiddenError(error.message);
-  }
   if (error instanceof DomainErrors.UserNotAuthorizedToGenerateUsernamePasswordError) {
     return new HttpErrors.ForbiddenError(error.message);
   }
@@ -164,7 +165,7 @@ function _mapToHttpError(error) {
     return new HttpErrors.ForbiddenError(error.message);
   }
   if (error instanceof DomainErrors.CertificationCandidateAlreadyLinkedToUserError) {
-    return new HttpErrors.ForbiddenError('Le candidat de certification est déjà lié à un utilisateur.');
+    return new HttpErrors.ForbiddenError(error.message, error.code);
   }
   if (error instanceof DomainErrors.CertificationCandidateByPersonalInfoNotFoundError) {
     return new HttpErrors.NotFoundError(
@@ -185,11 +186,8 @@ function _mapToHttpError(error) {
   if (error instanceof DomainErrors.CertificationCandidatePersonalInfoWrongFormat) {
     return new HttpErrors.BadRequestError("Un ou plusieurs champs d'informations d'identité sont au mauvais format.");
   }
-  if (error instanceof DomainErrors.CertificationCandidateAddError) {
-    return new HttpErrors.UnprocessableEntityError(error.message);
-  }
-  if (error instanceof DomainErrors.CertificationCandidatesImportError) {
-    return new HttpErrors.UnprocessableEntityError(error.message, error.code);
+  if (error instanceof DomainErrors.CertificationCandidatesError) {
+    return new HttpErrors.UnprocessableEntityError(error.message, error.code, error.meta);
   }
   if (error instanceof DomainErrors.CertificationCandidateForbiddenDeletionError) {
     return new HttpErrors.ForbiddenError(error.message);
@@ -332,17 +330,14 @@ function _mapToHttpError(error) {
   if (error instanceof DomainErrors.WrongDateFormatError) {
     return new HttpErrors.BadRequestError(error.message);
   }
-  if (error instanceof DomainErrors.SessionAlreadyFinalizedError) {
-    return new HttpErrors.BadRequestError(error.message);
-  }
   if (error instanceof DomainErrors.SessionWithoutStartedCertificationError) {
-    return new HttpErrors.BadRequestError(error.message);
+    return new HttpErrors.BadRequestError(error.message, error.code, error.meta);
   }
   if (error instanceof DomainErrors.SessionWithIdAndInformationOnMassImportError) {
     return new HttpErrors.BadRequestError(error.message);
   }
   if (error instanceof DomainErrors.SessionWithAbortReasonOnCompletedCertificationCourseError) {
-    return new HttpErrors.ConflictError(error.message);
+    return new HttpErrors.ConflictError(error.message, error.code, error.meta);
   }
   if (error instanceof DomainErrors.SessionStartedDeletionError) {
     return new HttpErrors.ConflictError(error.message);
@@ -446,14 +441,6 @@ function _mapToHttpError(error) {
     return new HttpErrors.ConflictError(error.message);
   }
 
-  if (error instanceof DomainErrors.CpfBirthInformationValidationError) {
-    return new HttpErrors.UnprocessableEntityError(error.message);
-  }
-
-  if (error instanceof DomainErrors.CpfBirthInformationValidationError) {
-    return new HttpErrors.UnprocessableEntityError(error.message);
-  }
-
   if (error instanceof DomainErrors.UncancellableOrganizationInvitationError) {
     return new HttpErrors.UnprocessableEntityError(error.message);
   }
@@ -506,6 +493,14 @@ function _mapToHttpError(error) {
     return new HttpErrors.BadRequestError(error.message, 'SENDING_EMAIL_TO_INVALID_EMAIL_ADDRESS', error.meta);
   }
 
+  if (error instanceof DomainErrors.CertificationCandidateNotFoundError) {
+    return new HttpErrors.NotFoundError(error.message, error.code);
+  }
+
+  if (error instanceof DomainErrors.SessionAlreadyFinalizedError) {
+    return new HttpErrors.ConflictError(error.message, error.code);
+  }
+
   return new HttpErrors.BaseHttpError(error.message);
 }
 
@@ -524,4 +519,4 @@ function handle(request, h, error) {
   return h.response(errorSerializer.serialize(httpError)).code(httpError.status);
 }
 
-module.exports = { handle };
+export { handle };

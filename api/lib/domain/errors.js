@@ -1,4 +1,4 @@
-const { SESSION_SUPERVISING } = require('./constants/session-supervising');
+import { SESSION_SUPERVISING } from './constants/session-supervising.js';
 
 class DomainError extends Error {
   constructor(message, code, meta) {
@@ -276,12 +276,6 @@ class CampaignTypeError extends DomainError {
   }
 }
 
-class UserNotAuthorizedToGetCertificationCoursesError extends DomainError {
-  constructor(message = "Cet utilisateur n'est pas autorisé à récupérer ces certification courses.") {
-    super(message);
-  }
-}
-
 class UserNotAuthorizedToGenerateUsernamePasswordError extends DomainError {
   constructor(message = "Cet utilisateur n'est pas autorisé à générer un identifiant et un mot de passe.") {
     super(message);
@@ -350,11 +344,6 @@ class InvalidCertificationCandidate extends DomainError {
     if (type === 'any.only' && error.key === 'sex') {
       error.why = 'not_a_sex_code';
     }
-
-    if (type === 'array.max' && error.key === 'complementaryCertifications') {
-      error.why = 'only_one_complementary_certification';
-    }
-
     if (type === 'any.only' && error.key === 'billingMode') {
       if (allowedValues.length === 1 && allowedValues[0] === null) {
         error.why = 'billing_mode_not_null';
@@ -370,9 +359,13 @@ class InvalidCertificationCandidate extends DomainError {
     if (type === 'any.required' && error.key === 'prepaymentCode') {
       error.why = 'prepayment_code_null';
     }
-    if (type === 'object.assert' && errorDetail.context.subject.key === 'birthPostalCode') {
-      error.why = 'birthPostalCode_birthINSEECode_invalid';
+    if (type === 'number.less' || type === 'number.min') {
+      error.why = 'extra_time_percentage_out_of_range';
     }
+    if (type === 'date.greater') {
+      error.why = 'birthdate_must_be_greater';
+    }
+
     return new InvalidCertificationCandidate({ error });
   }
 }
@@ -501,14 +494,22 @@ class CertificationCandidateOnFinalizedSessionError extends DomainError {
 }
 
 class CertificationCandidateAlreadyLinkedToUserError extends DomainError {
-  constructor(message = 'Ce candidat de certification a déjà été lié à un utilisateur.') {
+  constructor(message = 'At least one candidate is already linked to a user.') {
     super(message);
+    this.code = 'SESSION_STARTED_CANDIDATE_ALREADY_LINKED_TO_USER';
   }
 }
 
 class CertificationCandidateByPersonalInfoNotFoundError extends DomainError {
   constructor(message = "Aucun candidat de certification n'a été trouvé avec ces informations.") {
     super(message);
+  }
+}
+
+class CertificationCandidateNotFoundError extends DomainError {
+  constructor(message = 'No candidate found') {
+    super(message);
+    this.code = 'CANDIDATE_NOT_FOUND';
   }
 }
 
@@ -563,57 +564,9 @@ class CertificationCandidateForbiddenDeletionError extends DomainError {
   }
 }
 
-class CertificationCandidateAddError extends DomainError {
-  constructor(message = 'Candidat de certification invalide.') {
-    super(message);
-  }
-
-  static fromInvalidCertificationCandidateError(error) {
-    let message = 'Candidat de certification invalide.';
-
-    if (error.why === 'not_a_billing_mode') {
-      message = `Le champ “Tarification part Pix” ne peut contenir qu'une des valeurs suivantes: Gratuite, Payante ou Prépayée.`;
-    } else if (error.why === 'prepayment_code_null') {
-      message = `Le champ “Code de prépaiement” est obligatoire puisque l’option “Prépayée” a été sélectionnée pour ce candidat.`;
-    } else if (error.why === 'prepayment_code_not_null') {
-      message = `Le champ “Code de prépaiement” doit rester vide puisque l’option “Prépayée” n'a pas été sélectionnée pour ce candidat.`;
-    }
-
-    return new CertificationCandidateAddError(message);
-  }
-}
-
-class CertificationCandidatesImportError extends DomainError {
-  constructor({ message = "Quelque chose s'est mal passé. Veuillez réessayer", code = null } = {}) {
-    super(message, code);
-  }
-
-  static fromInvalidCertificationCandidateError(error, keyLabelMap, lineNumber) {
-    const label = error.key in keyLabelMap ? keyLabelMap[error.key].replace(/\* /, '') : 'none';
-    const linePortion = `Ligne ${lineNumber} :`;
-    let contentPortion = "Quelque chose s'est mal passé. Veuillez réessayer";
-
-    if (error.why === 'not_a_date' || error.why === 'date_format') {
-      contentPortion = `Le champ “${label}” doit être au format jj/mm/aaaa.`;
-    } else if (error.why === 'email_format') {
-      contentPortion = `Le champ “${label}” doit être au format email.`;
-    } else if (error.why === 'not_a_string') {
-      contentPortion = `Le champ “${label}” doit être une chaîne de caractères.`;
-    } else if (error.why === 'not_a_number') {
-      contentPortion = `Le champ “${label}” doit être un nombre.`;
-    } else if (error.why === 'required') {
-      contentPortion = `Le champ “${label}” est obligatoire.`;
-    } else if (error.why === 'not_a_sex_code') {
-      contentPortion = `Le champ “${label}” accepte les valeurs "M" pour un homme ou "F" pour une femme.`;
-    } else if (error.why === 'not_a_billing_mode') {
-      contentPortion = `Le champ “${label}” ne peut contenir qu'une des valeurs suivantes: Gratuite, Payante ou Prépayée.`;
-    } else if (error.why === 'prepayment_code_null') {
-      contentPortion = `Le champ “${label}” est obligatoire puisque l’option “Prépayée” a été sélectionnée pour ce candidat.`;
-    } else if (error.why === 'prepayment_code_not_null') {
-      contentPortion = `Le champ “${label}” doit rester vide puisque l’option “Prépayée” n'a pas été sélectionnée pour ce candidat.`;
-    }
-
-    return new CertificationCandidatesImportError({ message: `${linePortion} ${contentPortion}` });
+class CertificationCandidatesError extends DomainError {
+  constructor({ message = "Quelque chose s'est mal passé. Veuillez réessayer", code = null, meta = null } = {}) {
+    super(message, code, meta);
   }
 }
 
@@ -917,8 +870,9 @@ class AdminMemberError extends DomainError {
 }
 
 class SessionAlreadyFinalizedError extends DomainError {
-  constructor(message = 'Erreur, tentatives de finalisation multiples de la session.') {
+  constructor(message = 'Cannot finalize session more than once.') {
     super(message);
+    this.code = 'SESSION_ALREADY_FINALIZED';
   }
 }
 
@@ -929,18 +883,18 @@ class SessionWithIdAndInformationOnMassImportError extends DomainError {
 }
 
 class SessionWithoutStartedCertificationError extends DomainError {
-  constructor(
-    message = "Cette session n'a pas débuté, vous ne pouvez pas la finaliser. Vous pouvez néanmoins la supprimer."
-  ) {
+  constructor(message = "This session hasn't started, you can't finalise it. However, you can delete it.") {
     super(message);
+    this.code = 'SESSION_WITHOUT_STARTED_CERTIFICATION';
   }
 }
 
 class SessionWithAbortReasonOnCompletedCertificationCourseError extends DomainError {
   constructor(
-    message = 'Le champ “Raison de l’abandon” a été renseigné pour un candidat qui a terminé son test de certification entre temps. La session ne peut donc pas être finalisée. Merci de rafraîchir la page avant de finaliser.'
+    message = 'The field "Reason for abandonment" has been filled in for a candidate who has finished their certification exam in between. The session therefore can\'t be finalised. Please refresh the page before finalising.'
   ) {
     super(message);
+    this.code = 'SESSION_WITH_ABORT_REASON_ON_COMPLETED_CERTIFICATION_COURSE';
   }
 }
 
@@ -1190,12 +1144,6 @@ class InvalidExternalAPIResponseError extends DomainError {
   }
 }
 
-class CpfBirthInformationValidationError extends DomainError {
-  constructor(message) {
-    super(message);
-  }
-}
-
 class NoOrganizationToAttach extends DomainError {
   constructor(message) {
     super(message);
@@ -1321,7 +1269,7 @@ class InvalidStageError extends DomainError {
   }
 }
 
-module.exports = {
+export {
   LocaleFormatError,
   LocaleNotSupportedError,
   AccountRecoveryDemandNotCreatedError,
@@ -1361,7 +1309,6 @@ module.exports = {
   CertificationAttestationGenerationError,
   CertificationBadgeForbiddenDeletionError,
   CertificationCandidateOnFinalizedSessionError,
-  CertificationCandidateAddError,
   CertificationCandidateAlreadyLinkedToUserError,
   CertificationCandidateByPersonalInfoNotFoundError,
   CertificationCandidateByPersonalInfoTooManyMatchesError,
@@ -1369,9 +1316,10 @@ module.exports = {
   CertificationCandidateDeletionError,
   CertificationCandidateForbiddenDeletionError,
   CertificationCandidateMultipleUserLinksWithinSessionError,
+  CertificationCandidateNotFoundError,
   CertificationCandidatePersonalInfoFieldMissingError,
   CertificationCandidatePersonalInfoWrongFormat,
-  CertificationCandidatesImportError,
+  CertificationCandidatesError,
   CertificationCenterMembershipCreationError,
   CertificationCenterMembershipDisableError,
   CertificationComputeError,
@@ -1385,7 +1333,6 @@ module.exports = {
   ChallengeToBeDeneutralizedNotFoundError,
   CertificationIssueReportAutomaticallyResolvedShouldNotBeUpdatedManually,
   CompetenceResetError,
-  CpfBirthInformationValidationError,
   CsvImportError,
   CsvParsingError,
   DeprecatedCertificationIssueReportCategoryError,
@@ -1486,7 +1433,6 @@ module.exports = {
   UserNotAuthorizedToCreateResourceError,
   UserNotAuthorizedToGenerateUsernamePasswordError,
   UserNotAuthorizedToGetCampaignResultsError,
-  UserNotAuthorizedToGetCertificationCoursesError,
   UserNotAuthorizedToRemoveAuthenticationMethod,
   UserNotAuthorizedToUpdateCampaignError,
   UserNotAuthorizedToUpdatePasswordError,

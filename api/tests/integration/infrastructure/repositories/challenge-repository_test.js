@@ -1,9 +1,9 @@
-const _ = require('lodash');
-const { expect, mockLearningContent, domainBuilder, catchErr } = require('../../../test-helper');
-const Challenge = require('../../../../lib/domain/models/Challenge');
-const Validator = require('../../../../lib/domain/models/Validator');
-const challengeRepository = require('../../../../lib/infrastructure/repositories/challenge-repository');
-const { NotFoundError } = require('../../../../lib/domain/errors');
+import _ from 'lodash';
+import { expect, mockLearningContent, domainBuilder, catchErr } from '../../../test-helper.js';
+import { Challenge } from '../../../../lib/domain/models/Challenge.js';
+import { Validator } from '../../../../lib/domain/models/Validator.js';
+import * as challengeRepository from '../../../../lib/infrastructure/repositories/challenge-repository.js';
+import { NotFoundError } from '../../../../lib/domain/errors.js';
 
 describe('Integration | Repository | challenge-repository', function () {
   describe('#get', function () {
@@ -59,6 +59,213 @@ describe('Integration | Repository | challenge-repository', function () {
       expect(actualChallenge.validator.solution.isT2Enabled).to.equal(true);
       expect(actualChallenge.validator.solution.isT3Enabled).to.equal(false);
       expect(actualChallenge.validator.solution.scoring).to.equal('');
+      expect(actualChallenge.validator.solution.type).to.equal(challenge.type);
+      expect(actualChallenge.validator.solution.value).to.equal(challenge.solution);
+    });
+  });
+
+  describe('#getForPix1D', function () {
+    it('should return an error when the mission is not found', async function () {
+      // given
+      const missionId = 'recCHAL1';
+      const activityLevel = 'didacticiel';
+
+      mockLearningContent({
+        tubes: [],
+      });
+
+      // when
+      const error = await catchErr(challengeRepository.getForPix1D)({ missionId, activityLevel, challengeNumber: 1 });
+
+      // then
+      expect(error).to.be.instanceOf(NotFoundError);
+      expect(error.message).to.equal("Aucune mission trouvée pour l'identifiant : recCHAL1");
+    });
+    it('should return an error when the skill associated to the challenge is not found', async function () {
+      // given
+      const missionId = 'recCHAL1';
+      const activityLevel = 'entrainement';
+      const tubeId = 'tubeId';
+      const tube = _buildTube({ id: tubeId, missionId, name: '@rechercher_didacticiel' });
+      const skill = _buildSkill({ id: 'recSkill1', name: '@rechercher_didacticiel1', tubeId });
+
+      mockLearningContent({
+        skills: [skill],
+        tubes: [tube],
+      });
+
+      // when
+      const error = await catchErr(challengeRepository.getForPix1D)({ missionId, activityLevel, challengeNumber: 1 });
+
+      // then
+      expect(error).to.be.instanceOf(NotFoundError);
+      expect(error.message).to.equal(
+        'Aucun challenge trouvé pour la mission : recCHAL1, le niveau entrainement et le numéro 1'
+      );
+    });
+    it('should return an error when the challenge is not found', async function () {
+      // given
+      const missionId = 'recCHAL1';
+      const activityLevel = 'didacticiel';
+      const tubeId = 'tubeId';
+      const tube = _buildTube({ id: tubeId, missionId, name: '@rechercher_didacticiel' });
+      const skill = _buildSkill({ id: 'recSkill1', name: '@rechercher_didacticiel1', tubeId });
+      const challenge = _buildChallenge({
+        id: 'recChallenge1',
+        name: '@rechercher_didacticiel1',
+        tubeId,
+        skill: { id: 'otherSkillId' },
+      });
+
+      const learningContent = {
+        skills: [skill],
+        challenges: [challenge],
+        tubes: [tube],
+      };
+
+      mockLearningContent(learningContent);
+
+      // when
+      const error = await catchErr(challengeRepository.getForPix1D)({ missionId, activityLevel, challengeNumber: 1 });
+
+      // then
+      expect(error).to.be.instanceOf(NotFoundError);
+      expect(error.message).to.equal(
+        'Aucun challenge trouvé pour la mission : recCHAL1, le niveau didacticiel et le numéro 1'
+      );
+    });
+    it('should return the challenge with the correct activityLevel', async function () {
+      //given
+      const missionId = 'recCHAL1';
+      const activityLevel = 'entrainement';
+      const activiteDidacticiel = _buildTube({
+        id: 'activiteDidacticielId',
+        missionId,
+        name: '@rechercher_didacticiel',
+      });
+      const activiteEntrainement = _buildTube({
+        id: 'activiteEntrainementId',
+        missionId,
+        name: '@rechercher_entrainement',
+      });
+      const acquisDidacticiel = _buildSkill({
+        id: 'recSkill1',
+        name: '@rechercher_didacticiel1',
+        tubeId: activiteDidacticiel.id,
+      });
+      const acquisEntrainement = _buildSkill({
+        id: 'recSkill2',
+        name: '@rechercher_entrainement1',
+        tubeId: activiteEntrainement.id,
+      });
+
+      const epreuveDidacticiel = _buildChallenge({ id: 'challengeId1', skill: { id: acquisDidacticiel.id } });
+      const epreuveEntrainement = _buildChallenge({ id: 'challengeId2', skill: { id: acquisEntrainement.id } });
+
+      const learningContent = {
+        tubes: [activiteDidacticiel, activiteEntrainement],
+        challenges: [epreuveDidacticiel, epreuveEntrainement],
+        skills: [acquisDidacticiel, acquisEntrainement],
+      };
+
+      mockLearningContent(learningContent);
+
+      const expectedChallenge = {
+        ...domainBuilder.buildChallenge({ id: epreuveEntrainement.id }),
+        skill: undefined,
+      };
+
+      // when
+      const actualChallenge = await challengeRepository.getForPix1D({ missionId, activityLevel, challengeNumber: 1 });
+
+      // then
+      expect(actualChallenge).to.be.instanceOf(Challenge);
+      expect(_.omit(actualChallenge, ['validator', 'skill', 'focused', 'timer'])).to.deep.equal(
+        _.omit(expectedChallenge, ['validator', 'skill', 'focused', 'timer'])
+      );
+    });
+    it('should return the challenge for the given missionId', async function () {
+      //given
+      const missionId = 'recCHAL1';
+      const otherMissionId = 'recOTMI1';
+      const activityLevel = 'entrainement';
+
+      const activiteEntrainement = _buildTube({
+        id: 'activiteEntrainementId',
+        missionId,
+        name: '@rechercher_entrainement',
+      });
+      const activiteEntrainementAutreMission = _buildTube({
+        id: 'activiteEntrainementId',
+        missionId: otherMissionId,
+        name: '@rechercher_entrainement',
+      });
+      const acquisEntrainementAutreMission = _buildSkill({
+        id: 'recSkill1',
+        name: '@rechercher_didacticiel1',
+        tubeId: activiteEntrainementAutreMission.id,
+      });
+      const acquisEntrainement = _buildSkill({
+        id: 'recSkill2',
+        name: '@rechercher_entrainement1',
+        tubeId: activiteEntrainement.id,
+      });
+
+      const epreuveEntrainementAutreMission = _buildChallenge({
+        id: 'challengeId1',
+        skill: { id: acquisEntrainementAutreMission.id },
+      });
+      const epreuveEntrainement = _buildChallenge({ id: 'challengeId2', skill: { id: acquisEntrainement.id } });
+
+      const learningContent = {
+        tubes: [activiteEntrainementAutreMission, activiteEntrainement],
+        challenges: [epreuveEntrainementAutreMission, epreuveEntrainement],
+        skills: [acquisEntrainementAutreMission, acquisEntrainement],
+      };
+
+      mockLearningContent(learningContent);
+
+      const expectedChallenge = {
+        ...domainBuilder.buildChallenge({ id: epreuveEntrainement.id }),
+        skill: undefined,
+      };
+
+      // when
+      const actualChallenge = await challengeRepository.getForPix1D({ missionId, activityLevel, challengeNumber: 1 });
+
+      // then
+      expect(actualChallenge).to.be.instanceOf(Challenge);
+      expect(_.omit(actualChallenge, ['validator', 'skill', 'focused', 'timer'])).to.deep.equal(
+        _.omit(expectedChallenge, ['validator', 'skill', 'focused', 'timer'])
+      );
+    });
+    it('should return the correct validor for the challenge type', async function () {
+      // given
+      const missionId = 'recCHAL1';
+      const activityLevel = 'didacticiel';
+      const tubeId = 'tubeId';
+      const tube = _buildTube({ id: tubeId, missionId, name: '@rechercher_didacticiel' });
+      const skill = _buildSkill({ id: 'recSkill1', name: '@rechercher_didacticiel1', tubeId });
+
+      const challenge = _buildChallenge({ id: 'challengeId', skill: { id: skill.id } });
+
+      const learningContent = {
+        skills: [skill],
+        challenges: [challenge],
+        tubes: [tube],
+      };
+
+      mockLearningContent(learningContent);
+
+      domainBuilder.buildChallenge({ id: challenge.id, type: challenge.type });
+
+      // when
+      const actualChallenge = await challengeRepository.getForPix1D({ missionId, activityLevel, challengeNumber: 1 });
+
+      // then
+
+      expect(actualChallenge.validator).to.be.instanceOf(Validator);
+      expect(actualChallenge.validator.solution.id).to.equal(challenge.id);
       expect(actualChallenge.validator.solution.type).to.equal(challenge.type);
       expect(actualChallenge.validator.solution.value).to.equal(challenge.solution);
     });
@@ -445,6 +652,106 @@ describe('Integration | Repository | challenge-repository', function () {
     });
   });
 
+  describe('#findFlashCompatible', function () {
+    beforeEach(function () {
+      // given
+      const skill = domainBuilder.buildSkill({ id: 'recSkill1' });
+      const locales = ['fr-fr'];
+      const activeChallenge = domainBuilder.buildChallenge({
+        id: 'activeChallenge',
+        skill,
+        status: 'validé',
+        locales,
+      });
+      const archivedChallenge = domainBuilder.buildChallenge({
+        id: 'archivedChallenge',
+        skill,
+        status: 'archivé',
+        locales,
+      });
+      const outdatedChallenge = domainBuilder.buildChallenge({
+        id: 'outdatedChallenge',
+        skill,
+        status: 'périmé',
+        locales,
+      });
+      const learningContent = {
+        skills: [{ ...skill, status: 'actif', level: skill.difficulty }],
+        challenges: [
+          { ...activeChallenge, skillId: 'recSkill1', alpha: 3.57, delta: -8.99 },
+          { ...archivedChallenge, skillId: 'recSkill1', alpha: 3.2, delta: 1.06 },
+          { ...outdatedChallenge, skillId: 'recSkill1', alpha: 4.1, delta: -2.08 },
+        ],
+      };
+      mockLearningContent(learningContent);
+    });
+
+    context('without requesting obsolete challenges', function () {
+      it('should return all flash compatible challenges with skills', async function () {
+        // given
+        const locale = 'fr-fr';
+
+        // when
+        const actualChallenges = await challengeRepository.findFlashCompatible({
+          locale,
+        });
+
+        // then
+        expect(actualChallenges).to.have.lengthOf(2);
+        expect(actualChallenges[0]).to.be.instanceOf(Challenge);
+        expect(actualChallenges[0]).to.deep.contain({
+          status: 'validé',
+        });
+        expect(actualChallenges[1]).to.deep.contain({
+          status: 'archivé',
+        });
+      });
+
+      it('should allow overriding success probability threshold default value', async function () {
+        // given
+        const successProbabilityThreshold = 0.75;
+
+        // when
+        const actualChallenges = await challengeRepository.findActiveFlashCompatible({
+          locale: 'fr-fr',
+          successProbabilityThreshold,
+        });
+
+        // then
+        expect(actualChallenges).to.have.lengthOf(1);
+        expect(actualChallenges[0]).to.be.instanceOf(Challenge);
+        expect(actualChallenges[0].minimumCapability).to.equal(-8.682265465359073);
+      });
+    });
+
+    context('when requesting obsolete challenges', function () {
+      it('should return all flash compatible challenges with skills', async function () {
+        // given
+        const locale = 'fr-fr';
+
+        // when
+        const actualChallenges = await challengeRepository.findFlashCompatible({
+          locale,
+          useObsoleteChallenges: true,
+        });
+
+        // then
+        expect(actualChallenges).to.have.lengthOf(3);
+        expect(actualChallenges[0]).to.be.instanceOf(Challenge);
+        expect(actualChallenges[0]).to.deep.contain({
+          status: 'validé',
+        });
+        expect(actualChallenges[1]).to.deep.contain({
+          status: 'archivé',
+        });
+
+        expect(actualChallenges[2]).to.deep.contain({
+          status: 'périmé',
+        });
+      });
+    });
+  });
+
   describe('#findActiveFlashCompatible', function () {
     beforeEach(function () {
       // given
@@ -482,9 +789,13 @@ describe('Integration | Repository | challenge-repository', function () {
     it('should return only flash compatible challenges with skills', async function () {
       // given
       const locale = 'fr-fr';
+      const successProbabilityThreshold = 0.95;
 
       // when
-      const actualChallenges = await challengeRepository.findActiveFlashCompatible({ locale });
+      const actualChallenges = await challengeRepository.findActiveFlashCompatible({
+        locale,
+        successProbabilityThreshold,
+      });
 
       // then
       expect(actualChallenges).to.have.lengthOf(1);
@@ -638,17 +949,27 @@ describe('Integration | Repository | challenge-repository', function () {
   });
 });
 
-function _buildSkill({ id }) {
+function _buildSkill({ id, name = '@sau6', tubeId = 'recTUB123' }) {
   return {
     competenceId: 'recCOMP123',
     id,
-    name: '@sau6',
+    name,
     pixValue: 3,
-    tubeId: 'recTUB123',
+    tubeId,
     tutorialIds: [],
     version: 1,
     status: 'actif',
     level: 1,
+  };
+}
+
+function _buildTube({ id, name, missionId }) {
+  return {
+    id,
+    name,
+    title: 'My title',
+    thematicId: missionId,
+    skillIds: [],
   };
 }
 
@@ -677,5 +998,6 @@ function _buildChallenge({ id, skill, status = 'validé' }) {
     alpha: 1,
     delta: 0,
     skill,
+    shuffled: false,
   };
 }

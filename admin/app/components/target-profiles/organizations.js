@@ -1,6 +1,6 @@
 import { action } from '@ember/object';
 import Component from '@glimmer/component';
-import { inject as service } from '@ember/service';
+import { service } from '@ember/service';
 import uniq from 'lodash/uniq';
 import { tracked } from '@glimmer/tracking';
 
@@ -8,9 +8,14 @@ export default class Organizations extends Component {
   @service store;
   @service notifications;
   @service router;
+  @service currentUser;
 
   @tracked organizationsToAttach = '';
   @tracked existingTargetProfile = '';
+
+  get isSuperAdminOrMetier() {
+    return this.currentUser.adminMember.isSuperAdmin || this.currentUser.adminMember.isMetier;
+  }
 
   get isDisabledAttachOrganizationsFromExistingTargetProfile() {
     return this.existingTargetProfile === '';

@@ -1,14 +1,13 @@
-const {
+import {
   CertificationCandidateByPersonalInfoTooManyMatchesError,
-  CertificationCandidateAddError,
   CertificationCandidateOnFinalizedSessionError,
-  CpfBirthInformationValidationError,
-} = require('../errors.js');
+  CertificationCandidatesError,
+} from '../errors.js';
 
-module.exports = async function addCertificationCandidateToSession({
+const addCertificationCandidateToSession = async function ({
   sessionId,
   certificationCandidate,
-  complementaryCertifications,
+  complementaryCertification,
   sessionRepository,
   certificationCandidateRepository,
   certificationCpfService,
@@ -27,7 +26,7 @@ module.exports = async function addCertificationCandidateToSession({
   try {
     certificationCandidate.validate(isSco);
   } catch (error) {
-    throw CertificationCandidateAddError.fromInvalidCertificationCandidateError(error);
+    throw new CertificationCandidatesError(error);
   }
 
   const duplicateCandidates = await certificationCandidateRepository.findBySessionIdAndPersonalInfo({
@@ -50,15 +49,20 @@ module.exports = async function addCertificationCandidateToSession({
   });
 
   if (cpfBirthInformation.hasFailed()) {
-    throw new CpfBirthInformationValidationError(cpfBirthInformation.firstErrorMessage);
+    throw new CertificationCandidatesError({
+      code: cpfBirthInformation.firstErrorCode,
+      meta: { ...cpfBirthInformation },
+    });
   }
 
   certificationCandidate.updateBirthInformation(cpfBirthInformation);
 
-  certificationCandidate.complementaryCertifications = complementaryCertifications;
+  certificationCandidate.complementaryCertification = complementaryCertification;
 
   return await certificationCandidateRepository.saveInSession({
     certificationCandidate,
     sessionId: certificationCandidate.sessionId,
   });
 };
+
+export { addCertificationCandidateToSession };

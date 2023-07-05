@@ -1,10 +1,13 @@
-const { PassThrough } = require('stream');
-const { expect, sinon, domainBuilder, streamToPromise, catchErr } = require('../../../test-helper');
-const startWritingCampaignAssessmentResultsToStream = require('../../../../lib/domain/usecases/start-writing-campaign-assessment-results-to-stream');
-const { UserNotAuthorizedToGetCampaignResultsError, CampaignTypeError } = require('../../../../lib/domain/errors');
-const campaignCsvExportService = require('../../../../lib/domain/services/campaign-csv-export-service');
-const { getI18n } = require('../../../tooling/i18n/i18n');
-const StageCollection = require('../../../../lib/domain/models/user-campaign-results/StageCollection');
+import stream from 'stream';
+
+const { PassThrough } = stream;
+
+import { expect, sinon, domainBuilder, streamToPromise, catchErr } from '../../../test-helper.js';
+import { startWritingCampaignAssessmentResultsToStream } from '../../../../lib/domain/usecases/start-writing-campaign-assessment-results-to-stream.js';
+import { UserNotAuthorizedToGetCampaignResultsError, CampaignTypeError } from '../../../../lib/domain/errors.js';
+import * as campaignCsvExportService from '../../../../lib/domain/services/campaign-csv-export-service.js';
+import { getI18n } from '../../../tooling/i18n/i18n.js';
+import { StageCollection } from '../../../../lib/domain/models/user-campaign-results/StageCollection.js';
 
 describe('Unit | Domain | Use Cases | start-writing-campaign-assessment-results-to-stream', function () {
   const campaignRepository = { get: () => undefined };
@@ -110,6 +113,7 @@ describe('Unit | Domain | Use Cases | start-writing-campaign-assessment-results-
     const csvExpected =
       '\uFEFF"Nom de l\'organisation";' +
       '"ID Campagne";' +
+      '"Code";' +
       '"Nom de la campagne";' +
       '"Parcours";' +
       '"Nom du Participant";' +
@@ -177,6 +181,7 @@ describe('Unit | Domain | Use Cases | start-writing-campaign-assessment-results-
     const csvExpected =
       '\uFEFF"Nom de l\'organisation";' +
       '"ID Campagne";' +
+      '"Code";' +
       '"Nom de la campagne";' +
       '"Parcours";' +
       '"Nom du Participant";' +
@@ -240,6 +245,7 @@ describe('Unit | Domain | Use Cases | start-writing-campaign-assessment-results-
     const csvExpected =
       '\uFEFF"Nom de l\'organisation";' +
       '"ID Campagne";' +
+      '"Code";' +
       '"Nom de la campagne";' +
       '"Parcours";' +
       '"Nom du Participant";' +
@@ -302,6 +308,7 @@ describe('Unit | Domain | Use Cases | start-writing-campaign-assessment-results-
     const csvExpected =
       '\uFEFF"Nom de l\'organisation";' +
       '"ID Campagne";' +
+      '"Code";' +
       '"Nom de la campagne";' +
       '"Parcours";' +
       '"Nom du Participant";' +
@@ -373,6 +380,7 @@ describe('Unit | Domain | Use Cases | start-writing-campaign-assessment-results-
     const csvExpected =
       '\uFEFF"Nom de l\'organisation";' +
       '"ID Campagne";' +
+      '"Code";' +
       '"Nom de la campagne";' +
       '"Parcours";' +
       '"Nom du Participant";' +
@@ -444,6 +452,7 @@ describe('Unit | Domain | Use Cases | start-writing-campaign-assessment-results-
     const csvExpected =
       '\uFEFF"Nom de l\'organisation";' +
       '"ID Campagne";' +
+      '"Code";' +
       '"Nom de la campagne";' +
       '"Parcours";' +
       '"Nom du Participant";' +
@@ -507,6 +516,7 @@ describe('Unit | Domain | Use Cases | start-writing-campaign-assessment-results-
       const csvExpected =
         '\uFEFF"Nom de l\'organisation";' +
         '"ID Campagne";' +
+        '"Code";' +
         '"Nom de la campagne";' +
         '"Parcours";' +
         '"Nom du Participant";' +
@@ -570,6 +580,7 @@ describe('Unit | Domain | Use Cases | start-writing-campaign-assessment-results-
       const csvExpected =
         '\uFEFF"Nom de l\'organisation";' +
         '"ID Campagne";' +
+        '"Code";' +
         '"Nom de la campagne";' +
         '"Parcours";' +
         '"Nom du Participant";' +
@@ -653,6 +664,7 @@ describe('Unit | Domain | Use Cases | start-writing-campaign-assessment-results-
     const csvHeaderExpected =
       '\uFEFF"Nom de l\'organisation";' +
       '"ID Campagne";' +
+      '"Code";' +
       '"Nom de la campagne";' +
       '"Parcours";' +
       '"Nom du Participant";' +
@@ -673,6 +685,7 @@ describe('Unit | Domain | Use Cases | start-writing-campaign-assessment-results-
     const csvParticipantResultExpected =
       `"${organization.name}";` +
       `${campaign.id};` +
+      `"${campaign.code}";` +
       `"${campaign.name}";` +
       `"${targetProfile.name}";` +
       `"${participantInfo.participantLastName}";` +
@@ -707,6 +720,7 @@ describe('Unit | Domain | Use Cases | start-writing-campaign-assessment-results-
       campaignCsvExportService,
       stageCollectionRepository,
     });
+
     const csv = await csvPromise;
 
     // then

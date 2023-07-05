@@ -1,7 +1,6 @@
-const Session = require('../../../../lib/domain/models/Session');
-const { expect, sinon } = require('../../../test-helper');
-const _ = require('lodash');
-const { domainBuilder } = require('../../../test-helper');
+import { Session } from '../../../../lib/domain/models/Session.js';
+import { expect, sinon, domainBuilder } from '../../../test-helper.js';
+import _ from 'lodash';
 
 const SESSION_PROPS = [
   'id',
@@ -23,6 +22,7 @@ const SESSION_PROPS = [
   'certificationCenterId',
   'assignedCertificationOfficerId',
   'supervisorPassword',
+  'version',
 ];
 
 describe('Unit | Domain | Models | Session', function () {

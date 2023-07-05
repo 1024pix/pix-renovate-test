@@ -1,8 +1,8 @@
-const { expect, sinon, catchErr, domainBuilder } = require('../../../test-helper');
-const { CertificationCandidateAlreadyLinkedToUserError } = require('../../../../lib/domain/errors');
-const importCertificationCandidatesFromCandidatesImportSheet = require('../../../../lib/domain/usecases/import-certification-candidates-from-candidates-import-sheet');
-const DomainTransaction = require('../../../../lib/infrastructure/DomainTransaction');
-const { getI18n } = require('../../../tooling/i18n/i18n');
+import { expect, sinon, catchErr, domainBuilder } from '../../../test-helper.js';
+import { CertificationCandidateAlreadyLinkedToUserError } from '../../../../lib/domain/errors.js';
+import { importCertificationCandidatesFromCandidatesImportSheet } from '../../../../lib/domain/usecases/import-certification-candidates-from-candidates-import-sheet.js';
+import { DomainTransaction } from '../../../../lib/infrastructure/DomainTransaction.js';
+import { getI18n } from '../../../tooling/i18n/i18n.js';
 const i18n = getI18n();
 
 describe('Unit | UseCase | import-certification-candidates-from-attendance-sheet', function () {
@@ -77,11 +77,10 @@ describe('Unit | UseCase | import-certification-candidates-from-attendance-sheet
           // given
           const sessionId = 'sessionId';
           const odsBuffer = 'buffer';
-          const complementaryCertifications = [
-            domainBuilder.buildComplementaryCertification(),
-            domainBuilder.buildComplementaryCertification(),
-          ];
-          const certificationCandidate = domainBuilder.buildCertificationCandidate({ complementaryCertifications });
+          const complementaryCertification = domainBuilder.buildComplementaryCertification();
+          const certificationCandidate = domainBuilder.buildCertificationCandidate({
+            complementaryCertification,
+          });
           const certificationCandidates = [certificationCandidate];
 
           sessionRepository.isSco.resolves(false);
@@ -126,7 +125,6 @@ describe('Unit | UseCase | import-certification-candidates-from-attendance-sheet
           });
           expect(certificationCandidateRepository.saveInSession).to.have.been.calledWith({
             certificationCandidate,
-            complementaryCertifications,
             sessionId,
             domainTransaction,
           });

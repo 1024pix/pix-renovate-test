@@ -1,5 +1,5 @@
 import Model, { attr } from '@ember-data/model';
-import { inject as service } from '@ember/service';
+import { service } from '@ember/service';
 
 export default class CertificationCandidate extends Model {
   @service intl;
@@ -20,11 +20,7 @@ export default class CertificationCandidate extends Model {
   @attr('string') sex;
   @attr('string') billingMode;
   @attr('string') prepaymentCode;
-  @attr complementaryCertifications;
-
-  get complementaryCertificationsList() {
-    return this.complementaryCertifications.map(({ label }) => label).join(', ');
-  }
+  @attr complementaryCertification;
 
   get genderLabel() {
     const candidateGender = this.sex;

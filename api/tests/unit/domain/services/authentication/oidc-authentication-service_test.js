@@ -1,24 +1,109 @@
-const { expect, sinon, catchErr } = require('../../../../test-helper');
-const settings = require('../../../../../lib/config');
+import { expect, sinon, catchErr } from '../../../../test-helper.js';
+import { config as settings } from '../../../../../lib/config.js';
 
-const OidcAuthenticationService = require('../../../../../lib/domain/services/authentication/oidc-authentication-service');
-const jsonwebtoken = require('jsonwebtoken');
-const httpAgent = require('../../../../../lib/infrastructure/http/http-agent');
-const AuthenticationSessionContent = require('../../../../../lib/domain/models/AuthenticationSessionContent');
-const {
+import { OidcAuthenticationService } from '../../../../../lib/domain/services/authentication/oidc-authentication-service.js';
+import jsonwebtoken from 'jsonwebtoken';
+import { httpAgent } from '../../../../../lib/infrastructure/http/http-agent.js';
+import { AuthenticationSessionContent } from '../../../../../lib/domain/models/AuthenticationSessionContent.js';
+
+import {
   InvalidExternalAPIResponseError,
   OidcInvokingTokenEndpointError,
   OidcMissingFieldsError,
   OidcUserInfoFormatError,
-} = require('../../../../../lib/domain/errors');
-const DomainTransaction = require('../../../../../lib/infrastructure/DomainTransaction');
-const UserToCreate = require('../../../../../lib/domain/models/UserToCreate');
-const AuthenticationMethod = require('../../../../../lib/domain/models/AuthenticationMethod');
-const OidcIdentityProviders = require('../../../../../lib/domain/constants/oidc-identity-providers');
-const monitoringTools = require('../../../../../lib/infrastructure/monitoring-tools');
-const { OIDC_ERRORS } = require('../../../../../lib/domain/constants');
+} from '../../../../../lib/domain/errors.js';
+
+import { DomainTransaction } from '../../../../../lib/infrastructure/DomainTransaction.js';
+import { UserToCreate } from '../../../../../lib/domain/models/UserToCreate.js';
+import { AuthenticationMethod } from '../../../../../lib/domain/models/AuthenticationMethod.js';
+import * as OidcIdentityProviders from '../../../../../lib/domain/constants/oidc-identity-providers.js';
+import { monitoringTools } from '../../../../../lib/infrastructure/monitoring-tools.js';
+import { OIDC_ERRORS } from '../../../../../lib/domain/constants.js';
 
 describe('Unit | Domain | Services | oidc-authentication-service', function () {
+  describe('#isReady', function () {
+    describe('when configKey is set', function () {
+      describe('when enabled in config', function () {
+        describe('when config is valid', function () {
+          it('returns true', function () {
+            // given
+            settings.someOidcProviderService = {
+              isEnabled: true,
+              clientId: 'anId',
+              clientSecret: 'aSecret',
+              authenticationUrl: 'https://example.net',
+              userInfoUrl: 'https://example.net',
+              tokenUrl: 'https://example.net',
+              aProperty: 'aValue',
+            };
+            const oidcAuthenticationService = new OidcAuthenticationService({
+              configKey: 'someOidcProviderService',
+              additionalRequiredProperties: ['aProperty'],
+            });
+
+            // when
+            const result = oidcAuthenticationService.isReady;
+
+            // then
+            expect(result).to.be.true;
+          });
+        });
+
+        describe('when config is invalid', function () {
+          it('returns false', function () {
+            // given
+            settings.someOidcProviderService = {
+              isEnabled: true,
+            };
+            const oidcAuthenticationService = new OidcAuthenticationService({
+              configKey: 'someOidcProviderService',
+            });
+
+            // when
+            const result = oidcAuthenticationService.isReady;
+
+            // then
+            expect(result).to.be.false;
+          });
+        });
+      });
+
+      describe('when not enabled in config', function () {
+        it('returns false', function () {
+          // given
+          settings.someOidcProviderService = {
+            isEnabled: false,
+          };
+          const oidcAuthenticationService = new OidcAuthenticationService({
+            configKey: 'someOidcProviderService',
+          });
+
+          // when
+          const result = oidcAuthenticationService.isReady;
+
+          // then
+          expect(result).to.be.false;
+        });
+      });
+    });
+
+    describe('when configKey is not set', function () {
+      it('returns false', function () {
+        // given
+        settings.someOidcProviderService = {
+          isEnabled: true,
+        };
+        const oidcAuthenticationService = new OidcAuthenticationService({});
+
+        // when
+        const result = oidcAuthenticationService.isReady;
+
+        // then
+        expect(result).to.be.false;
+      });
+    });
+  });
+
   describe('#createAccessToken', function () {
     it('should create access token with user id', function () {
       // given
@@ -556,7 +641,7 @@ describe('Unit | Domain | Services | oidc-authentication-service', function () {
       const userId = 1;
       userToCreateRepository.create.withArgs({ user, domainTransaction }).resolves({ id: userId });
 
-      const identityProvider = OidcIdentityProviders.CNAV.service.code;
+      const identityProvider = OidcIdentityProviders.CNAV.code;
       const expectedAuthenticationMethod = new AuthenticationMethod({
         identityProvider,
         externalIdentifier: externalIdentityId,

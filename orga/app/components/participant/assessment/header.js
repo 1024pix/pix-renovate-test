@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { inject as service } from '@ember/service';
+import { service } from '@ember/service';
 
 export default class Header extends Component {
   @service intl;
@@ -34,5 +34,9 @@ export default class Header extends Component {
         models: [this.args.campaign.id, this.args.participation.id],
       },
     ];
+  }
+
+  get percentage() {
+    return Math.round(this.args.participation.masteryRate * 100);
   }
 }

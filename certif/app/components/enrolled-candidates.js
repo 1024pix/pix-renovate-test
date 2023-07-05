@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { inject as service } from '@ember/service';
+import { service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import EmberObject, { action } from '@ember/object';
 import get from 'lodash/get';
@@ -164,7 +164,7 @@ export default class EnrolledCandidates extends Component {
       extraTimePercentage: certificationCandidateData.extraTimePercentage,
       billingMode: certificationCandidateData.billingMode,
       prepaymentCode: this._trimOrUndefinedIfFalsy(certificationCandidateData.prepaymentCode),
-      complementaryCertifications: certificationCandidateData.complementaryCertifications,
+      complementaryCertification: certificationCandidateData.complementaryCertification,
     });
   }
 
@@ -178,8 +178,14 @@ export default class EnrolledCandidates extends Component {
     this._handleSavingError(errorText, certificationCandidate);
   }
 
-  _handleEntityValidationError(certificationCandidate, err) {
-    const errorText = get(err, 'errors[0].detail');
+  _handleEntityValidationError(certificationCandidate, errorResponse) {
+    let errorText = this.intl.t(`common.api-error-messages.internal-server-error`);
+    const error = errorResponse?.errors?.[0];
+    if (error?.code) {
+      errorText = this.intl.t(`common.api-error-messages.certification-candidate.${error.code}`, {
+        ...error?.meta,
+      });
+    }
     this._handleSavingError(errorText, certificationCandidate);
   }
 

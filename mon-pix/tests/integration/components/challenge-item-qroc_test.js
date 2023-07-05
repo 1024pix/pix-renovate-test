@@ -1,7 +1,6 @@
 import { module, test } from 'qunit';
 import setupIntlRenderingTest from '../../helpers/setup-intl-rendering';
-// eslint-disable-next-line no-restricted-imports
-import { find, render } from '@ember/test-helpers';
+import { render } from '@1024pix/ember-testing-library';
 import { hbs } from 'ember-cli-htmlbars';
 
 module('Integration | Component | Challenge item QROC', function (hooks) {
@@ -32,17 +31,17 @@ module('Integration | Component | Challenge item QROC', function (hooks) {
       this.set('challenge', {
         timer: false,
         format: 'paragraphe',
-        proposals: '${myInput}',
+        proposals: 'mon label: ${myInput}',
       });
       this.set('answer', {});
 
       // when
-      await render(
+      const screen = await render(
         hbs`<ChallengeItemQroc @challenge={{this.challenge}} @answer={{this.answer}} @assessment={{this.assessment}} />`
       );
 
       // then
-      assert.strictEqual(find('.challenge-response__proposal--paragraph').tagName, 'TEXTAREA');
+      assert.dom(screen.getByRole('textbox', { name: 'mon label:' })).exists();
     });
   });
 
@@ -52,17 +51,18 @@ module('Integration | Component | Challenge item QROC', function (hooks) {
       this.set('challenge', {
         timer: false,
         format: 'phrase',
-        proposals: '${myInput}',
+        proposals: 'mon label: ${myInput}',
       });
       this.set('answer', {});
 
       // when
-      await render(
+      const screen = await render(
         hbs`<ChallengeItemQroc @challenge={{this.challenge}} @answer={{this.answer}} @assessment={{this.assessment}} />`
       );
 
       // then
-      assert.strictEqual(find('.challenge-response__proposal--sentence').tagName, 'INPUT');
+      assert.dom(screen.getByRole('textbox', { name: 'mon label:' })).exists();
+      assert.dom(screen.getByRole('textbox', { name: 'mon label:' })).hasAttribute('type', 'text');
     });
   });
 
@@ -72,17 +72,18 @@ module('Integration | Component | Challenge item QROC', function (hooks) {
       this.set('challenge', {
         timer: false,
         format: 'nombre',
-        proposals: '${myInput}',
+        proposals: 'mon label: ${myInput}',
       });
       this.set('answer', {});
 
       // when
-      await render(
+      const screen = await render(
         hbs`<ChallengeItemQroc  @challenge={{this.challenge}} @answer={{this.answer}} @assessment={{this.assessment}} />`
       );
 
       // then
-      assert.strictEqual(find('[id="qroc_input"]').getAttribute('type'), 'number');
+      assert.dom(screen.getByRole('spinbutton', { name: 'mon label:' })).exists();
+      assert.dom(screen.getByRole('spinbutton', { name: 'mon label:' })).hasAttribute('type', 'number');
     });
   });
 
@@ -97,20 +98,18 @@ module('Integration | Component | Challenge item QROC', function (hooks) {
         this.set('challenge', {
           timer: false,
           format: data.format,
-          proposals: '${myInput}',
+          proposals: 'mon label: ${myInput}',
         });
         this.set('answer', {});
 
         // when
-        await render(
+        const screen = await render(
           hbs`<ChallengeItemQroc @challenge={{this.challenge}} @answer={{this.answer}} @assessment={{this.assessment}} />`
         );
 
         // then
-        assert.dom('.challenge-response__proposal--paragraph').doesNotExist();
-        assert.dom('.challenge-response__proposal--sentence').doesNotExist();
-        assert.strictEqual(find('.challenge-response__proposal').tagName, 'INPUT');
-        assert.strictEqual(find('.challenge-response__proposal').getAttribute('size'), data.expectedSize);
+        assert.dom(screen.getByRole('textbox', { name: 'mon label:' })).exists();
+        assert.dom(screen.getByRole('textbox', { name: 'mon label:' })).hasAttribute('size', data.expectedSize);
       });
     });
   });
@@ -128,17 +127,17 @@ module('Integration | Component | Challenge item QROC', function (hooks) {
           this.set('challenge', {
             timer: false,
             format: data.format,
-            proposals: '${myInput}',
+            proposals: 'mon label: ${myInput}',
           });
           this.set('answer', { value: '' });
 
           // when
-          await render(
+          const screen = await render(
             hbs`<ChallengeItemQroc  @challenge={{this.challenge}} @answer={{this.answer}} @assessment={{this.assessment}}/>`
           );
 
           // then
-          assert.strictEqual(find(data.cssClass).getAttribute('autocomplete'), 'nope');
+          assert.dom(screen.getByRole('textbox', { name: 'mon label:' })).hasAttribute('autocomplete', 'nope');
         });
       });
 
@@ -148,17 +147,17 @@ module('Integration | Component | Challenge item QROC', function (hooks) {
           this.set('challenge', {
             timer: false,
             format: data.format,
-            proposals: '${myInput}',
+            proposals: 'mon label: ${myInput}',
           });
           this.set('answer', { value: 'myValue' });
 
           // when
-          await render(
+          const screen = await render(
             hbs`<ChallengeItemQroc @challenge={{this.challenge}} @answer={{this.answer}} @assessment={{this.assessment}}/>`
           );
 
           // then
-          assert.strictEqual(find(data.cssClass).value, 'myValue');
+          assert.strictEqual(screen.getByRole('textbox', { name: 'mon label:' }).value, 'myValue');
         });
       });
 
@@ -178,17 +177,17 @@ module('Integration | Component | Challenge item QROC', function (hooks) {
             this.set('challenge', {
               timer: false,
               format: data.format,
-              proposals: '${myInput}',
+              proposals: 'mon label: ${myInput}',
             });
             this.set('answer', { value: input });
 
             // when
-            await render(
+            const screen = await render(
               hbs`<ChallengeItemQroc @challenge={{this.challenge}} @answer={{this.answer}} @assessment={{this.assessment}} />`
             );
 
             // then
-            assert.strictEqual(find(data.cssClass).value, output);
+            assert.strictEqual(screen.getByRole('textbox', { name: 'mon label:' }).value, output);
           });
         });
       });
@@ -201,17 +200,17 @@ module('Integration | Component | Challenge item QROC', function (hooks) {
       this.set('challenge', {
         timer: false,
         format: 'mots',
-        proposals: '${myInput value="c\'est prérempli !!!"}',
+        proposals: 'mon label: ${myInput value="c\'est prérempli !!!"}',
       });
       this.set('answer', {});
 
       // when
-      await render(
+      const screen = await render(
         hbs`<ChallengeItemQroc @challenge={{this.challenge}} @answer={{this.answer}} @assessment={{this.assessment}} />`
       );
 
       // then
-      assert.strictEqual(find('.challenge-response__proposal').value, "c'est prérempli !!!");
+      assert.strictEqual(screen.getByRole('textbox', { name: 'mon label:' }).value, "c'est prérempli !!!");
     });
 
     test('should prefill number input with default value', async function (assert) {
@@ -219,17 +218,17 @@ module('Integration | Component | Challenge item QROC', function (hooks) {
       this.set('challenge', {
         timer: false,
         format: 'nombre',
-        proposals: '${myInput value=42}',
+        proposals: 'mon label: ${myInput value=42}',
       });
       this.set('answer', {});
 
       // when
-      await render(
+      const screen = await render(
         hbs`<ChallengeItemQroc @challenge={{this.challenge}} @answer={{this.answer}} @assessment={{this.assessment}} />`
       );
 
       // then
-      assert.strictEqual(find('.pix-input__input--default').value, '42');
+      assert.strictEqual(screen.getByRole('spinbutton', { name: 'mon label:' }).value, '42');
     });
   });
 });

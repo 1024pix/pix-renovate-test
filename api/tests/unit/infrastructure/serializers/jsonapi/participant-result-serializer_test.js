@@ -1,8 +1,8 @@
-const { expect, domainBuilder } = require('../../../../test-helper');
-const serializer = require('../../../../../lib/infrastructure/serializers/jsonapi/participant-result-serializer');
-const AssessmentResult = require('../../../../../lib/domain/read-models/participant-results/AssessmentResult');
-const KnowledgeElement = require('../../../../../lib/domain/models/KnowledgeElement');
-const StageCollection = require('../../../../../lib/domain/models/user-campaign-results/StageCollection');
+import { expect, domainBuilder } from '../../../../test-helper.js';
+import * as serializer from '../../../../../lib/infrastructure/serializers/jsonapi/participant-result-serializer.js';
+import { AssessmentResult } from '../../../../../lib/domain/read-models/participant-results/AssessmentResult.js';
+import { KnowledgeElement } from '../../../../../lib/domain/models/KnowledgeElement.js';
+import { StageCollection } from '../../../../../lib/domain/models/user-campaign-results/StageCollection.js';
 
 describe('Unit | Serializer | JSON API | participant-result-serializer', function () {
   context('#serialize', function () {
@@ -75,6 +75,7 @@ describe('Unit | Serializer | JSON API | participant-result-serializer', functio
           isAlwaysVisible: true,
           isCertifiable: false,
           isValid: true,
+          acquisitionPercentage: null,
         },
       ];
     });
@@ -168,6 +169,7 @@ describe('Unit | Serializer | JSON API | participant-result-serializer', functio
               'is-always-visible': true,
               'is-certifiable': false,
               'is-valid': true,
+              'acquisition-percentage': null,
             },
             id: '3',
             type: 'campaignParticipationBadges',

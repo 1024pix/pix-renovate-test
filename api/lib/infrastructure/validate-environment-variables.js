@@ -1,4 +1,4 @@
-const Joi = require('joi');
+import Joi from 'joi';
 
 const schema = Joi.object({
   REDIS_URL: Joi.string().uri().optional(),
@@ -58,11 +58,11 @@ const schema = Joi.object({
 }).options({ allowUnknown: true });
 
 const validateEnvironmentVariables = function () {
-  // eslint-disable-next-line node/no-process-env
+  // eslint-disable-next-line n/no-process-env
   const { error } = schema.validate(process.env);
   if (error) {
     throw new Error('Configuration is invalid: ' + error.message + ', but was: ' + error.details[0].context.value);
   }
 };
 
-module.exports = validateEnvironmentVariables;
+export { validateEnvironmentVariables };

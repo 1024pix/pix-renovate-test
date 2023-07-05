@@ -2,7 +2,7 @@ import Controller from '@ember/controller';
 import { action } from '@ember/object';
 // eslint-disable-next-line ember/no-computed-properties-in-native-classes
 import { alias } from '@ember/object/computed';
-import { inject as service } from '@ember/service';
+import { service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
 export default class SessionsNewController extends Controller {
@@ -31,10 +31,13 @@ export default class SessionsNewController extends Controller {
     if (this.checkMissingSessionFields()) return;
     try {
       await this.session.save();
-    } catch (error) {
-      const status = error?.errors?.[0]?.status;
+    } catch (responseError) {
+      const error = responseError?.errors?.[0];
 
-      if (status === '400') {
+      if (error?.code) {
+        return this.notifications.error(this.intl.t(`common.api-error-messages.${error.code}`));
+      }
+      if (error?.status === '400') {
         return this.notifications.error(this.intl.t('common.api-error-messages.bad-request-error'));
       }
       return this.notifications.error(this.intl.t('common.api-error-messages.internal-server-error'));

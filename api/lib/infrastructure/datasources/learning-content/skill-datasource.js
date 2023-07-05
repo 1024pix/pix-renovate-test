@@ -1,5 +1,5 @@
-const _ = require('lodash');
-const datasource = require('./datasource.js');
+import _ from 'lodash';
+import * as datasource from './datasource.js';
 
 const ACTIVE_STATUS = 'actif';
 const OPERATIVE_STATUSES = ['actif', 'archivé'];
@@ -10,6 +10,14 @@ const skillDatasource = datasource.extend({
   async findActive() {
     const skills = await this.list();
     return _.filter(skills, { status: ACTIVE_STATUS });
+  },
+
+  async findAllByName(name) {
+    const skills = await this.list();
+    const filteredSkills = _.filter(skills, function (skill) {
+      return _.isEqual(skill.name, name);
+    });
+    return filteredSkills;
   },
 
   async findOperative() {
@@ -61,4 +69,4 @@ const skillDatasource = datasource.extend({
   },
 });
 
-module.exports = { skillDatasource };
+export { skillDatasource };

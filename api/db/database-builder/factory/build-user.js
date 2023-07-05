@@ -1,21 +1,22 @@
-const isNil = require('lodash/isNil');
-const isUndefined = require('lodash/isUndefined');
+import lodash from 'lodash';
+const { isUndefined, isNil } = lodash;
 
-const databaseBuffer = require('../database-buffer');
+import { databaseBuffer } from '../database-buffer.js';
+import { AuthenticationMethod } from '../../../lib/domain/models/AuthenticationMethod.js';
+import { NON_OIDC_IDENTITY_PROVIDERS } from '../../../lib/domain/constants/identity-providers.js';
+import { Membership } from '../../../lib/domain/models/Membership.js';
 
-const AuthenticationMethod = require('../../../lib/domain/models/AuthenticationMethod');
-const Membership = require('../../../lib/domain/models/Membership');
+import * as encrypt from '../../../lib/domain/services/encryption-service.js';
 
-const encrypt = require('../../../lib/domain/services/encryption-service');
+import { buildPixAdminRole } from './build-pix-admin-role.js';
+import { buildOrganization } from './build-organization.js';
+import { buildMembership } from './build-membership.js';
+import { buildCertificationCenter } from './build-certification-center.js';
+import { buildCertificationCenterMembership } from './build-certification-center-membership.js';
+import { DEFAULT_PASSWORD } from '../../seeds/data/users-builder.js';
+import { PIX_ADMIN } from '../../../lib/domain/constants.js';
 
-const buildPixAdminRole = require('./build-pix-admin-role');
-const buildOrganization = require('./build-organization');
-const buildMembership = require('./build-membership');
-const buildCertificationCenter = require('./build-certification-center');
-const buildCertificationCenterMembership = require('./build-certification-center-membership');
-
-const { DEFAULT_PASSWORD } = require('../../seeds/data/users-builder');
-const { ROLES } = require('../../../lib/domain/constants').PIX_ADMIN;
+const { ROLES } = PIX_ADMIN;
 
 function _buildPixAuthenticationMethod({
   id = databaseBuffer.getNextId(),
@@ -31,7 +32,7 @@ function _buildPixAuthenticationMethod({
   const values = {
     id,
     userId,
-    identityProvider: AuthenticationMethod.identityProviders.PIX,
+    identityProvider: NON_OIDC_IDENTITY_PROVIDERS.PIX.code,
     authenticationComplement: new AuthenticationMethod.PixAuthenticationComplement({
       password: hashedPassword,
       shouldChangePassword,
@@ -402,4 +403,4 @@ buildUser.withCertificationCenterMembership = function buildUserWithCertificatio
   return user;
 };
 
-module.exports = buildUser;
+export { buildUser };

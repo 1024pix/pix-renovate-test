@@ -1,6 +1,6 @@
-const { domainBuilder, sinon, hFake, expect } = require('../../../test-helper');
-const usecases = require('../../../../lib/domain/usecases/index.js');
-const sessionWithCleaCertifiedCandidateController = require('../../../../lib/application/sessions/session-with-clea-certified-candidate-controller');
+import { domainBuilder, sinon, hFake, expect } from '../../../test-helper.js';
+import { usecases } from '../../../../lib/domain/usecases/index.js';
+import { sessionWithCleaCertifiedCandidateController } from '../../../../lib/application/sessions/session-with-clea-certified-candidate-controller.js';
 
 describe('Unit | Controller | session-with-clea-certified-candidate', function () {
   describe('#getCleaCertifiedCandidateDataCsv', function () {
@@ -15,22 +15,22 @@ describe('Unit | Controller | session-with-clea-certified-candidate', function (
       const cleaCertifiedCandidates = [
         domainBuilder.buildCleaCertifiedCandidate({ createdAt: new Date('2021-01-01') }),
       ];
+      const dependencies = {
+        getCleaCertifiedCandidateCsv: sinon.stub(),
+      };
 
       sinon
         .stub(usecases, 'getCleaCertifiedCandidateBySession')
         .withArgs({ sessionId: 1 })
         .resolves({ session, cleaCertifiedCandidateData: cleaCertifiedCandidates });
 
-      const certificationResultUtils = {
-        getCleaCertifiedCandidateCsv: sinon.stub(),
-      };
-      certificationResultUtils.getCleaCertifiedCandidateCsv.withArgs(cleaCertifiedCandidates).resolves('csv-string');
+      dependencies.getCleaCertifiedCandidateCsv.withArgs({ cleaCertifiedCandidates }).resolves('csv-string');
 
       // when
       const response = await sessionWithCleaCertifiedCandidateController.getCleaCertifiedCandidateDataCsv(
         request,
         hFake,
-        { certificationResultUtils }
+        dependencies
       );
 
       // then

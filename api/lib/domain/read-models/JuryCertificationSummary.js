@@ -1,4 +1,4 @@
-const { status: assessmentResultStatuses } = require('../models/AssessmentResult.js');
+import { status as assessmentResultStatuses } from '../models/AssessmentResult.js';
 const STARTED = 'started';
 const ENDED_BY_SUPERVISOR = 'endedBySupervisor';
 
@@ -16,7 +16,7 @@ class JuryCertificationSummary {
     isCancelled,
     isEndedBySupervisor,
     hasSeenEndTestScreen,
-    complementaryCertificationTakenLabels,
+    complementaryCertificationTakenLabel,
     certificationIssueReports,
   } = {}) {
     this.id = id;
@@ -26,7 +26,7 @@ class JuryCertificationSummary {
     this.isCancelled = isCancelled;
     this.pixScore = pixScore;
     this.isFlaggedAborted = Boolean(abortReason) && !completedAt;
-    this.complementaryCertificationTakenLabels = complementaryCertificationTakenLabels;
+    this.complementaryCertificationTakenLabel = complementaryCertificationTakenLabel;
     this.createdAt = createdAt;
     this.completedAt = completedAt;
     this.isPublished = isPublished;
@@ -58,6 +58,8 @@ function _getStatus({ status, isEndedBySupervisor }) {
 
   return status;
 }
+const statuses = { ...assessmentResultStatuses, STARTED, ENDED_BY_SUPERVISOR };
 
-module.exports = JuryCertificationSummary;
-module.exports.statuses = { ...assessmentResultStatuses, STARTED, ENDED_BY_SUPERVISOR };
+JuryCertificationSummary.statuses = statuses;
+
+export { JuryCertificationSummary, statuses };

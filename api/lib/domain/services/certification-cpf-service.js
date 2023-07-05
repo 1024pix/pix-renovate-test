@@ -1,6 +1,9 @@
-const { normalizeAndSortChars } = require('../../infrastructure/utils/string-utils.js');
-const isEmpty = require('lodash/isEmpty');
-const { CERTIFICATION_CANDIDATES_ERRORS } = require('../constants/certification-candidates-errors');
+import { normalizeAndSortChars } from '../../infrastructure/utils/string-utils.js';
+import lodash from 'lodash';
+
+const { isEmpty } = lodash;
+
+import { CERTIFICATION_CANDIDATES_ERRORS } from '../constants/certification-candidates-errors.js';
 
 const CpfValidationStatus = {
   FAILURE: 'FAILURE',
@@ -38,6 +41,10 @@ class CpfBirthInformationValidation {
 
   get firstErrorMessage() {
     return this.errors?.[0]?.message;
+  }
+
+  get firstErrorCode() {
+    return this.errors?.[0]?.code;
   }
 }
 
@@ -145,7 +152,12 @@ async function getBirthInformation({
   certificationCpfCountryRepository,
   certificationCpfCityRepository,
 }) {
-  const cpfBirthInformationValidation = new CpfBirthInformationValidation();
+  const cpfBirthInformationValidation = new CpfBirthInformationValidation({
+    birthCountry,
+    birthCity,
+    birthPostalCode,
+    birthINSEECode,
+  });
 
   if (!birthCountry && !birthINSEECode && !birthPostalCode && !birthCity) {
     cpfBirthInformationValidation.failure({
@@ -238,8 +250,4 @@ function _getActualCity(cities) {
   return actualCity.name;
 }
 
-module.exports = {
-  getBirthInformation,
-  CpfBirthInformationValidation,
-  CpfValidationStatus,
-};
+export { getBirthInformation, CpfBirthInformationValidation, CpfValidationStatus };

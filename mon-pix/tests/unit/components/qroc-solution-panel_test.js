@@ -8,11 +8,12 @@ module('Unit | Component | qroc-solution-panel', function (hooks) {
   setupIntl(hooks);
   const rightAnswer = { result: 'ok' };
   const wrongAnswer = { result: 'ko' };
+  const skippedAnswer = { result: 'aband' };
 
   module('#isNotCorrectlyAnswered', function () {
     test('should return false when result is ok', function (assert) {
       // given
-      const component = createGlimmerComponent('component:qroc-solution-panel', { answer: rightAnswer });
+      const component = createGlimmerComponent('qroc-solution-panel', { answer: rightAnswer });
       // when
       const isNotCorrectlyAnswered = component.isNotCorrectlyAnswered;
       // then
@@ -21,7 +22,7 @@ module('Unit | Component | qroc-solution-panel', function (hooks) {
 
     test('should return true when result is not ok', function (assert) {
       // given
-      const component = createGlimmerComponent('component:qroc-solution-panel', { answer: wrongAnswer });
+      const component = createGlimmerComponent('qroc-solution-panel', { answer: wrongAnswer });
       // when
       const isNotCorrectlyAnswered = component.isNotCorrectlyAnswered;
       // then
@@ -35,7 +36,7 @@ module('Unit | Component | qroc-solution-panel', function (hooks) {
       const answer = {
         value: '#ABAND#',
       };
-      const component = createGlimmerComponent('component:qroc-solution-panel', { answer });
+      const component = createGlimmerComponent('qroc-solution-panel', { answer });
       // when
       const answerToDisplay = component.answerToDisplay;
 
@@ -48,7 +49,7 @@ module('Unit | Component | qroc-solution-panel', function (hooks) {
       const answer = {
         value: 'La Reponse B',
       };
-      const component = createGlimmerComponent('component:qroc-solution-panel', { answer });
+      const component = createGlimmerComponent('qroc-solution-panel', { answer });
       // when
       const answerToDisplay = component.answerToDisplay;
 
@@ -61,7 +62,7 @@ module('Unit | Component | qroc-solution-panel', function (hooks) {
     test('should return the first solution if the solution has some variants', function (assert) {
       // given
       const solution = 'Reponse\nreponse\nréponse';
-      const component = createGlimmerComponent('component:qroc-solution-panel', { solution });
+      const component = createGlimmerComponent('qroc-solution-panel', { solution });
       // when
       const solutionToDisplay = component.understandableSolution;
 
@@ -72,7 +73,7 @@ module('Unit | Component | qroc-solution-panel', function (hooks) {
     test('should return the solution', function (assert) {
       // given
       const solution = 'Reponse';
-      const component = createGlimmerComponent('component:qroc-solution-panel', { solution });
+      const component = createGlimmerComponent('qroc-solution-panel', { solution });
       // when
       const solutionToDisplay = component.understandableSolution;
 
@@ -83,7 +84,7 @@ module('Unit | Component | qroc-solution-panel', function (hooks) {
     test('should return an empty string if the solution is null', function (assert) {
       // given
       const emptySolution = '';
-      const component = createGlimmerComponent('component:qroc-solution-panel', { solution: emptySolution });
+      const component = createGlimmerComponent('qroc-solution-panel', { solution: emptySolution });
       // when
       const solutionToDisplay = component.understandableSolution;
 
@@ -94,12 +95,41 @@ module('Unit | Component | qroc-solution-panel', function (hooks) {
     test('should return an empty string if the solution is an empty String', function (assert) {
       // given
       const solutionNull = null;
-      const component = createGlimmerComponent('component:qroc-solution-panel', { solution: solutionNull });
+      const component = createGlimmerComponent('qroc-solution-panel', { solution: solutionNull });
       // when
       const solutionToDisplay = component.understandableSolution;
 
       // then
       assert.strictEqual(solutionToDisplay, '');
+    });
+  });
+
+  module('#inputAriaLabel', function () {
+    test('should return specific aria label if answer is  ok', function (assert) {
+      // given
+      const component = createGlimmerComponent('qroc-solution-panel', { answer: rightAnswer });
+      // when
+      const inputAriaLabel = component.inputAriaLabel;
+      // then
+      assert.strictEqual(inputAriaLabel, 'La réponse donnée est valide');
+    });
+
+    test('should return specific aria label if answer is ko', function (assert) {
+      // given
+      const component = createGlimmerComponent('qroc-solution-panel', { answer: wrongAnswer });
+      // when
+      const inputAriaLabel = component.inputAriaLabel;
+      // then
+      assert.strictEqual(inputAriaLabel, 'La réponse donnée est fausse');
+    });
+
+    test('should return specific aria label if answer is skipped', function (assert) {
+      // given
+      const component = createGlimmerComponent('qroc-solution-panel', { answer: skippedAnswer });
+      // when
+      const inputAriaLabel = component.inputAriaLabel;
+      // then
+      assert.strictEqual(inputAriaLabel, 'Question passée');
     });
   });
 });

@@ -1,15 +1,15 @@
-const jsYaml = require('js-yaml');
-const { applyPreTreatments, applyTreatments } = require('./validation-treatments.js');
-const { YamlParsingError } = require('../../domain/errors.js');
-const { getEnabledTreatments, useLevenshteinRatio } = require('./services-utils.js');
-const { validateAnswer } = require('./string-comparison-service.js');
-
-const AnswerStatus = require('../models/AnswerStatus.js');
+import jsYaml from 'js-yaml';
+import { applyPreTreatments, applyTreatments } from './validation-treatments.js';
+import { YamlParsingError } from '../../domain/errors.js';
+import { getEnabledTreatments, useLevenshteinRatio } from './services-utils.js';
+import { validateAnswer } from './string-comparison-service.js';
+import { AnswerStatus } from '../models/AnswerStatus.js';
+import { Validation } from '../models/index.js';
 
 function applyTreatmentsToSolutions(solutions, enabledTreatments) {
   return Object.fromEntries(
-    Object.entries(solutions).map(([solutionGroup, acceptedSolutions]) => [
-      solutionGroup,
+    Object.entries(solutions).map(([solutionKey, acceptedSolutions]) => [
+      solutionKey,
       acceptedSolutions.map((acceptedSolution) => applyTreatments(acceptedSolution.toString(), enabledTreatments)),
     ])
   );
@@ -21,7 +21,7 @@ function applyTreatmentsToAnswers(answers, enabledTreatments) {
   );
 }
 
-function formatResult(scoring, numberOfGoodAnswers, nbOfAnswers) {
+function getAnswerStatus(scoring, numberOfGoodAnswers, nbOfAnswers) {
   if (!scoring || Object.keys(scoring).length === 0) {
     return numberOfGoodAnswers === nbOfAnswers ? AnswerStatus.OK : AnswerStatus.KO;
   } else {
@@ -39,40 +39,35 @@ function formatResult(scoring, numberOfGoodAnswers, nbOfAnswers) {
   }
 }
 
-function getNumberOfGoodAnswers(treatedAnswers, treatedSolutions, enabledTreatments) {
-  return getAnswersStatuses(treatedAnswers, treatedSolutions, enabledTreatments).filter(({ status }) => status === 'ok')
-    .length;
+function getNumberOfGoodAnswers(treatedAnswers, treatedSolutions, enabledTreatments, solutions) {
+  return getCorrectionDetails(treatedAnswers, treatedSolutions, enabledTreatments, solutions).answersEvaluation.filter(
+    Boolean
+  ).length;
 }
 
-function getAnswersStatuses(treatedAnswers, treatedSolutions, enabledTreatments) {
+function getSolutionsWithoutGoodAnswers(remainingUnmatchedSolutions) {
+  return Object.values(remainingUnmatchedSolutions).map((availableSolutions) => availableSolutions[0]);
+}
+
+function getCorrectionDetails(treatedAnswers, treatedSolutions, enabledTreatments, solutions) {
   const remainingUnmatchedSolutions = new Map(Object.entries(treatedSolutions));
 
-  return Object.values(treatedAnswers)
-    .map((answer) => {
-      for (const [solutionGroup, acceptedSolutions] of remainingUnmatchedSolutions) {
-        const status = validateAnswer(answer, acceptedSolutions, useLevenshteinRatio(enabledTreatments));
-
-        if (status) {
-          remainingUnmatchedSolutions.delete(solutionGroup);
-
-          return { answer, status: 'ok', alternativeSolutions: [] };
-        }
+  const answersEvaluation = Object.values(treatedAnswers).map((answer) => {
+    for (const [solutionKey, acceptedSolutions] of remainingUnmatchedSolutions) {
+      const status = validateAnswer(answer, acceptedSolutions, useLevenshteinRatio(enabledTreatments));
+      if (status) {
+        remainingUnmatchedSolutions.delete(solutionKey);
+        delete solutions[solutionKey];
+        return true;
       }
+    }
+    return false;
+  });
 
-      return { answer, status: 'ko' };
-    })
-    .map((answerAndStatus) => {
-      if (answerAndStatus.status === 'ko') {
-        const alternativeSolutions = getAlternativeSolutions(remainingUnmatchedSolutions);
-        return { ...answerAndStatus, alternativeSolutions };
-      }
-
-      return answerAndStatus;
-    });
-}
-
-function getAlternativeSolutions(remainingUnmatchedSolutions) {
-  return Array.from(remainingUnmatchedSolutions.values()).map((availableSolutions) => availableSolutions[0]);
+  return {
+    answersEvaluation,
+    solutionsWithoutGoodAnswers: answersEvaluation.every(Boolean) ? [] : getSolutionsWithoutGoodAnswers(solutions),
+  };
 }
 
 function convertYamlToJsObjects(preTreatedAnswers, yamlSolution, yamlScoring) {
@@ -94,57 +89,44 @@ function treatAnswersAndSolutions(deactivations, solutions, answers) {
   return { enabledTreatments, treatedSolutions, treatedAnswers };
 }
 
-module.exports = {
-  match({
-    answerValue,
-    solution: { deactivations, scoring: yamlScoring, value: yamlSolution },
-    dependencies = {
-      applyPreTreatments,
-      convertYamlToJsObjects,
-      getEnabledTreatments,
-      treatAnswersAndSolutions,
-    },
-  }) {
-    // Input checking
-    if (typeof answerValue !== 'string' || !answerValue.length || !String(yamlSolution).includes('\n')) {
-      return AnswerStatus.KO;
-    }
-
-    // Pre-Treatments
-    const preTreatedAnswers = dependencies.applyPreTreatments(answerValue);
-    const { answers, solutions, scoring } = dependencies.convertYamlToJsObjects(
-      preTreatedAnswers,
-      yamlSolution,
-      yamlScoring
-    );
-    const { enabledTreatments, treatedSolutions, treatedAnswers } = dependencies.treatAnswersAndSolutions(
-      deactivations,
-      solutions,
-      answers
-    );
-    const numberOfGoodAnswers = getNumberOfGoodAnswers(treatedAnswers, treatedSolutions, enabledTreatments);
-
-    return formatResult(scoring, numberOfGoodAnswers, Object.keys(answers).length);
+const match = function ({
+  answerValue,
+  solution: { deactivations, scoring: yamlScoring, value: yamlSolution },
+  dependencies = {
+    applyPreTreatments,
+    convertYamlToJsObjects,
+    treatAnswersAndSolutions,
   },
+}) {
+  // If challenge is skipped, return ko validation
+  const properlyFormattedYamlSolution = String(yamlSolution).includes('\n');
 
-  getSolution({
-    answerValue,
-    solution: { deactivations, scoring: yamlScoring, value: yamlSolution },
-    dependencies = {
-      applyPreTreatments,
-      convertYamlToJsObjects,
-      treatAnswersAndSolutions,
-    },
-  }) {
-    // Pre-Treatments
-    const preTreatedAnswers = dependencies.applyPreTreatments(answerValue);
-    const { answers, solutions } = dependencies.convertYamlToJsObjects(preTreatedAnswers, yamlSolution, yamlScoring);
-    const { enabledTreatments, treatedSolutions, treatedAnswers } = dependencies.treatAnswersAndSolutions(
-      deactivations,
-      solutions,
-      answers
-    );
+  if (typeof answerValue !== 'string' || !answerValue.length || !properlyFormattedYamlSolution) {
+    return new Validation({ result: AnswerStatus.KO, resultDetails: null });
+  }
 
-    return getAnswersStatuses(treatedAnswers, treatedSolutions, enabledTreatments);
-  },
+  // Pre-Treatments
+  const preTreatedAnswers = dependencies.applyPreTreatments(answerValue);
+  const { answers, solutions, scoring } = dependencies.convertYamlToJsObjects(
+    preTreatedAnswers,
+    yamlSolution,
+    yamlScoring
+  );
+  const { enabledTreatments, treatedSolutions, treatedAnswers } = dependencies.treatAnswersAndSolutions(
+    deactivations,
+    solutions,
+    answers
+  );
+  const numberOfGoodAnswers = getNumberOfGoodAnswers(treatedAnswers, treatedSolutions, enabledTreatments, solutions);
+  const answerStatus = getAnswerStatus(scoring, numberOfGoodAnswers, Object.keys(answers).length);
+
+  return new Validation({
+    result: answerStatus,
+    resultDetails:
+      answerStatus.status !== AnswerStatus.OK.status
+        ? getCorrectionDetails(treatedAnswers, treatedSolutions, enabledTreatments, solutions)
+        : null,
+  });
 };
+
+export { match, getCorrectionDetails };

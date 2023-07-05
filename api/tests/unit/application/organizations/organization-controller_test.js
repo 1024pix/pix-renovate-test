@@ -1,22 +1,14 @@
-const {
-  domainBuilder,
-  expect,
-  generateValidRequestAuthorizationHeader,
-  hFake,
-  sinon,
-} = require('../../../test-helper');
+import { domainBuilder, expect, generateValidRequestAuthorizationHeader, hFake, sinon } from '../../../test-helper.js';
 
-const Organization = require('../../../../lib/domain/models/Organization');
-const OrganizationInvitation = require('../../../../lib/domain/models/OrganizationInvitation');
-const Membership = require('../../../../lib/domain/models/Membership');
-const ScoOrganizationParticipant = require('../../../../lib/domain/read-models/ScoOrganizationParticipant');
-const SupOrganizationParticipant = require('../../../../lib/domain/read-models/SupOrganizationParticipant');
-
-const organizationController = require('../../../../lib/application/organizations/organization-controller.js');
-const usecases = require('../../../../lib/domain/usecases/index.js');
-const queryParamsUtils = require('../../../../lib/infrastructure/utils/query-params-utils');
-
-const { getI18n } = require('../../../tooling/i18n/i18n');
+import { Organization } from '../../../../lib/domain/models/Organization.js';
+import { OrganizationInvitation } from '../../../../lib/domain/models/OrganizationInvitation.js';
+import { Membership } from '../../../../lib/domain/models/Membership.js';
+import { ScoOrganizationParticipant } from '../../../../lib/domain/read-models/ScoOrganizationParticipant.js';
+import { SupOrganizationParticipant } from '../../../../lib/domain/read-models/SupOrganizationParticipant.js';
+import { organizationController } from '../../../../lib/application/organizations/organization-controller.js';
+import { usecases } from '../../../../lib/domain/usecases/index.js';
+import * as queryParamsUtils from '../../../../lib/infrastructure/utils/query-params-utils.js';
+import { getI18n } from '../../../tooling/i18n/i18n.js';
 
 describe('Unit | Application | Organizations | organization-controller', function () {
   let request;
@@ -544,6 +536,7 @@ describe('Unit | Application | Organizations | organization-controller', functio
             attributes: {
               name: 'Super profil cible',
               outdated: false,
+              'created-at': undefined,
             },
           },
         ],
@@ -636,6 +629,7 @@ describe('Unit | Application | Organizations | organization-controller', functio
         query: {
           'sort[participationCount]': 'asc',
           'sort[lastnameSort]': 'asc',
+          'sort[divisionSort]': 'desc',
         },
       };
       usecases.findPaginatedFilteredScoParticipants.resolves({});
@@ -651,6 +645,7 @@ describe('Unit | Application | Organizations | organization-controller', functio
         sort: {
           participationCount: 'asc',
           lastnameSort: 'asc',
+          divisionSort: 'desc',
         },
       });
     });
@@ -1129,6 +1124,7 @@ describe('Unit | Application | Organizations | organization-controller', functio
     it('should return a response with CSV results', async function () {
       // given
       const request = {
+        i18n: getI18n(),
         params: {
           id: 1,
         },
@@ -1148,17 +1144,10 @@ describe('Unit | Application | Organizations | organization-controller', functio
         .withArgs({ organizationId: 1, division: '3èmeA' })
         .resolves(certificationResults);
 
-      const certificationResultUtilsStub = {
-        getDivisionCertificationResultsCsv: sinon.stub(),
-      };
-
-      const dependencies = {
-        certificationResultUtils: certificationResultUtilsStub,
-      };
-
-      certificationResultUtilsStub.getDivisionCertificationResultsCsv
-        .withArgs({ certificationResults })
-        .resolves('csv-string');
+      const dependencies = { getDivisionCertificationResultsCsv: sinon.stub() };
+      dependencies.getDivisionCertificationResultsCsv
+        .withArgs({ division: '3èmeA', certificationResults, i18n: request.i18n })
+        .resolves({ content: 'csv-string', filename: '20190101_resultats_3èmeA.csv' });
 
       // when
       const response = await organizationController.downloadCertificationResults(request, hFake, dependencies);

@@ -1,7 +1,7 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
-import { inject as service } from '@ember/service';
+import { service } from '@ember/service';
 
 const FRANCE_INSEE_CODE = '99100';
 const INSEE_CODE_OPTION = 'insee';
@@ -17,7 +17,7 @@ export default class NewCertificationCandidateModal extends Component {
 
   @tracked isLoading = false;
 
-  get complementaryCertifications() {
+  get complementaryCertificationsHabilitations() {
     return this.currentUser.currentAllowedCertificationCenterAccess?.habilitations;
   }
 
@@ -66,12 +66,8 @@ export default class NewCertificationCandidateModal extends Component {
 
   @action
   updateComplementaryCertification(complementaryCertification) {
-    this.args.candidateData.complementaryCertifications = [];
-
-    const complementaryCertifications = this.args.candidateData.complementaryCertifications;
-
     if (complementaryCertification?.target?.value !== 'none') {
-      complementaryCertifications.addObject(complementaryCertification);
+      this.args.candidateData.complementaryCertification = complementaryCertification;
     }
   }
 

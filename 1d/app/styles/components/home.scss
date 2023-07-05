@@ -1,0 +1,19 @@
+.container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  background-color: #FFF0D6;
+  height: 100vh;
+}
+
+.cards {
+  display : flex;
+}
+
+.logo {
+  margin: 20px;
+}
+
+.instruction {
+  font-size: 1.25rem;
+}

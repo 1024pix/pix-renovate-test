@@ -1,9 +1,12 @@
-const logger = require('../../logger.js');
-const { FileValidationError } = require('../../../../lib/domain/errors.js');
-const { convertDateValue } = require('../../utils/date-utils.js');
-const { headers, emptySession, COMPLEMENTARY_CERTIFICATION_SUFFIX } = require('../../utils/csv/sessions-import.js');
-const { isEmpty } = require('lodash');
-const { checkCsvHeader, parseCsvWithHeader } = require('../../helpers/csv.js');
+import { logger } from '../../logger.js';
+import { FileValidationError } from '../../../../lib/domain/errors.js';
+import { convertDateValue } from '../../utils/date-utils.js';
+import { headers, emptySession, COMPLEMENTARY_CERTIFICATION_SUFFIX } from '../../utils/csv/sessions-import.js';
+import lodash from 'lodash';
+
+const { isEmpty } = lodash;
+
+import { checkCsvHeader, parseCsvWithHeader } from '../../helpers/csv.js';
 
 function _csvFormulaEscapingPrefix(data) {
   const mayBeInterpretedAsFormula = /^[-@=+]/.test(data);
@@ -172,7 +175,7 @@ function _hasSessionIdAndCandidateInformation(data) {
 
 function _getDataFromColumnNames({ expectedHeadersKeys, headers, line }) {
   const data = {};
-  data.complementaryCertifications = _extractComplementaryCertificationLabelsFromLine(line);
+  data.complementaryCertification = _extractComplementaryCertificationLabelFromLine(line);
 
   expectedHeadersKeys.forEach((key) => {
     const headerLabel = headers[key];
@@ -195,29 +198,26 @@ function _getDataFromColumnNames({ expectedHeadersKeys, headers, line }) {
   return data;
 }
 
-function _extractComplementaryCertificationLabelsFromLine(line) {
-  const complementaryCertificationLabels = [];
+function _extractComplementaryCertificationLabelFromLine(line) {
+  let complementaryCertificationLabel = null;
 
   Object.keys(line).map((header) => {
     if (_isComplementaryCertification(header)) {
       const complementaryCertificationValue = line[header];
       if (_isTrueValue(complementaryCertificationValue)) {
-        const complementaryCertificationLabel = _getComplementaryCertificationLabel(
+        complementaryCertificationLabel = _getComplementaryCertificationLabel(
           header,
           COMPLEMENTARY_CERTIFICATION_SUFFIX
         );
-
-        complementaryCertificationLabels.push(complementaryCertificationLabel);
       }
     }
   });
-
-  return complementaryCertificationLabels;
+  return complementaryCertificationLabel;
 }
 
 function _isTrueValue(complementaryCertificationValue) {
   const TRUE_VALUE = 'OUI';
-  return complementaryCertificationValue.trim().toUpperCase() === TRUE_VALUE;
+  return complementaryCertificationValue?.trim().toUpperCase() === TRUE_VALUE;
 }
 
 function _isComplementaryCertification(header) {
@@ -306,7 +306,7 @@ function _createCandidate({
   billingMode,
   prepaymentCode,
   sex,
-  complementaryCertifications,
+  complementaryCertification,
   line,
 }) {
   return {
@@ -324,7 +324,7 @@ function _createCandidate({
     billingMode,
     prepaymentCode,
     sex,
-    complementaryCertifications,
+    complementaryCertification,
     line,
   };
 }
@@ -337,8 +337,4 @@ function serializeLine(lineArray) {
   return lineArray.map(_csvSerializeValue).join(';') + '\n';
 }
 
-module.exports = {
-  serializeLine,
-  deserializeForSessionsImport,
-  deserializeForOrganizationsImport,
-};
+export { serializeLine, deserializeForSessionsImport, deserializeForOrganizationsImport };

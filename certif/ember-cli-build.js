@@ -20,12 +20,11 @@ module.exports = function (defaults) {
     flatpickr: {
       locales: ['fr'],
     },
+    'ember-simple-auth': {
+      useSessionSetupMethod: true,
+    },
     'ember-cli-template-lint': {
       testGenerator: 'qunit',
-    },
-    'ember-dayjs': {
-      locales: ['fr'],
-      plugins: ['customParseFormat'],
     },
   });
 

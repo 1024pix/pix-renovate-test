@@ -1,5 +1,559 @@
 # Pix Changelog
 
+## v4.12.0 (04/07/2023)
+
+
+### :rocket: Amélioration
+- [#6442](https://github.com/1024pix/pix/pull/6442) [FEATURE] api: Modification du mail des résultats de certification (PIX-8239).
+- [#6354](https://github.com/1024pix/pix/pull/6354) [FEATURE] Traduction des CSV des résultats de certification (PIX-8085).
+- [#6482](https://github.com/1024pix/pix/pull/6482) [FEATURE] ajout d'une colonne à la liste de campagnes pour afficher leurs codes (PIX-8477).
+- [#6496](https://github.com/1024pix/pix/pull/6496) [FEATURE] Retourner le nouveau champ areKnowledgeElementsResettable dans l'API.
+- [#6477](https://github.com/1024pix/pix/pull/6477) [FEATURE] Empêcher un challenge d'être enregistré deux fois pendant une certif V3 (PIX-8470).
+
+### :building_construction: Tech
+- [#6497](https://github.com/1024pix/pix/pull/6497) [TECH] Amélioration et correction des certification complémentaire dans les nouveaux seeds (PIX-8506).
+- [#6462](https://github.com/1024pix/pix/pull/6462) [TECH] Nettoyage des erreurs liés à l'ajout d'un candidat à une session de certification (PIX-8445).
+- [#6512](https://github.com/1024pix/pix/pull/6512) [TECH] Vérrouiller la version Node de l'API en v16.
+- [#6488](https://github.com/1024pix/pix/pull/6488) [TECH] Récupération du dernier challenge vu lors d'une reprise de session (PIX-8258).
+- [#6454](https://github.com/1024pix/pix/pull/6454) [TECH] Ajouter des tests au prehandler assessment-authorization (PIX-8022).
+
+### :bug: Correction
+- [#6511](https://github.com/1024pix/pix/pull/6511) [BUGFIX] Réparer l'affichage du lien contenu dans le message de blocage de compte sur Pix App, Orga, Certif, Admin (PIX-8501).
+- [#6510](https://github.com/1024pix/pix/pull/6510) [BUGFIX] Améliorer le texte sur la double mire SSO (PIX-8529).
+- [#6509](https://github.com/1024pix/pix/pull/6509) [BUGFIX] Permettre de revenir dans une organisation PRO après suppression (Pix-8527).
+- [#6505](https://github.com/1024pix/pix/pull/6505) [BUGFIX] Ajouter la possibilité de trier la page élèves par Classe (PIX-8479).
+
+### :coffee: Autre
+- [#6514](https://github.com/1024pix/pix/pull/6514) [BUG] Retirer la colonne Actions de la liste d'Organisations (PIX-8535).
+- [#6292](https://github.com/1024pix/pix/pull/6292) [ADMIN] Permettre de déplacer une méthode de connexion via SSO vers un autre utilisateur (PIX-7738).
+
+## v4.11.0 (29/06/2023)
+
+
+### :boom: BREAKING CHANGE
+- [#6229](https://github.com/1024pix/pix/pull/6229) [BREAKING] Ajouter la fonctionnalité d'activer/désactiver facilement un SSO OIDC (PIX-7749).
+
+### :rocket: Amélioration
+- [#6444](https://github.com/1024pix/pix/pull/6444) [FEATURE] Permettre aux organisation type PRO de supprimer des prescrits (PIX-6616).
+- [#6483](https://github.com/1024pix/pix/pull/6483) [FEATURE] Ajoute le champ areKnowledgeElementsResettable dans la table target-profiles (PIX-8486).
+- [#6491](https://github.com/1024pix/pix/pull/6491) [FEATURE] Ajout du code campagne dans l'export csv des campagnes (PIX-8478).
+- [#6461](https://github.com/1024pix/pix/pull/6461) [FEATURE] Afficher la notion de progressivité sur les résultats thématiques en lacunes non certifiants (PIX-8057).
+- [#6487](https://github.com/1024pix/pix/pull/6487) [FEATURE] Pix1D - Ajouter un bouton de retour vers l'accueil à la page de fin de mission (Pix-8481).
+- [#6457](https://github.com/1024pix/pix/pull/6457) [FEATURE] Enregistrement au fur et à mesure des challenges passés en certif V3 (PIX-8452).
+- [#6320](https://github.com/1024pix/pix/pull/6320) [FEATURE] Retravailler l'accessibilité des signalements de problème en épreuve (PIX-7668).
+- [#6471](https://github.com/1024pix/pix/pull/6471) [FEATURE] Afficher une bannière annonçant l'ouverture de l'import de session en masse sur Pix Certif (PIX-6964).
+- [#6458](https://github.com/1024pix/pix/pull/6458) [FEATURE] Pix1D - Prévenir l'élève s'il n'a pas terminé son activité à la validation (PIX-8281).
+- [#6463](https://github.com/1024pix/pix/pull/6463) [FEATURE] Modifier le texte sur la double mire SSO PIX-8407.
+- [#6448](https://github.com/1024pix/pix/pull/6448) [FEATURE] Ajouter un aria-label sur les liens d'aide sur les épreuves sur Pix-App (PIX-8076).
+
+### :building_construction: Tech
+- [#6411](https://github.com/1024pix/pix/pull/6411) [TECH] Utiliser les nouvelles seeds pour la team xp eval (PIX-8225).
+- [#6492](https://github.com/1024pix/pix/pull/6492) [TECH] Partager la configuration ESLint.
+- [#6401](https://github.com/1024pix/pix/pull/6401) [TECH] Mettre à jour les seeds de la Team Accès (PIX-8208).
+- [#6443](https://github.com/1024pix/pix/pull/6443) [TECH] Créer un jeu de données pour une session demarrée (PIX-8409).
+- [#6455](https://github.com/1024pix/pix/pull/6455) [TECH] Uniformisations des règles de lint de traductions.
+- [#6464](https://github.com/1024pix/pix/pull/6464) [TECH] Supprimer les faux positifs sur les tests automatisés en utilisant VScode (PIX-8663).
+
+### :bug: Correction
+- [#6495](https://github.com/1024pix/pix/pull/6495) [BUGFIX] Rectifier l'alignement des réponses d'un QROCm passé (PIX-8488).
+- [#6500](https://github.com/1024pix/pix/pull/6500) [BUGFIX] Ajout de la version de session pour l'import en masse (PIX-8510).
+- [#6499](https://github.com/1024pix/pix/pull/6499) [BUGFIX] Suppression d'un objet non existant lors de la génération des nouvelles seeds.
+- [#6493](https://github.com/1024pix/pix/pull/6493) [BUGFIX] Trace seulement les vraies erreurs dans l'API (PIX-8484).
+- [#6473](https://github.com/1024pix/pix/pull/6473) [BUGFIX] Corrige le script test:api:watch cassé depuis le passage aux modules ESM.
+
+### :coffee: Autre
+- [#6494](https://github.com/1024pix/pix/pull/6494) [BUMP] Lock file maintenance (api).
+- [#6485](https://github.com/1024pix/pix/pull/6485) [BUMP] Update dependency ember-file-upload to v8 (admin).
+- [#6484](https://github.com/1024pix/pix/pull/6484) [BUMP] Update dependency ember-file-upload to v8 (certif).
+- [#6479](https://github.com/1024pix/pix/pull/6479) [BUMP] Lock file maintenance (dossier racine).
+- [#6478](https://github.com/1024pix/pix/pull/6478) [BUMP] Update dependency mocha to v10 (dossier racine).
+- [#6475](https://github.com/1024pix/pix/pull/6475) [BUMP] Update dependency husky to v8 (dossier racine).
+- [#6474](https://github.com/1024pix/pix/pull/6474) [BUMP] Update dependency lint-staged to v13 (dossier racine).
+- [#6472](https://github.com/1024pix/pix/pull/6472) [BUMP] Update eslint (major).
+- [#6469](https://github.com/1024pix/pix/pull/6469) [CLEANUP] Supprime la version en doublon en haut du changelog.
+
+## v4.10.0 (26/06/2023)
+
+
+### :rocket: Amélioration
+- [#6459](https://github.com/1024pix/pix/pull/6459) [FEATURE] Pix1D - customiser la page de fin de mission (PIX-8417).
+- [#6449](https://github.com/1024pix/pix/pull/6449) [FEATURE] Terminer la session de certif V3 après un nombre précis de questions (PIX-8436).
+- [#6447](https://github.com/1024pix/pix/pull/6447) [FEATURE] Améliorer l'affichage des solutions des QROCm (PIX-6221).
+- [#6453](https://github.com/1024pix/pix/pull/6453) [FEATURE] Afficher les résultats thématiques en lacunes lorsqu'ils sont certifiantes ou non (PIX-8438).
+- [#6445](https://github.com/1024pix/pix/pull/6445) [FEATURE] Utiliser le nouvel algorithme pour choisir les épreuves lors d'une certif v3 (PIX-8426).
+- [#6452](https://github.com/1024pix/pix/pull/6452) [FEATURE] Ajout d'une modale de confirmation quand on détache une orga d'un profil cible (PIX-7030).
+- [#6450](https://github.com/1024pix/pix/pull/6450) [FEATURE] Pix1D - Amélioration de la page d'introduction de mission.
+- [#6439](https://github.com/1024pix/pix/pull/6439) [FEATURE] Création de la page d'accès aux missions (PIX-8283).
+- [#6260](https://github.com/1024pix/pix/pull/6260) [FEATURE] Ajoute le détachement d'un profil cible d'une organisation (PIX-7028).
+- [#6413](https://github.com/1024pix/pix/pull/6413) [FEATURE] Identification de la version des certification-courses (PIX-8273).
+
+### :building_construction: Tech
+- [#6460](https://github.com/1024pix/pix/pull/6460) [TECH] Nettoyage des fichiers de l'ajout de la modale pour détacher un profil cible (PIX-8450).
+- [#6434](https://github.com/1024pix/pix/pull/6434) [TECH] Mise à jour des configurations de vscode.
+- [#6441](https://github.com/1024pix/pix/pull/6441) [TECH] Linter les traduction de Pix Admin.
+- [#6456](https://github.com/1024pix/pix/pull/6456) [TECH] Utiliser les nouveaux imports de services dans Ember.js.
+- [#6436](https://github.com/1024pix/pix/pull/6436) [TECH] Amélioration des tests en utilisant Testing Library (PIX-8412).
+- [#6416](https://github.com/1024pix/pix/pull/6416) [TECH] Monter Pix-UI en version 36.0.0 sur PixApp (PIX-8252).
+- [#6427](https://github.com/1024pix/pix/pull/6427) [TECH] Ajouter une config pour jouer Pix1d sur safari (PIX-8403).
+- [#6446](https://github.com/1024pix/pix/pull/6446) [TECH] Suppression des scripts `dev` des applis fronts.
+- [#6433](https://github.com/1024pix/pix/pull/6433) [TECH] Uniformisation des `scripts` des `package.json`.
+- [#6407](https://github.com/1024pix/pix/pull/6407) [TECH] Faciliter la création de migrations BDD.
+- [#6430](https://github.com/1024pix/pix/pull/6430) [TECH] Refactorer l'utilitaire de barreling.
+- [#6440](https://github.com/1024pix/pix/pull/6440) [TECH] Corriger l'import des fichiers d'un dossier sur Windows. .
+- [#6429](https://github.com/1024pix/pix/pull/6429) [TECH] Remplacer eslint-plugin-node par son successeur eslint-plugin-n.
+
+### :bug: Correction
+- [#6435](https://github.com/1024pix/pix/pull/6435) [BUGFIX] Améliorer le design de l'input sur l'écran de réponse des QROC sur Pix-App (PIX-8316).
+
+### :coffee: Autre
+- [#6468](https://github.com/1024pix/pix/pull/6468) [BUMP] Lock file maintenance (api).
+- [#6466](https://github.com/1024pix/pix/pull/6466) [BUMP] Update node to v16.20.1.
+- [#6467](https://github.com/1024pix/pix/pull/6467) [BUMP] Update dependency hapi-swagger to v17 (api).
+
+## v4.9.0 (21/06/2023)
+
+
+### :rocket: Amélioration
+- [#6384](https://github.com/1024pix/pix/pull/6384) [FEATURE] Afficher les corrections QROCM-dep sous les champs en erreur (PIX-8263).
+- [#6385](https://github.com/1024pix/pix/pull/6385) [FEATURE] Traduire les erreurs lors de la création d'un candidat via la modale sur Pix Certif (PIX-8320).
+
+### :building_construction: Tech
+- [#6414](https://github.com/1024pix/pix/pull/6414) [TECH] Analyser la progression des migrations lors des MEP (PIX-8336).
+- [#6431](https://github.com/1024pix/pix/pull/6431) [TECH] Création des seeds pour la certif next-gen (PIX-8402).
+- [#6426](https://github.com/1024pix/pix/pull/6426) [TECH] Importer automatiquement les databases builders.
+- [#6428](https://github.com/1024pix/pix/pull/6428) [TECH] Corriger la v4.4.0 dans le CHANGELOG .
+
+### :bug: Correction
+- [#6438](https://github.com/1024pix/pix/pull/6438) [BUGFIX] Les signalements ne peuvent plus être ajoutés à la finalisation de la session (PIX-8416).
+- [#6437](https://github.com/1024pix/pix/pull/6437) [BUGFIX] Les métriques systèmes ne sont plus tracées (PIX-8411).
+
+## v4.8.0 (20/06/2023)
+
+
+### :rocket: Amélioration
+- [#6388](https://github.com/1024pix/pix/pull/6388) [FEATURE] Renvoyer le pourcentage d'acquisition d'un Résultat Thématique à la fin d'une campagne (PIX-8058).
+- [#6408](https://github.com/1024pix/pix/pull/6408) [FEATURE] Identification des sessions NextGen en base de données (pix-8374).
+- [#6295](https://github.com/1024pix/pix/pull/6295) [FEATURE] Traduire les erreurs lors de l'import de candidats sur Pix Certif (PIX-7967).
+
+### :building_construction: Tech
+- [#6424](https://github.com/1024pix/pix/pull/6424) [TECH] Renuméroter les ADR.
+- [#6419](https://github.com/1024pix/pix/pull/6419) [TECH] Mise à jour de Pix-UI en V36 sur pix-certif (PIX-8389).
+- [#6415](https://github.com/1024pix/pix/pull/6415) [TECH] Afficher l'avancement des migrations de BDD.
+
+### :bug: Correction
+- [#6412](https://github.com/1024pix/pix/pull/6412) [BUGFIX] QCU: Mention "La bonne réponse est : ..." incorrecte (PIX-8385).
+- [#6398](https://github.com/1024pix/pix/pull/6398) [BUGFIX] Harmoniser la taille des cartes des contenus formatifs (PIX-8349).
+
+## v4.7.0 (16/06/2023)
+
+
+### :building_construction: Tech
+- [#6406](https://github.com/1024pix/pix/pull/6406) [TECH] Revert partiel de la PR 6346 - Passage de mission linéaire Pix1D (PIX-7693).
+- [#6381](https://github.com/1024pix/pix/pull/6381) [TECH] Remplacer le champ isV2Certification par version dans les certification (PIX-8298).
+- [#6399](https://github.com/1024pix/pix/pull/6399) [TECH] Refacto de la méthode privée "#" en "_".
+- [#6403](https://github.com/1024pix/pix/pull/6403) [TECH] Renommer l'application pix1d en 1d (PIX-8373).
+
+### :bug: Correction
+- [#6333](https://github.com/1024pix/pix/pull/6333) [BUGFIX] Corriger les urls de la documentation des Organisations en fonction de certains TAGS (PIX-8271).
+
+## v4.6.0 (15/06/2023)
+
+
+### :rocket: Amélioration
+- [#6396](https://github.com/1024pix/pix/pull/6396) [FEATURE] Ajout du champ challengeId dans la réponse du simulateur d'évaluation.
+
+### :building_construction: Tech
+- [#6397](https://github.com/1024pix/pix/pull/6397) [TECH] Utiliser l'attribut embedHeight pour setter la hauteur d'un embed (PIX-8370).
+
+### :bug: Correction
+- [#6402](https://github.com/1024pix/pix/pull/6402) [BUGFIX] Le select des QROC n'affiche pas sa valeur courante (PIX-8371).
+
+### :coffee: Autre
+- [#6400](https://github.com/1024pix/pix/pull/6400) [BUMP] Mise à jour de @ember/test-helpers et de @ember/qunit sur les applications.
+
+## v4.5.0 (15/06/2023)
+
+
+### :rocket: Amélioration
+- [#6373](https://github.com/1024pix/pix/pull/6373) [FEATURE] Filtrer les épreuves périmées dans les simulateurs (PIX-8328). .
+- [#6352](https://github.com/1024pix/pix/pull/6352) [FEATURE] Ajout de la version dans la DB pour les certification-courses (PIX-8299).
+- [#6369](https://github.com/1024pix/pix/pull/6369) [FEATURE] Script de rollback de migrations des paliers des PC (PIX-8338).
+- [#6266](https://github.com/1024pix/pix/pull/6266) [FEATURE] Empêcher la double soumission des formulaires d'authentification (PIX-8153).
+- [#6361](https://github.com/1024pix/pix/pull/6361) [FEATURE] Amélioration du wording lors de la création d'une campagne d'évaluation (PIX-8293).
+- [#6346](https://github.com/1024pix/pix/pull/6346) [FEATURE] Pix1D - Passage de mission linéaire.
+- [#6348](https://github.com/1024pix/pix/pull/6348) [FEATURE] Améliorer l'accessibilité des images décoratives sur Pix-App (PIX-6815).
+
+### :building_construction: Tech
+- [#6367](https://github.com/1024pix/pix/pull/6367) [TECH] Automatiquement importer les usecases pour leur injecter les dépendances.
+- [#6391](https://github.com/1024pix/pix/pull/6391) [TECH] Remise de l'ancienne requête de publication de sessions en masse (PIX-8365).
+- [#6362](https://github.com/1024pix/pix/pull/6362) [TECH] Mise à jour du changelog après le hotfix 4.2.1.
+- [#6366](https://github.com/1024pix/pix/pull/6366) [TECH] Augmenter le temps d'inactivité du browser sur pix-admin.
+
+### :bug: Correction
+- [#6378](https://github.com/1024pix/pix/pull/6378) [BUGFIX] Utilise un mot de passe statique dans les tests.
+- [#6383](https://github.com/1024pix/pix/pull/6383) [BUGFIX] Informer l'utilisateur de la maintenance sur pix1d (PIX-8336).
+- [#6365](https://github.com/1024pix/pix/pull/6365) [BUGFIX] Un test d'acceptance pix-admin échoue aléatoirement (PIX-8341).
+
+### :coffee: Autre
+- [#6375](https://github.com/1024pix/pix/pull/6375) [BUMP] Update dependency cypress-axe to ^0.14.0 (e2e).
+- [#6374](https://github.com/1024pix/pix/pull/6374) [BUMP] Update nginx Docker tag to v1.25.1.
+- [#6372](https://github.com/1024pix/pix/pull/6372) [BUMP] Lock file maintenance (dossier racine).
+
+## v4.4.0 (13/06/2023)
+
+
+
+### :rocket: Amélioration
+- [#6328](https://github.com/1024pix/pix/pull/6328) [FEATURE] Afficher si l'envoi multiple est dispo dans les paramètres d'une campagne d'évaluation (PIX-8198).
+
+### :building_construction: Tech
+- [#6359](https://github.com/1024pix/pix/pull/6359) [TECH] Trier le fichier index des use-cases.
+
+### :bug: Correction
+- [#6360](https://github.com/1024pix/pix/pull/6360) [BUGFIX] Corrige les jobs pgboss .
+
+## v4.3.1 (13/06/2023)
+
+### :bug: Correction
+- [#6360](https://github.com/1024pix/pix/pull/6360) [BUGFIX] Corrige les jobs pgboss .
+
+## v4.3.0 (13/06/2023)
+
+
+### :rocket: Amélioration
+- [#6306](https://github.com/1024pix/pix/pull/6306) [FEATURE] Design des épreuves avec embed auto dans Pix1D (PIX-8100).
+- [#6338](https://github.com/1024pix/pix/pull/6338) [FEATURE] Ajouter un lien de redirection vers le profil cible dans la liste des campagnes d'une organisation sur Pix Admin(PIX-8145).
+- [#6308](https://github.com/1024pix/pix/pull/6308) [FEATURE] Filtrer les bonnes réponses utilisateurs des solutions (PIX-8147) .
+- [#6344](https://github.com/1024pix/pix/pull/6344) [FEATURE] Ajout de la colonne isV3Pilot dans la table certification-centers (PIX-8249).
+- [#6329](https://github.com/1024pix/pix/pull/6329) [FEATURE] Rapatrie le code de hapi-pino dans l'API.
+- [#6307](https://github.com/1024pix/pix/pull/6307) [FEATURE] Amélioration et ajout d'une barre de défilement au menu utilisateur sur Pix Certif (PIX-8154).
+- [#6300](https://github.com/1024pix/pix/pull/6300) [FEATURE] Script de migration des paliers seuils en niveaux (PIX-8098).
+- [#6309](https://github.com/1024pix/pix/pull/6309) [FEATURE] Améliorer l'accessibilité de la modale de solution des QROC/m (PIX-8189).
+- [#6243](https://github.com/1024pix/pix/pull/6243) [FEATURE] Empêcher la soumission du formulaire d'inscription de Pix App si des erreurs n'ont pas été corrigées (PIX-7815)
+
+### :building_construction: Tech
+- [#6358](https://github.com/1024pix/pix/pull/6358) [TECH] Suppression de déprécations de faker.
+- [#6332](https://github.com/1024pix/pix/pull/6332) [TECH] Proposer l'injection de dépendances pour les répositories.
+- [#6355](https://github.com/1024pix/pix/pull/6355) [TECH] Harmoniser les imports de `data-fetcher`.
+- [#6353](https://github.com/1024pix/pix/pull/6353) [TECH] Supprimer les warnings sinon.stub.
+- [#6238](https://github.com/1024pix/pix/pull/6238) [TECH] Renommage de la certification complémentaire PIX+ Droit Avancé (PIX-7911).
+- [#6323](https://github.com/1024pix/pix/pull/6323) [TECH] Monter de version Ember 4.12 sur PixOrga (PIX-8264).
+- [#6343](https://github.com/1024pix/pix/pull/6343) [TECH] Suppression de dépendances a la racine inutilisés.
+- [#6335](https://github.com/1024pix/pix/pull/6335) [TECH] Utiliser toString() au lieu de .string sur les instances SafeString.
+- [#6325](https://github.com/1024pix/pix/pull/6325) [TECH] Mise à jour du CHANGELOG (PIX-8243)
+
+### :bug: Correction
+- [#6324](https://github.com/1024pix/pix/pull/6324) [BUGFIX] Exiger les données obligatoires sur la route POST /api/certification-courses (PIX-8262).
+- [#6334](https://github.com/1024pix/pix/pull/6334) [BUGFIX] La bonne réponse affichée pour un QCM mélangé n'est pas bonne (PIX-8250).
+- [#6337](https://github.com/1024pix/pix/pull/6337) [BUGFIX] :ambulance: Hotfix v4.2.1.
+- [#6327](https://github.com/1024pix/pix/pull/6327) [BUGFIX] Retourner une erreur dans la méthode getWithComplementaryCertification lorsque le candidat n'existe pas (PIX-8266).
+- [#6322](https://github.com/1024pix/pix/pull/6322) [BUGFIX] Permettre à un candidat éligible mais non inscrit à une certif complémentaire de passer la certification (PIX-8257).
+
+### :coffee: Autre
+- [#6351](https://github.com/1024pix/pix/pull/6351) [BUMP] Lock file maintenance (api).
+- [#6245](https://github.com/1024pix/pix/pull/6245) [BUMP] Update embroider monorepo to v3 (mon-pix) (major).
+- [#6339](https://github.com/1024pix/pix/pull/6339) [BUMP] Update dependency axios to v1 (api).
+- [#6347](https://github.com/1024pix/pix/pull/6347) [DOC] Corriger les entrées du changelog.
+- [#6341](https://github.com/1024pix/pix/pull/6341) [BUMP] Update dependency query-string to v8 (admin).
+- [#6340](https://github.com/1024pix/pix/pull/6340) [BUMP] Update dependency @ls-lint/ls-lint to v2 (api).
+
+## v4.2.1 (08/06/2023)
+
+### :bug: Correction
+- [#6322](https://github.com/1024pix/pix/pull/6322) [BUGFIX] Permettre à un candidat éligible mais non inscrit à une certif complémentaire de passer la certification (PIX-8257)
+
+## v4.2.0 (06/06/2023)
+
+
+### :rocket: Amélioration
+- [#6294](https://github.com/1024pix/pix/pull/6294) [FEATURE] Pix1D - Ajouter la prévisualisation des challenges (PIX-8048)
+- [#6303](https://github.com/1024pix/pix/pull/6303) [FEATURE] Avoir toujours la liste des badges et des logos des éditeurs de CF à jour (PIX-8218).
+- [#6242](https://github.com/1024pix/pix/pull/6242) [FEATURE] Création du endpoint pour la suppression de prescrits (PIX-7948)
+- [#6277](https://github.com/1024pix/pix/pull/6277) [FEATURE] Utiliser les composants du Design System pour les QROC et QROCm sur Pix-App (PIX-8103)
+- [#6293](https://github.com/1024pix/pix/pull/6293) [FEATURE] Batch sur les différents scénarios de simulations (PIX-8197).
+- [#6298](https://github.com/1024pix/pix/pull/6298) [FEATURE] Forcer des compétences dans l'algorithme Flash (PIX-8160)
+- [#6311](https://github.com/1024pix/pix/pull/6311) [FEATURE] Améliorer l'accessibilité du bouton "Réinitialiser" l'embed sur Pix-App (PIX-8074)
+
+### :building_construction: Tech
+- [#6315](https://github.com/1024pix/pix/pull/6315) [TECH] Mise à jour de dépendances vulnérable sur les applications
+- [#6301](https://github.com/1024pix/pix/pull/6301) [TECH] Mettre à jour ember-dayjs dans sa dernière version (PIX-8222)
+- [#6151](https://github.com/1024pix/pix/pull/6151) [TECH] Documenter le choix de l'injection de dépendances
+- [#6304](https://github.com/1024pix/pix/pull/6304) [TECH] Corriger l'alignement des étoiles dans Pix Orga (PIX-7983)
+
+### :bug: Correction
+- [#6310](https://github.com/1024pix/pix/pull/6310) [BUGFIX] Changement de wording pour l'affichage des contenus formatifs (PIX-8157).
+- [#6313](https://github.com/1024pix/pix/pull/6313) [BUGFIX] Corriger la création de campagne à envoi multiple (PIX-8238)
+
+### :coffee: Autre
+- [#6321](https://github.com/1024pix/pix/pull/6321) [BUMP] Update dependency inquirer to v9 (api)
+- [#6319](https://github.com/1024pix/pix/pull/6319) [BUMP] Update dependency file-type to v18 (api)
+- [#6318](https://github.com/1024pix/pix/pull/6318) [BUMP] Update dependency pino-pretty to v10 (api)
+- [#6214](https://github.com/1024pix/pix/pull/6214) [BUMP] Update dependency pg-boss to v9 (api)
+- [#6312](https://github.com/1024pix/pix/pull/6312) [BUMP] Mise à jour des dépendances vulnérables sur admin 
+
+## v4.1.3 (08/06/2023)
+
+
+### :bug: Correction
+ - [#6322](https://github.com/1024pix/pix/pull/6322) [BUGFIX] Permettre à un candidat éligible mais non inscrit à une certif complémentaire de passer la certification (PIX-8257)
+
+## v4.1.2 (05/06/2023)
+
+
+### :bug: Correction
+- [#6314](https://github.com/1024pix/pix/pull/6314) [TECH] Gestion de langue manquante sur le kit superviseur (PIX-8243)
+
+## v4.1.1 (01/06/2023)
+
+
+### :building_construction: Tech
+- [#6302](https://github.com/1024pix/pix/pull/6302) [TECH] Revert le ticket Améliorer le style visuel du bloc d'embed d'une épreuve (PIX-8112)
+
+## v4.1.0 (01/06/2023)
+
+
+### :rocket: Amélioration
+- [#6299](https://github.com/1024pix/pix/pull/6299) [FEATURE] Toujours afficher le résultat en pourcentage d'une campagne (PIX-7986)
+- [#6272](https://github.com/1024pix/pix/pull/6272) [FEATURE] Améliorer le style visuel du bloc d'embed d'une épreuve (PIX-8112).
+- [#6291](https://github.com/1024pix/pix/pull/6291) [FEATURE] Améliorer l'a11y de la page de lancement d'une épreuve chronométrée (PIX-7670).
+- [#6297](https://github.com/1024pix/pix/pull/6297) [FEATURE] Creation d'un script pour l'envoi des emails de resultat de certification (PIX-8211)
+- [#6276](https://github.com/1024pix/pix/pull/6276) [FEATURE] Arrêter la mission au 1er challenge échoué ou passé (PIX-8181)
+- [#6265](https://github.com/1024pix/pix/pull/6265) [FEATURE] Traduire le Kit surveillant en anglais (PIX-6688)
+- [#6283](https://github.com/1024pix/pix/pull/6283) [FEATURE] Afficher des corrections claires pour les QROCM-dep (PIX-7866)
+- [#6287](https://github.com/1024pix/pix/pull/6287) [FEATURE] Ajout d'une capacité initiale dans les simulateurs d'évaluation (PIX-8159).
+- [#6264](https://github.com/1024pix/pix/pull/6264) [FEATURE] Traduction d'éléments encore non traduits sur Pix Certif (PIX-8027).
+- [#6263](https://github.com/1024pix/pix/pull/6263) [FEATURE] Reporter le texte des pages SCO de Pix Certif dans des clés de traduction (PIX-8023).
+- [#6145](https://github.com/1024pix/pix/pull/6145) [FEATURE] Suppression de l'heure de fin de session de la feuille d'émargement et import de candidat (PIX-7836)
+- [#6262](https://github.com/1024pix/pix/pull/6262) [FEATURE] Améliorer le style visuel de la recommendation des contenus formatifs (PIX-7667).
+- [#6269](https://github.com/1024pix/pix/pull/6269) [FEATURE] Ajout d'une condition d’arrêt au scénario
+- [#6271](https://github.com/1024pix/pix/pull/6271) [FEATURE] Suppression du filtre du status des challenges pour les simulateurs (PIX-8173).
+- [#6275](https://github.com/1024pix/pix/pull/6275) [FEATURE] Remplacement de AnswerStatus par la réponse dans les simulateurs (PIX-8179).
+- [#6274](https://github.com/1024pix/pix/pull/6274) [FEATURE] Indiquer la réussite/l'échec d'une épreuve Pix1D dans une modale
+
+### :building_construction: Tech
+- [#6285](https://github.com/1024pix/pix/pull/6285) [TECH] Mis à jour des instanciations des Chart sur PixOrga (PIX-8186)
+- [#6296](https://github.com/1024pix/pix/pull/6296) [TECH] Supprime les dépendances chai-dom et eslint-plugin-mocha de mon-pix
+- [#6289](https://github.com/1024pix/pix/pull/6289) [TECH] Remplacement des termes answers/simulationAnswers par answerStatus (pix-8183)
+- [#6290](https://github.com/1024pix/pix/pull/6290) [TECH] Mise à jour de ember-fontawesome en version 1.0.0
+- [#6282](https://github.com/1024pix/pix/pull/6282) [TECH] Supprime l'orb slack de la configuration de circleci
+- [#6273](https://github.com/1024pix/pix/pull/6273) [TECH] Supprime un fichier inutile a la racine
+- [#6235](https://github.com/1024pix/pix/pull/6235) [TECH] Persister les données créées par le tooling des seeds à chaque fin d'appel (PIX-8107)
+- [#6083](https://github.com/1024pix/pix/pull/6083) [TECH] Migre pix1d sur embroider (PIX-7764)
+- [#6279](https://github.com/1024pix/pix/pull/6279) [TECH] Mise à jour de ember-dayjs
+- [#6282](https://github.com/1024pix/pix/pull/6282) [TECH] Supprime l'orb slack de la configuration de circleci
+
+### :bug: Correction
+- [#6288](https://github.com/1024pix/pix/pull/6288) [BUGFIX] Ajouter le i18n à la méthode publishInBatch (PIX-8187).
+- [#6267](https://github.com/1024pix/pix/pull/6267) [BUGFIX] Remettre la génération de villes et de pays dans les seeds (PIX-8162)
+
+### :coffee: Autre
+- [#6278](https://github.com/1024pix/pix/pull/6278) [BUMP] Update nginx Docker tag to v1.25.0
+- [#6280](https://github.com/1024pix/pix/pull/6280) [BUMP] Update node to v16.20.0
+- [#6284](https://github.com/1024pix/pix/pull/6284) [BUMP] Update dependency ember-composable-helpers to v5 (certif)
+
+## v4.0.1 (30/05/2023)
+
+### :bug: Correction
+- [#6288](https://github.com/1024pix/pix/pull/6288) [BUGFIX] Ajouter le i18n à la méthode publishInBatch (PIX-8187).
+
+## v4.0.0 (26/05/2023)
+
+
+### :rocket: Amélioration
+- [#6042](https://github.com/1024pix/pix/pull/6042) [FEATURE] Mise en place des passages de mission restreint à l'activité Didacticiel (PIX-7692)
+- [#6259](https://github.com/1024pix/pix/pull/6259) [FEATURE] Simulation d'un scénario à partir d'une capacité (PIX-8122).
+- [#6256](https://github.com/1024pix/pix/pull/6256) [FEATURE] Génération d'un scénario aléatoire (PIX-8121).
+- [#6258](https://github.com/1024pix/pix/pull/6258) [FEATURE] Amélioration du design de l'espace surveillant sur pix Certif (PIX-8125).
+- [#6233](https://github.com/1024pix/pix/pull/6233) [FEATURE] Import de CSV pour génération de scénarios déterministes (PIX-8038).
+- [#6261](https://github.com/1024pix/pix/pull/6261) [FEATURE] Ajouter la traduction anglaise du mail d'invitation à Pix Certif (PIX-8141).
+- [#6218](https://github.com/1024pix/pix/pull/6218) [FEATURE] Elaboration d'un simulateur de scénarios déterministes pour le nouvel algo (PIX-8037).
+- [#5661](https://github.com/1024pix/pix/pull/5661) [FEATURE] ETQ Admin Support, télécharger les attestations de certification d'une session (PIX-7132)
+- [#6002](https://github.com/1024pix/pix/pull/6002) [FEATURE] Traduire les messages d'erreur de l'API (PIX-6690).
+- [#6202](https://github.com/1024pix/pix/pull/6202) [FEATURE] Améliorer le style du bloc de réponse des épreuves Pix-App (PIX-7717)
+- [#6211](https://github.com/1024pix/pix/pull/6211) [FEATURE] Renvoyer le détail de validation de QRCOM-dep depuis l'API (PIX-7919)
+- [#6232](https://github.com/1024pix/pix/pull/6232) [FEATURE] Ajouter un sélecteur de langue sur la page connexion de Pix Certif domaine international (PIX-5955)
+
+### :building_construction: Tech
+- [#6226](https://github.com/1024pix/pix/pull/6226) [TECH] Améliorer les tests sur me "notifier à pole emploi" suite au passage à ESM (PIX-8065)
+- [#6257](https://github.com/1024pix/pix/pull/6257) [TECH] Active l'option staticHelpers d'embroider sur mon-pix
+- [#6223](https://github.com/1024pix/pix/pull/6223) [TECH] Monter Pix UI en v34.1.0 sur Pix Certif (PIX-7971).
+- [#6247](https://github.com/1024pix/pix/pull/6247) [TECH] Supprime la dépendance ember-template-lint a la racine
+- [#6102](https://github.com/1024pix/pix/pull/6102) [TECH] Rendre les certifications complémentaires uniques par inscription en certification (PIX-7345).
+- [#6240](https://github.com/1024pix/pix/pull/6240) [TECH] Spécifie la version minimale de node 16 sur l'API pour que cela fonctionne
+- [#5787](https://github.com/1024pix/pix/pull/5787) [TECH] Utiliser le système de module ESM (PIX-7202)
+
+### :bug: Correction
+- [#6241](https://github.com/1024pix/pix/pull/6241) [BUGFIX] Corrige le traitement des taches Pole Emploi (PIX-8079)
+
+### :coffee: Autre
+- [#6268](https://github.com/1024pix/pix/pull/6268) [DOC] :memo: Ajout d'un ADR sur la décision de supprimer Gravitee
+- [#6255](https://github.com/1024pix/pix/pull/6255) [BUMP] Update dependency @faker-js/faker to v8 (admin)
+- [#6254](https://github.com/1024pix/pix/pull/6254) [BUMP] Update dependency @faker-js/faker to v8 (mon-pix)
+- [#6253](https://github.com/1024pix/pix/pull/6253) [BUMP] Update dependency @faker-js/faker to v8 (certif)
+- [#6191](https://github.com/1024pix/pix/pull/6191) [BUMP] Update dependency ember-template-lint to v5 (mon-pix)
+- [#6250](https://github.com/1024pix/pix/pull/6250) [BUMP] Update dependency @faker-js/faker to v8 (orga)
+- [#6249](https://github.com/1024pix/pix/pull/6249) [BUMP] Update dependency ember-template-lint to v5 (admin)
+- [#6246](https://github.com/1024pix/pix/pull/6246) [BUMP] Update dependency ember-template-lint to v5 (certif)
+- [#6244](https://github.com/1024pix/pix/pull/6244) [BUMP] Update embroider monorepo to v3 (certif) (major)
+- [#6234](https://github.com/1024pix/pix/pull/6234) [BUMP] Update embroider monorepo to v3 (orga) (major)
+
+## v3.354.0 (22/05/2023)
+
+
+### :rocket: Amélioration
+- [#6221](https://github.com/1024pix/pix/pull/6221) [FEATURE] Traduire la modale de confirmation de finalisation de session sur Pix Certif (PIX-8012).
+- [#6196](https://github.com/1024pix/pix/pull/6196) [FEATURE] Traduire le mail des résultats de certification en anglais (PIX-6687).
+
+### :building_construction: Tech
+- [#6222](https://github.com/1024pix/pix/pull/6222) [TECH] [Pix Orga] Aligner la double mire sur la maquette et nos standards (PIX-8073)
+- [#6230](https://github.com/1024pix/pix/pull/6230) [TECH] Pouvoir switcher entre vieilles et nouvelles seeds grâce à une variable d'environnement (PIX-8104)
+- [#6227](https://github.com/1024pix/pix/pull/6227) [TECH] Activer l'option composants statiques d'embroider sur Pix App
+- [#6228](https://github.com/1024pix/pix/pull/6228) [TECH] Enrichir les outils "Campagnes" afin de permettre la création à la volée de participants (PIX-7961)
+
+### :bug: Correction
+- [#6236](https://github.com/1024pix/pix/pull/6236) [BUGFIX] Affichage de la bonne réponse dans le panneau de correction (PIX-8110)
+- [#6231](https://github.com/1024pix/pix/pull/6231) [BUGFIX] Corriger à nouveau la taille du logo Pix sur les pages d'épreuve de Certification (PIX-8033).
+
+## v3.353.0 (17/05/2023)
+
+
+### :rocket: Amélioration
+- [#6224](https://github.com/1024pix/pix/pull/6224) [FEATURE] Extraire la liste des PCs avec paliers par seuil à convertir en niveau depuis le fichier XLS fourni par le PRO (PIX-7860)
+- [#6201](https://github.com/1024pix/pix/pull/6201) [FEATURE] Modifier les requêtes en lecture pour utiliser la vue sur les prescrits actifs (PIX-7683)
+- [#6198](https://github.com/1024pix/pix/pull/6198) [FEATURE][ADMIN] Permettre la modification de la locale d'un utilisateur (PIX-7358)
+- [#6192](https://github.com/1024pix/pix/pull/6192) [FEATURE] Afficher l'heure de fin de session théorique pour le surveillant dans Pix Certif (PIX-7834)
+- [#6182](https://github.com/1024pix/pix/pull/6182) [FEATURE] Ajout language switcher sur la double mire de la page d'invitation pour rejoindre certif (PIX-7217)
+- [#6210](https://github.com/1024pix/pix/pull/6210) [FEATURE] Améliorer le responsive des résultats des compétences en fin de campagne sur Pix-App (PIX-7972)
+- [#6126](https://github.com/1024pix/pix/pull/6126) [FEATURE][ORGA] Ajout du language switcher sur la double mire de connexion/inscription avec invitation (PIX-7743)
+- [#6180](https://github.com/1024pix/pix/pull/6180) [FEATURE] Afficher une notification de confirmation lors du changement de langue sur Pix App > Mon compte (PIX-7893).
+- [#6188](https://github.com/1024pix/pix/pull/6188) [FEATURE] Ajout d'aléatoire dans le choix des épreuves de l'algorithme flash (PIX-7997).
+- [#6189](https://github.com/1024pix/pix/pull/6189) [FEATURE] Empêcher la validation si deux réponses ne sont pas cochés pour les QCM sur Pix-App (PIX-7973)
+- [#6197](https://github.com/1024pix/pix/pull/6197) [FEATURE] Amélioration de message de validation de suppression d'une participation (PIX-8049)
+- [#6146](https://github.com/1024pix/pix/pull/6146) [FEATURE] Permettre de sélectionner l'envoi multiple pour les campagnes d'évaluation dans pix orga (PIX-7473)
+- [#6181](https://github.com/1024pix/pix/pull/6181) [FEATURE] Uniformiser le formulaire de signalement sur Pix-App (PIX-7711)
+
+### :building_construction: Tech
+- [#6212](https://github.com/1024pix/pix/pull/6212) [TECH][Pix Orga] Ne pas modifier la langue de l'utilisateur quand le paramètre lang se trouve dans l'url (PIX-8009)
+- [#6219](https://github.com/1024pix/pix/pull/6219) [TECH] Fournir des outils génériques et documentés orientés "Profil Utilisateur" (PIX-7960)
+- [#6213](https://github.com/1024pix/pix/pull/6213) [TECH] Tracer les événements wip de pg-boss
+- [#6172](https://github.com/1024pix/pix/pull/6172) [TECH] Fournir des outils génériques et documentés orientés "sessions de certification" (PIX-7980)
+- [#6209](https://github.com/1024pix/pix/pull/6209) [TECH] Met à jour ember-cli-notifications pour corriger les tests dans le navigateur
+- [#6179](https://github.com/1024pix/pix/pull/6179) [TECH][MON-PIX] Ne pas modifier la langue de l'utilisateur quand le paramètre lang se trouve dans l'url (PIX-7851)
+- [#6208](https://github.com/1024pix/pix/pull/6208) [TECH] Utilise la version v1 de l'action notify-file-change
+- [#6178](https://github.com/1024pix/pix/pull/6178) [TECH] Éviter les imports dupliqués sur Pix App (PIX-8018)
+- [#6200](https://github.com/1024pix/pix/pull/6200) [TECH] Script pour récupérer des profil cibles / clés de lectures / certifications complémentaires depuis une base existante et transformer en dump pour les seeds (PIX-8059)
+- [#6195](https://github.com/1024pix/pix/pull/6195) [TECH] Améliorer les tests sur la vérification d'accès à un assessment.
+
+### :bug: Correction
+- [#6220](https://github.com/1024pix/pix/pull/6220) [BUGFIX] Corriger l'affichage de la partie "J'ai déjà un compte" sur la double mire Pix Orga (PIX-8086)
+- [#6173](https://github.com/1024pix/pix/pull/6173) [BUGFIX] Affichage du temps majoré dans la liste des candidats de Pix Certif. (PIX-8008)
+- [#6199](https://github.com/1024pix/pix/pull/6199) [BUGFIX] Améliorer le responsive du select dans le formulaire de signalement (PIX-8056)
+- [#6205](https://github.com/1024pix/pix/pull/6205) [BUGFIX] La notification de changement de configuration ne fonctionne toujours pas
+- [#6204](https://github.com/1024pix/pix/pull/6204) [BUGFIX] La notification de changement de configuration ne fonctionne plus
+- [#6203](https://github.com/1024pix/pix/pull/6203) [BUGFIX] L'envoi de message échoue car le nom du channel est utilisé à la place de l'identifiant
+
+### :coffee: Autre
+- [#6216](https://github.com/1024pix/pix/pull/6216) [BUMP] Update dependency uuid to v9 (test-algo)
+- [#6215](https://github.com/1024pix/pix/pull/6215) [BUMP] Update dependency uuid to v9 (api)
+- [#6207](https://github.com/1024pix/pix/pull/6207) [BUMP] Update dependency @1024pix/stylelint-config to v3 (admin)
+- [#6206](https://github.com/1024pix/pix/pull/6206) [BUMP] Update dependency @1024pix/stylelint-config to v3 (mon-pix)
+- [#6186](https://github.com/1024pix/pix/pull/6186) [BUMP] Update dependency stylelint to v15 (orga)
+- [#6187](https://github.com/1024pix/pix/pull/6187) [BUMP] Update dependency stylelint to v15 (pix1d)
+- [#6185](https://github.com/1024pix/pix/pull/6185) [BUMP] Update dependency stylelint to v15 (certif)
+
+## v3.352.0 (11/05/2023)
+
+
+### :rocket: Amélioration
+- [#6150](https://github.com/1024pix/pix/pull/6150) [FEATURE] Ordre aléatoire pour les propositions de QCU/QCM (PIX-7736)
+- [#6160](https://github.com/1024pix/pix/pull/6160) [FEATURE] Amélioration de message de validation de suppression d'une participation (PIX-5625)
+- [#6137](https://github.com/1024pix/pix/pull/6137) [FEATURE] Vérification de l'égilibité des candidats à une certif compl. dans l'espace surveillant (PIX-7833).
+- [#6177](https://github.com/1024pix/pix/pull/6177) [FEATURE] Suppression de toutes références à Gravitee (PIX-7940)
+- [#6096](https://github.com/1024pix/pix/pull/6096) [FEATURE] Afficher un bouton de confirmation de présence dans l'espace surveillant sur Pix Certif (PIX-7832)
+- [#6156](https://github.com/1024pix/pix/pull/6156) [FEATURE][MON-PIX] Ajouter le sélecteur de langue sur la page de présentation d'une campagne (PIX-7744)
+- [#6154](https://github.com/1024pix/pix/pull/6154) [FEATURE] Désactiver le bouton Effacer les filtres lorsqu'aucun fitre n'est activé (Pix-7970)
+- [#6104](https://github.com/1024pix/pix/pull/6104) [FEATURE] Amélioration de la page de détails des profils cibles (PIX-7907)
+- [#6078](https://github.com/1024pix/pix/pull/6078) [FEATURE] Améliorer les tests sur Pix App avec Testing Library (part 3) (PIX-7870).
+
+### :building_construction: Tech
+- [#6149](https://github.com/1024pix/pix/pull/6149) [TECH] Implementation d'un Domain Model CorrectionBlockQRCOMDep (PIX-8012)
+- [#6082](https://github.com/1024pix/pix/pull/6082) [TECH] Supprime la dépendance ember-cli-sri des apps embroider
+- [#6157](https://github.com/1024pix/pix/pull/6157) [TECH] Utilise exclusivement l'API history dans les apps Ember
+- [#6176](https://github.com/1024pix/pix/pull/6176) [TECH] Utiliser la méthode `visit` d'`ember-testing-library` plutôt que celle de `@ember/test-helpers` (PIX-8017)
+- [#6162](https://github.com/1024pix/pix/pull/6162) [TECH] montée de version pix-ui : 34.1.0 (PIX-7899)
+- [#6166](https://github.com/1024pix/pix/pull/6166) [TECH] Fournir des outils génériques et documentés orientés "Organisations" et "Centres de certification" (PIX-7995)
+
+### :bug: Correction
+- [#6193](https://github.com/1024pix/pix/pull/6193) [BUGFIX] Corrige la media query
+- [#6153](https://github.com/1024pix/pix/pull/6153) [BUGFIX] Erreur lors ajout individuel d'un 2ème candidat à une session de certification sur Pix Certif (PIX-7935).
+
+### :coffee: Autre
+- [#6131](https://github.com/1024pix/pix/pull/6131) [BUMP] Update dependency stylelint to v15 (mon-pix)
+- [#6169](https://github.com/1024pix/pix/pull/6169) [BUMP] Update dependency stylelint to v15 (admin)
+- [#6183](https://github.com/1024pix/pix/pull/6183) [BUMP] Update dependency ember-simple-auth to v5 (admin)
+- [#6164](https://github.com/1024pix/pix/pull/6164) [BUMP] Update dependency ember-simple-auth to v5 (orga)
+- [#6174](https://github.com/1024pix/pix/pull/6174) [BUMP] Update dependency ember-simple-auth to v5 (certif)
+- [#6168](https://github.com/1024pix/pix/pull/6168) [BUMP] Update eslint (major)
+- [#5995](https://github.com/1024pix/pix/pull/5995) [BUMP] Update dependency ember-simple-auth to v5 (mon-pix)
+
+## v3.351.0 (09/05/2023)
+
+
+### :rocket: Amélioration
+- [#6143](https://github.com/1024pix/pix/pull/6143) [FEATURE] Modifier le tri des participations d'un utilisateur pour les regrouper par code campagne (PIX-5389)
+- [#6148](https://github.com/1024pix/pix/pull/6148) [FEATURE] Affiche la date de création des profil cibles dans la liste sur PixAdmin (PIX-7947)
+- [#6144](https://github.com/1024pix/pix/pull/6144) [FEATURE] Ajouter le sélecteur de langue sur la page app.pix.org/campagnes (PIX-7216)
+- [#6113](https://github.com/1024pix/pix/pull/6113) [FEATURE] Ajouter un sélecteur de langue sur la page connexion de Pix Orga domaine international (PIX-5604)
+
+### :building_construction: Tech
+- [#6163](https://github.com/1024pix/pix/pull/6163) [TECH] Utiliser la méthode `render` d'`ember-testing-library` plutôt que celle de `@ember/test-helpers` (PIX-7998)
+- [#6165](https://github.com/1024pix/pix/pull/6165) [TECH] Déplacer les données en commun des seeds dans un fichier dédié (PIX-7996)
+- [#6161](https://github.com/1024pix/pix/pull/6161) [TECH] Supprime la dépendance ember-collapsible-panel
+- [#6117](https://github.com/1024pix/pix/pull/6117) [TECH] Appeler session.setup de ember-simple-auth dans la route de l'application
+- [#6159](https://github.com/1024pix/pix/pull/6159) [TECH] Mise à jour de faker en v7
+- [#6155](https://github.com/1024pix/pix/pull/6155) [TECH] Compléter et documenter les outils génériques pour la création de contenus formatifs dans les seeds (PIX-7959)
+- [#6152](https://github.com/1024pix/pix/pull/6152) [TECH] Compléter et documenter les outils génériques pour la création de campagne dans les seeds (PIX-7959)
+- [#6130](https://github.com/1024pix/pix/pull/6130) [TECH] Met à jour vers @faker-js/faker
+- [#6147](https://github.com/1024pix/pix/pull/6147) [TECH] Compléter et documenter les outils génériques pour la création de profil cibles et clés de lecture dans les seeds (PIX-7951)
+- [#6074](https://github.com/1024pix/pix/pull/6074) [TECH] Uniformiser les vérifications joi pour l'import candidat (PIX-7859)
+- [#6127](https://github.com/1024pix/pix/pull/6127) [TECH] Mettre à jour les urls de certaines Orga ayant des tags (PIX-7928)
+- [#6136](https://github.com/1024pix/pix/pull/6136) [TECH] Centraliser le code permettant de changer de locales dans localeService (PIX-7922).
+
+### :bug: Correction
+- [#6138](https://github.com/1024pix/pix/pull/6138) [BUGFIX] Affichage du temps majoré dans l'Espace Surveillant (PIX-7835)
+
+### :coffee: Autre
+- [#6158](https://github.com/1024pix/pix/pull/6158) [BUMP] Update browser-tools orb to v1.4.1 (.circleci)
+- [#6142](https://github.com/1024pix/pix/pull/6142) [BUMP] Update nginx Docker tag to v1.24.0
+
+## v3.350.0 (04/05/2023)
+
+
+### :rocket: Amélioration
+- [#6134](https://github.com/1024pix/pix/pull/6134) [FEATURE] Suppression des références Gravitee  (PIX-7909)
+- [#6095](https://github.com/1024pix/pix/pull/6095) [FEATURE] Ajouter des liens vers la doc de création de contenu formatif (PIX-7881).
+- [#6123](https://github.com/1024pix/pix/pull/6123) [FEATURE] Utiliser les design tokens de typographie pour l'entête des épreuves (PIX-7779)
+- [#6120](https://github.com/1024pix/pix/pull/6120) [FEATURE] Ajouter une méthode au solution-service-qrcom-dep pour avoir le résultat complet (PIX-7865)
+- [#6105](https://github.com/1024pix/pix/pull/6105) [FEATURE] Trier les profiles cibles dans PixAdmin par status puis par nom (PIX-7913)
+
+### :building_construction: Tech
+- [#6084](https://github.com/1024pix/pix/pull/6084) [TECH] Permet de configurer le proxy de l'API des fronts pix vers une release de test  (PIX-7880)
+- [#6116](https://github.com/1024pix/pix/pull/6116) [TECH] Tester unitairement le use-case sessions-mass-import
+- [#6122](https://github.com/1024pix/pix/pull/6122) [TECH] Ajouter une erreur de lint si `render` ou `find` ne sont pas importés depuis `@1024pix/ember-testing-library` (PIX-7926)
+- [#6101](https://github.com/1024pix/pix/pull/6101) [TECH] Mise à jour de la langue utilisateur depuis le controller language (PIX-7871)
+- [#6124](https://github.com/1024pix/pix/pull/6124) [TECH] - Mettre en place l'injection de dépendances pour les cas restants
+- [#6106](https://github.com/1024pix/pix/pull/6106) [TECH] Renvoyer une erreur 422 au lieu d'une erreur 503 quand l'appel à la route /token de l'idp échoue (PIX-7915) 
+
+### :bug: Correction
+- [#6125](https://github.com/1024pix/pix/pull/6125) [BUGFIX] Améliorer la lecture d'écran des boutons d'action d'une épreuve (PIX-7920)
+- [#6100](https://github.com/1024pix/pix/pull/6100) [BUGFIX] Empêcher le scrollTop lors de l'utilisation d'un filtre/pagination (PIX-7912)
+
+### :coffee: Autre
+- [#6133](https://github.com/1024pix/pix/pull/6133) [BUMP] Update dependency p-queue to v7 (mon-pix)
+- [#6132](https://github.com/1024pix/pix/pull/6132) [BUMP] Update dependency p-queue to v7 (certif)
+- [#6129](https://github.com/1024pix/pix/pull/6129) [BUMP] Update dependency p-queue to v7 (admin)
+- [#6121](https://github.com/1024pix/pix/pull/6121) [BUMP] Update dependency ember-click-outside to v6 (orga)
+
 ## v3.349.0 (02/05/2023)
 
 

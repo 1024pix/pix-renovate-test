@@ -1,9 +1,10 @@
-const Joi = require('joi');
-const answerController = require('./answer-controller.js');
-const identifiersType = require('../../domain/types/identifiers-type.js');
-const { NotFoundError } = require('../../domain/errors.js');
+import Joi from 'joi';
+import { answerController } from './answer-controller.js';
+import { identifiersType } from '../../domain/types/identifiers-type.js';
+import { NotFoundError } from '../../domain/errors.js';
+import { securityPreHandlers } from '../security-pre-handlers.js';
 
-exports.register = async (server) => {
+const register = async function (server) {
   server.route([
     {
       method: 'POST',
@@ -39,6 +40,7 @@ exports.register = async (server) => {
       method: 'POST',
       path: '/api/pix1d/answers',
       config: {
+        pre: [{ method: securityPreHandlers.checkPix1dActivated }],
         auth: false,
         validate: {
           payload: Joi.object({
@@ -48,6 +50,7 @@ exports.register = async (server) => {
                 result: Joi.string().allow(null),
                 'result-details': Joi.string().allow(null),
               },
+              assessment: Joi.object(),
               relationships: Joi.object().required(),
               challenge: Joi.object(),
               type: Joi.string(),
@@ -135,4 +138,5 @@ exports.register = async (server) => {
   ]);
 };
 
-exports.name = 'answers-api';
+const name = 'answers-api';
+export { register, name };

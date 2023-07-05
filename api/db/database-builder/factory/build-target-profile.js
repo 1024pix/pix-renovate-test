@@ -1,8 +1,8 @@
-const buildOrganization = require('./build-organization');
-const databaseBuffer = require('../database-buffer');
-const _ = require('lodash');
+import { buildOrganization } from './build-organization.js';
+import { databaseBuffer } from '../database-buffer.js';
+import _ from 'lodash';
 
-module.exports = function buildTargetProfile({
+const buildTargetProfile = function ({
   id = databaseBuffer.getNextId(),
   name = 'Remplir un tableur',
   imageUrl = 'https://images.pix.fr/profil-cible/Illu_GEN.svg',
@@ -15,6 +15,7 @@ module.exports = function buildTargetProfile({
   comment = null,
   category = 'OTHER',
   migration_status = 'N/A',
+  areKnowledgeElementsResettable = false,
 } = {}) {
   ownerOrganizationId = _.isUndefined(ownerOrganizationId) ? buildOrganization().id : ownerOrganizationId;
 
@@ -31,9 +32,12 @@ module.exports = function buildTargetProfile({
     comment,
     category,
     migration_status,
+    areKnowledgeElementsResettable,
   };
   return databaseBuffer.pushInsertable({
     tableName: 'target-profiles',
     values,
   });
 };
+
+export { buildTargetProfile };

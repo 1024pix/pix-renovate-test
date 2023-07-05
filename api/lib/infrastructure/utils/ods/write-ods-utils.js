@@ -1,7 +1,11 @@
-const { loadOdsZip } = require('./common-ods-utils.js');
-const { DOMParser, XMLSerializer } = require('@xmldom/xmldom');
-const _ = require('lodash');
-const AddedCellOption = require('./added-cell-option.js');
+import { loadOdsZip } from './common-ods-utils.js';
+
+import xmldom from '@xmldom/xmldom';
+
+const { DOMParser, XMLSerializer } = xmldom;
+
+import _ from 'lodash';
+import { AddedCellOption } from './added-cell-option.js';
 
 const CONTENT_XML_IN_ODS = 'content.xml';
 
@@ -186,7 +190,7 @@ class OdsUtilsBuilder {
   _addColumn(column, tableHeaderRow, tableFirstRow) {
     this._withCellToEndOfLineWithStyleOfCellLabelled({
       lineNumber: tableHeaderRow,
-      cellToCopyLabel: this.translate('candidate-list-template.headers.extratime'),
+      cellToCopyLabel: this.translate('candidate-list-template.headers.extra-time'),
       addedCellOption: new AddedCellOption({ labels: column.headerLabel }),
     });
 
@@ -496,7 +500,7 @@ function _translateNoteBackgroundTitle(targetXmlDomElement, translate) {
   }
 }
 
-module.exports = {
+export {
   makeUpdatedOdsByContentXml,
   updateXmlSparseValues,
   updateXmlRows,

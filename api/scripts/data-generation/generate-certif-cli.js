@@ -1,29 +1,40 @@
-#!/usr/bin/env node
-'use strict';
-const inquirer = require('inquirer');
-require('dotenv').config({ path: `${__dirname}/../../.env` });
-const { knex, disconnect } = require(`../../db/knex-database-connection`);
-const bluebird = require('bluebird');
-const maxBy = require('lodash/maxBy');
-const logger = require('../../lib/infrastructure/logger');
-const { getNewSessionCode } = require('../../lib/domain/services/session-code-service');
-const { temporaryStorage } = require('../../lib/infrastructure/temporary-storage/index');
-const {
+import * as url from 'url';
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+// eslint-disable-next-line n/no-unpublished-import
+import inquirer from 'inquirer';
+import * as dotenv from 'dotenv';
+
+dotenv.config({ path: `${__dirname}/../../.env` });
+import { knex, disconnect } from '../../db/knex-database-connection.js';
+import bluebird from 'bluebird';
+import lodash from 'lodash';
+
+const { maxBy } = lodash;
+import { logger } from '../../lib/infrastructure/logger.js';
+import { getNewSessionCode } from '../../lib/domain/services/session-code-service.js';
+import { temporaryStorage } from '../../lib/infrastructure/temporary-storage/index.js';
+import {
   makeUserPixCertifiable,
   makeUserPixDroitCertifiable,
   makeUserCleaCertifiable,
   makeUserPixEduCertifiable,
-} = require('../../db/seeds/data/certification/tooling');
-const DatabaseBuilder = require('../../db/database-builder/database-builder');
-const databaseBuffer = require('../../db/database-builder/database-buffer');
-const databaseBuilder = new DatabaseBuilder({ knex, emptyFirst: false });
-const { learningContentCache } = require('../../lib/infrastructure/caches/learning-content-cache');
-const { SHARED } = require('../../lib/domain/models/CampaignParticipationStatuses');
+} from '../../db/seeds/data/certification/tooling.js';
+import { DatabaseBuilder } from '../../db/database-builder/database-builder.js';
+import { databaseBuffer } from '../../db/database-builder/database-buffer.js';
+import { learningContentCache } from '../../lib/infrastructure/caches/learning-content-cache.js';
+import { CampaignParticipationStatuses } from '../../lib/domain/models/CampaignParticipationStatuses.js';
 
+const { SHARED } = CampaignParticipationStatuses;
+
+const databaseBuilder = new DatabaseBuilder({ knex, emptyFirst: false });
 /**
  * LOG_LEVEL=info ./scripts/data-generation/generate-certif-cli.js 'SUP' 1 '[{"candidateNumber": 1, "key": "EDU_1ER_DEGRE"}, {"candidateNumber": 1, "key": "EDU_2ND_DEGRE"}]'
  * LOG_LEVEL=info ./scripts/data-generation/generate-certif-cli.js 'PRO' 2 '[{"candidateNumber": 1, "key": "CLEA"}, {"candidateNumber": 2, "key": "DROIT"}]'
- * LOG_LEVEL=info ./scripts/data-generation/generate-certif-cli.js 'PRO' 1'
+ * LOG_LEVEL=info ./scripts/data-generation/generate-certif-cli.js 'PRO' 1
+ *
+ * On a "production" environment (RA), you need to install inquirer package
+ * NODE_ENV= npm i inquirer@8.2.4 && LOG_LEVEL=info LOG_FOR_HUMANS=true ./scripts/data-generation/generate-certif-cli.js 'PRO' 1
  */
 
 const PIXCLEA = 'CLEA';
@@ -59,8 +70,8 @@ const questions = [
   },
   {
     type: 'confirm',
-    name: 'needComplementaryCertifications',
-    message: 'As tu besoin de certifications complémentaires ?',
+    name: 'needComplementaryCertification',
+    message: "As tu besoin d'une certification complémentaire ?",
     default: false,
     when({ centerType }) {
       return centerType !== 'SCO';
@@ -69,9 +80,9 @@ const questions = [
   {
     type: 'checkbox',
     name: 'complementaryCertifications',
-    message: "Quelles certifications complémentaires souhaitez-vous ? ('space' pour séléctionner)",
-    when({ needComplementaryCertifications }) {
-      return needComplementaryCertifications;
+    message: "Quelle certification complémentaire souhaitez-vous ? (1 par candidat, 'space' pour séléctionner)",
+    when({ needComplementaryCertification }) {
+      return needComplementaryCertification;
     },
     loop: false,
     choices({ candidateNumber }) {
@@ -102,7 +113,7 @@ const questions = [
   },
 ];
 
-async function main({ centerType, candidateNumber, complementaryCertifications }) {
+async function main({ centerType, candidateNumber, complementaryCertifications = [] }) {
   await _updateDatabaseBuilderSequenceNumber();
   const { id: organizationId } = databaseBuilder.factory.buildOrganization({
     type: centerType,
@@ -115,7 +126,6 @@ async function main({ centerType, candidateNumber, complementaryCertifications }
   if (centerType === 'SCO') {
     await _createScoCertificationCandidates({ candidateNumber, sessionId, organizationId }, databaseBuilder);
   } else {
-    let complementaryCertificationGroupedByCandidateIndex;
     if (complementaryCertifications?.length) {
       const complementaryCertificationKeys = complementaryCertifications.map(({ key }) => key);
       const complementaryCertificationIds = await knex('complementary-certifications')
@@ -126,7 +136,6 @@ async function main({ centerType, candidateNumber, complementaryCertifications }
         { complementaryCertificationIds, certificationCenterId },
         databaseBuilder
       );
-      complementaryCertificationGroupedByCandidateIndex = _groupByCandidateIndex(complementaryCertifications);
     }
 
     await _createNonScoCertificationCandidates(
@@ -134,7 +143,7 @@ async function main({ centerType, candidateNumber, complementaryCertifications }
         centerType,
         candidateNumber,
         sessionId,
-        complementaryCertificationGroupedByCandidateIndex,
+        complementaryCertifications,
         organizationId,
       },
       databaseBuilder
@@ -195,7 +204,7 @@ async function _createSessionAndReturnId(certificationCenterId, databaseBuilder)
 }
 
 async function _createNonScoCertificationCandidates(
-  { centerType, candidateNumber, sessionId, complementaryCertificationGroupedByCandidateIndex, organizationId },
+  { centerType, candidateNumber, sessionId, complementaryCertifications, organizationId },
   databaseBuilder
 ) {
   let maxUserId = await _getMaxUserId();
@@ -221,11 +230,12 @@ async function _createNonScoCertificationCandidates(
       authorizedToStart: true,
     });
 
-    if (complementaryCertificationGroupedByCandidateIndex && complementaryCertificationGroupedByCandidateIndex[i + 1]) {
-      const complementaryCertifications = complementaryCertificationGroupedByCandidateIndex[i + 1];
-
+    const complementaryCertification = complementaryCertifications.find(
+      ({ candidateNumber }) => candidateNumber === i + 1
+    );
+    if (complementaryCertification) {
       await _createComplementaryCertificationHability(
-        { complementaryCertifications, certificationCandidateId, userId, organizationLearnerId },
+        { complementaryCertification, certificationCandidateId, userId, organizationLearnerId },
         databaseBuilder
       );
     }
@@ -268,46 +278,47 @@ async function _createScoCertificationCandidates({ candidateNumber, sessionId, o
 }
 
 async function _createComplementaryCertificationHability(
-  { complementaryCertifications, certificationCandidateId, userId, organizationLearnerId },
+  { complementaryCertification, certificationCandidateId, userId, organizationLearnerId },
   databaseBuilder
 ) {
-  return bluebird.mapSeries(complementaryCertifications, async (key) => {
-    const { id: complementaryCertificationId } = await knex('complementary-certifications').where({ key }).first();
+  const { key } = complementaryCertification;
+  const { id: complementaryCertificationId } = await knex('complementary-certifications')
+    .where({ key: complementaryCertification.key })
+    .first();
 
-    databaseBuilder.factory.buildComplementaryCertificationSubscription({
-      complementaryCertificationId,
-      certificationCandidateId,
-    });
-    const badgeId = await _getBadgeIdByComplementaryCertificationKey(key);
-    const targetProfileId = await _getTargetProfileIdFromBadgeKey(key);
-    const { id: campaignId } = databaseBuilder.factory.buildCampaign({
-      targetProfileId,
-      name: 'GENERATED_CAMPAIGN',
-      creatorId: userId,
-      ownerId: userId,
-    });
-    const { id: campaignParticipationId } = databaseBuilder.factory.buildCampaignParticipation({
-      campaignId,
-      userId,
-      organizationLearnerId,
-      status: SHARED,
-      isCertifiable: true,
-    });
-    databaseBuilder.factory.buildBadgeAcquisition({ badgeId, userId, campaignParticipationId });
-
-    if (PIXDROIT === key) {
-      await makeUserPixDroitCertifiable({
-        userId,
-        databaseBuilder,
-      });
-    } else if (PIXCLEA === key) {
-      await makeUserCleaCertifiable({ userId, databaseBuilder });
-    } else if (PIXEDU1ERDEGRE === key) {
-      await makeUserPixEduCertifiable({ userId, databaseBuilder });
-    } else if (PIXEDU2NDDEGRE === key) {
-      await makeUserPixEduCertifiable({ userId, databaseBuilder });
-    }
+  databaseBuilder.factory.buildComplementaryCertificationSubscription({
+    complementaryCertificationId,
+    certificationCandidateId,
   });
+  const badgeId = await _getBadgeIdByComplementaryCertificationKey(key);
+  const targetProfileId = await _getTargetProfileIdFromBadgeKey(key);
+  const { id: campaignId } = databaseBuilder.factory.buildCampaign({
+    targetProfileId,
+    name: 'GENERATED_CAMPAIGN',
+    creatorId: userId,
+    ownerId: userId,
+  });
+  const { id: campaignParticipationId } = databaseBuilder.factory.buildCampaignParticipation({
+    campaignId,
+    userId,
+    organizationLearnerId,
+    status: SHARED,
+    isCertifiable: true,
+  });
+  databaseBuilder.factory.buildBadgeAcquisition({ badgeId, userId, campaignParticipationId });
+
+  if (PIXDROIT === key) {
+    await makeUserPixDroitCertifiable({
+      userId,
+      databaseBuilder,
+    });
+  } else if (PIXCLEA === key) {
+    await makeUserCleaCertifiable({ userId, databaseBuilder });
+  } else if (PIXEDU1ERDEGRE === key) {
+    await makeUserPixEduCertifiable({ userId, databaseBuilder });
+  } else if (PIXEDU2NDDEGRE === key) {
+    await makeUserPixEduCertifiable({ userId, databaseBuilder });
+  }
 }
 
 async function _getBadgeIdByComplementaryCertificationKey(complementaryCertificationKey) {
@@ -335,7 +346,7 @@ async function _getResults(sessionId) {
       lastName: 'certification-candidates.lastName',
       email: 'certification-candidates.email',
       birthdate: 'certification-candidates.birthdate',
-      complementaryCertifications: knex.raw('json_agg("complementary-certifications"."label")'),
+      complementaryCertification: 'complementary-certifications.label',
     })
     .join('certification-candidates', 'certification-candidates.sessionId', 'sessions.id')
     .leftJoin(
@@ -348,15 +359,7 @@ async function _getResults(sessionId) {
       'complementary-certifications.id',
       'complementary-certification-subscriptions.complementaryCertificationId'
     )
-    .where('sessions.id', sessionId)
-    .groupBy('sessions.id', 'certification-candidates.id');
-}
-
-function _groupByCandidateIndex(complementaryCertifications) {
-  return complementaryCertifications.reduce((acc, { candidateNumber, key }) => {
-    acc[candidateNumber] = (acc[candidateNumber] || []).concat(key);
-    return acc;
-  }, {});
+    .where('sessions.id', sessionId);
 }
 
 async function _createUser({ firstName, lastName, birthdate, email, organizationId, maxUserId }, databaseBuilder) {
@@ -390,25 +393,28 @@ async function _createUser({ firstName, lastName, birthdate, email, organization
   return { userId, organizationLearnerId };
 }
 
+const modulePath = url.fileURLToPath(import.meta.url);
+const isLaunchedFromCommandLine = process.argv[1] === modulePath;
 if (process.argv.length > 2 && !isInTest) {
   const [centerType, candidateNumber, complementaryCertifications = '[]'] = process.argv.slice(2);
 
   main({
     centerType,
     candidateNumber,
-    complementaryCertifications: JSON.parse(complementaryCertifications),
+    complementaryCertifications: JSON.parse(complementaryCertifications) || [],
   })
     .catch((error) => {
       logger.error(error);
       throw error;
     })
     .finally(_disconnect);
-} else if (require.main === module) {
+} else if (isLaunchedFromCommandLine) {
   inquirer
     .prompt(questions)
     .then(async (answers) => {
-      logger.info('\nDetails:');
+      logger.info('🙋🏽‍♂️ Demande :');
       logger.info(JSON.stringify(answers, null, '  '));
+      logger.info('👷🏾‍♀️ Création...');
       await main(answers);
     })
     .catch((error) => {
@@ -416,11 +422,6 @@ if (process.argv.length > 2 && !isInTest) {
       throw error;
     })
     .finally(_disconnect);
-} else {
-  module.exports = {
-    main,
-    databaseBuilder,
-  };
 }
 
 async function _disconnect() {
@@ -431,3 +432,5 @@ async function _disconnect() {
   await temporaryStorage.quit();
   logger.info('Exiting process gracefully...');
 }
+
+export { main, databaseBuilder };

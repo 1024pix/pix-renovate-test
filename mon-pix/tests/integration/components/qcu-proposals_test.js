@@ -1,7 +1,6 @@
 import { module, test } from 'qunit';
 import setupIntlRenderingTest from '../../helpers/setup-intl-rendering';
-// eslint-disable-next-line no-restricted-imports
-import { render } from '@ember/test-helpers';
+import { render } from '@1024pix/ember-testing-library';
 import { hbs } from 'ember-cli-htmlbars';
 
 module('Integration | Component | QCU proposals', function (hooks) {
@@ -32,7 +31,9 @@ module('Integration | Component | QCU proposals', function (hooks) {
       this.set('answerChanged', answerChangedHandler);
 
       // when
-      await render(hbs`{{qcu-proposals answers=this.answers proposals=this.proposals answerChanged='answerChanged'}}`);
+      await render(
+        hbs`<QcuProposals @answers={{this.answers}} @proposals={{this.proposals}} @answerChanged={{this.answerChanged}} />`
+      );
 
       // then
       assert.dom('.proposal-text').exists({ count: 3 });

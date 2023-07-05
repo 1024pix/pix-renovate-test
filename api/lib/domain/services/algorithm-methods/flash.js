@@ -1,6 +1,8 @@
-const { orderBy, range, sortBy, sortedUniqBy, sumBy } = require('lodash');
+import lodash from 'lodash';
 
-const config = require('../../../config.js');
+const { orderBy, range, sortBy, sortedUniqBy, sumBy } = lodash;
+
+import { config } from '../../../config.js';
 
 const DEFAULT_ESTIMATED_LEVEL = 0;
 const START_OF_SAMPLES = -9;
@@ -11,15 +13,33 @@ const DEFAULT_PROBABILITY_TO_ANSWER = 1;
 const DEFAULT_ERROR_RATE = 5;
 const ERROR_RATE_CLASS_INTERVAL = 9 / 80;
 
-module.exports = {
+export {
   getPossibleNextChallenges,
   getEstimatedLevelAndErrorRate,
   getChallengesForNonAnsweredSkills,
   calculateTotalPixScoreAndScoreByCompetence,
+  getReward,
 };
 
-function getPossibleNextChallenges({ allAnswers, challenges, estimatedLevel = DEFAULT_ESTIMATED_LEVEL } = {}) {
-  const nonAnsweredChallenges = getChallengesForNonAnsweredSkills({ allAnswers, challenges });
+function getPossibleNextChallenges({
+  allAnswers,
+  challenges,
+  estimatedLevel = DEFAULT_ESTIMATED_LEVEL,
+  warmUpLength = 0,
+  forcedCompetences = [],
+} = {}) {
+  let nonAnsweredChallenges = getChallengesForNonAnsweredSkills({ allAnswers, challenges });
+
+  if (allAnswers.length >= warmUpLength) {
+    const answersAfterWarmup = _getAnswersAfterWarmup({ answers: allAnswers, warmUpLength });
+
+    nonAnsweredChallenges = _filterAlreadyAnsweredCompetences({
+      answers: answersAfterWarmup,
+      nonAnsweredChallenges,
+      challenges,
+      forcedCompetences,
+    });
+  }
 
   if (nonAnsweredChallenges?.length === 0 || allAnswers.length >= config.features.numberOfChallengesForFlashMethod) {
     return {
@@ -27,28 +47,16 @@ function getPossibleNextChallenges({ allAnswers, challenges, estimatedLevel = DE
       possibleChallenges: [],
     };
   }
-
   const challengesWithReward = nonAnsweredChallenges.map((challenge) => {
     return {
       challenge,
-      reward: _getReward({ estimatedLevel, discriminant: challenge.discriminant, difficulty: challenge.difficulty }),
+      reward: getReward({ estimatedLevel, discriminant: challenge.discriminant, difficulty: challenge.difficulty }),
     };
   });
 
-  let maxReward = 0;
-  const possibleChallenges = challengesWithReward.reduce((acc, challengesWithReward) => {
-    if (challengesWithReward.reward > maxReward) {
-      acc = [challengesWithReward.challenge];
-      maxReward = challengesWithReward.reward;
-    } else if (challengesWithReward.reward === maxReward) {
-      acc.push(challengesWithReward.challenge);
-    }
-    return acc;
-  }, []);
-
   return {
     hasAssessmentEnded: false,
-    possibleChallenges,
+    possibleChallenges: _findBestPossibleChallenges(challengesWithReward),
   };
 }
 
@@ -135,6 +143,35 @@ function calculateTotalPixScoreAndScoreByCompetence({ allAnswers, challenges, es
   return pixScoreAndScoreByCompetence;
 }
 
+function _getAnswersAfterWarmup({ answers, warmUpLength }) {
+  return answers.slice(warmUpLength);
+}
+
+function _filterAlreadyAnsweredCompetences({ answers, challenges, forcedCompetences, nonAnsweredChallenges }) {
+  const answeredCompetenceIds = answers.map(
+    ({ challengeId }) => lodash.find(challenges, { id: challengeId }).competenceId
+  );
+
+  const remainingCompetenceIds = forcedCompetences.filter(
+    (competenceId) => !answeredCompetenceIds.includes(competenceId)
+  );
+
+  const allCompetencesAreAnswered = remainingCompetenceIds.length === 0;
+
+  return nonAnsweredChallenges.filter(
+    ({ competenceId }) => allCompetencesAreAnswered || remainingCompetenceIds.includes(competenceId)
+  );
+}
+
+function _findBestPossibleChallenges(challengesWithReward) {
+  const MAX_NUMBER_OF_RETURNED_CHALLENGES = 5;
+  const orderedChallengesWithReward = orderBy(challengesWithReward, 'reward', 'desc');
+
+  const possibleChallengesWithReward = orderedChallengesWithReward.slice(0, MAX_NUMBER_OF_RETURNED_CHALLENGES);
+
+  return possibleChallengesWithReward.map(({ challenge }) => challenge);
+}
+
 function _getDirectSucceededChallenges({ allAnswers, challenges }) {
   const correctAnswers = allAnswers.filter((answer) => answer.isOk());
   return correctAnswers.map((answer) => _findChallengeForAnswer(challenges, answer));
@@ -199,7 +236,7 @@ function _sumPixScoreAndScoreByCompetence(challenges) {
   return { pixScore, pixScoreByCompetence };
 }
 
-function _getReward({ estimatedLevel, discriminant, difficulty }) {
+function getReward({ estimatedLevel, discriminant, difficulty }) {
   const probability = _getProbability({ estimatedLevel, discriminant, difficulty });
   return probability * (1 - probability) * Math.pow(discriminant, 2);
 }

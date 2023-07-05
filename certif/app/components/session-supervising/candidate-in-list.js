@@ -1,36 +1,97 @@
-import { set } from '@ember/object';
+import { action, set } from '@ember/object';
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
-import { inject as service } from '@ember/service';
+import { service } from '@ember/service';
 import dayjs from 'dayjs';
 
 export default class CandidateInList extends Component {
   @service notifications;
+  @service intl;
+  @service featureToggles;
 
   @tracked isMenuOpen = false;
   @tracked isConfirmationModalDisplayed = false;
   @tracked modalDescriptionText;
   @tracked modalCancelText;
-  @tracked modalConfirmationText;
-  @tracked modalInstructionText = 'Information';
+  @tracked modalConfirmationText = this.intl.t('common.actions.confirm');
+  @tracked modalInstructionText = this.intl.t('pages.session-supervising.candidate-in-list.default-modal-title');
   @tracked actionOnConfirmation;
-  @service intl;
-  @service featureToggles;
+
+  get isConfirmButtonToBeDisplayed() {
+    return (
+      !this.args.candidate.hasStarted &&
+      !this.args.candidate.hasCompleted &&
+      this.featureToggles.featureToggles.isDifferentiatedTimeInvigilatorPortalEnabled
+    );
+  }
 
   get isCheckboxToBeDisplayed() {
-    return !this.args.candidate.hasStarted && !this.args.candidate.hasCompleted;
+    return (
+      !this.args.candidate.hasStarted &&
+      !this.args.candidate.hasCompleted &&
+      !this.featureToggles.featureToggles.isDifferentiatedTimeInvigilatorPortalEnabled
+    );
   }
 
   get optionsMenuShouldBeDisplayed() {
     return this.args.candidate.hasStarted;
   }
 
-  get shouldDisplayComplementaryCertification() {
+  get shouldDisplayEnrolledComplementaryCertification() {
     return (
-      this.args.candidate.complementaryCertification &&
+      this.args.candidate.enrolledComplementaryCertificationLabel &&
       this.featureToggles.featureToggles.isDifferentiatedTimeInvigilatorPortalEnabled
     );
+  }
+
+  get shouldDisplayTheoricalEndDatetime() {
+    return this.featureToggles.featureToggles.isDifferentiatedTimeInvigilatorPortalEnabled;
+  }
+
+  get shouldDisplayNonEligibilityWarning() {
+    return this._isReconciliated() && this._isNotEligibleToEnrolledComplementaryCertification();
+  }
+
+  _isNotEligibleToEnrolledComplementaryCertification() {
+    return (
+      !this.args.candidate.isStillEligibleToComplementaryCertification &&
+      this.args.candidate.enrolledComplementaryCertificationLabel
+    );
+  }
+
+  _isReconciliated() {
+    return (
+      this.featureToggles.featureToggles.isDifferentiatedTimeInvigilatorPortalEnabled && this.args.candidate.userId
+    );
+  }
+
+  get authorizationButtonLabel() {
+    const confirm = this.intl.t('pages.session-supervising.candidate-in-list.actions.confirm.label');
+    const cancel = this.intl.t('pages.session-supervising.candidate-in-list.actions.cancel-confirmation.label');
+
+    return this.args.candidate.authorizedToStart ? cancel : confirm;
+  }
+
+  get authorizationButtonAriaLabel() {
+    const candidateName = `${this.args.candidate.firstName} ${this.args.candidate.lastName}`;
+    const confirmAriaLabel = this.intl.t(
+      'pages.session-supervising.candidate-in-list.actions.confirm.extra-information',
+      {
+        candidate: candidateName,
+      }
+    );
+    const cancelAriaLabel = this.intl.t(
+      'pages.session-supervising.candidate-in-list.actions.cancel-confirmation.extra-information',
+      {
+        candidate: candidateName,
+      }
+    );
+
+    return this.args.candidate.authorizedToStart ? cancelAriaLabel : confirmAriaLabel;
+  }
+
+  get authorizationButtonBackgroundColor() {
+    return this.args.candidate.authorizedToStart ? 'transparent-dark' : 'blue';
   }
 
   @action
@@ -102,13 +163,21 @@ export default class CandidateInList extends Component {
           lastName: this.args.candidate.lastName,
         })
       );
-    } catch (error) {
-      this.notifications.error(
-        this.intl.t('pages.session-supervising.candidate-in-list.resume-test-modal.error', {
-          firstName: this.args.candidate.firstName,
-          lastName: this.args.candidate.lastName,
-        })
-      );
+    } catch (responseError) {
+      const error = responseError?.errors?.[0];
+      const parameters = {
+        firstName: this.args.candidate.firstName,
+        lastName: this.args.candidate.lastName,
+      };
+
+      let errorMessage;
+
+      if (error?.code) {
+        errorMessage = this.intl.t(`common.api-error-messages.${error.code}`, parameters);
+      } else {
+        errorMessage = this.intl.t('common.api-error-messages.authorize-resume-error', parameters);
+      }
+      this.notifications.error(errorMessage);
     }
   }
 
@@ -140,5 +209,10 @@ export default class CandidateInList extends Component {
   get candidateStartTime() {
     const startTime = dayjs(this.args.candidate.startDateTime).format('HH:mm');
     return startTime;
+  }
+
+  get candidateTheoricalEndDateTime() {
+    const theoricalEndDateTime = dayjs(this.args.candidate.theoricalEndDateTime).format('HH:mm');
+    return theoricalEndDateTime;
   }
 }

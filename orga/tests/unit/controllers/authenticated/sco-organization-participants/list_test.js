@@ -53,7 +53,7 @@ module('Unit | Controller | authenticated/sco-organization-participants/list', f
         await controller.importStudents(files);
 
         // then
-        const notificationMessage = controller.notifications.sendError.firstCall.firstArg.string;
+        const notificationMessage = controller.notifications.sendError.firstCall.firstArg.toString();
 
         assert.strictEqual(
           notificationMessage,
@@ -68,7 +68,7 @@ module('Unit | Controller | authenticated/sco-organization-participants/list', f
         await controller.importStudents(files);
 
         // then
-        const notificationMessage = controller.notifications.sendError.firstCall.firstArg.string;
+        const notificationMessage = controller.notifications.sendError.firstCall.firstArg.toString();
 
         assert.strictEqual(
           notificationMessage,
@@ -83,7 +83,7 @@ module('Unit | Controller | authenticated/sco-organization-participants/list', f
         await controller.importStudents(files);
 
         // then
-        const notificationMessage = controller.notifications.sendError.firstCall.firstArg.string;
+        const notificationMessage = controller.notifications.sendError.firstCall.firstArg.toString();
 
         assert.strictEqual(
           notificationMessage,
@@ -98,7 +98,7 @@ module('Unit | Controller | authenticated/sco-organization-participants/list', f
         await controller.importStudents(files);
 
         // then
-        const notificationMessage = controller.notifications.sendError.firstCall.firstArg.string;
+        const notificationMessage = controller.notifications.sendError.firstCall.firstArg.toString();
 
         assert.strictEqual(
           notificationMessage,
@@ -156,6 +156,60 @@ module('Unit | Controller | authenticated/sco-organization-participants/list', f
         // then
         assert.strictEqual(controller.someField, undefined);
       });
+    });
+  });
+
+  module('#sortByDivision', function () {
+    test('update sorting value and reset other', function (assert) {
+      // given
+      controller.divisionSort = null;
+      controller.participationCountOrder = 'Godzilla';
+      controller.lastnameSort = 'Kong';
+      controller.pageNumber = 9999;
+      // when
+      controller.sortByDivision('desc');
+
+      // then
+      assert.strictEqual(controller.divisionSort, 'desc');
+      assert.strictEqual(controller.participationCountOrder, null);
+      assert.strictEqual(controller.lastnameSort, null);
+      assert.strictEqual(controller.pageNumber, null);
+    });
+  });
+
+  module('#sortByLastname', function () {
+    test('update sorting value and reset other', function (assert) {
+      // given
+      controller.lastnameSort = null;
+      controller.divisionSort = 'king';
+      controller.participationCountOrder = 'Godzilla';
+      controller.pageNumber = 9999;
+      // when
+      controller.sortByLastname('desc');
+
+      // then
+      assert.strictEqual(controller.lastnameSort, 'desc');
+      assert.strictEqual(controller.divisionSort, null);
+      assert.strictEqual(controller.participationCountOrder, null);
+      assert.strictEqual(controller.pageNumber, null);
+    });
+  });
+
+  module('#sortByParticipationCount', function () {
+    test('update sorting value and reset other', function (assert) {
+      // given
+      controller.participationCountOrder = null;
+      controller.divisionSort = 'king';
+      controller.lastnameSort = 'T-Rex';
+      controller.pageNumber = 9999;
+      // when
+      controller.sortByParticipationCount('desc');
+
+      // then
+      assert.strictEqual(controller.participationCountOrder, 'desc');
+      assert.strictEqual(controller.lastnameSort, null);
+      assert.strictEqual(controller.divisionSort, null);
+      assert.strictEqual(controller.pageNumber, null);
     });
   });
 });

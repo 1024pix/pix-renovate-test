@@ -1,4 +1,4 @@
-const OidcIdentityProviders = require('../../../lib/domain/constants/oidc-identity-providers');
+import * as OidcIdentityProviders from '../../../lib/domain/constants/oidc-identity-providers.js';
 
 const PIX_SUPER_ADMIN_ID = 199;
 const PIX_SUPPORT_ID = 200;
@@ -8,7 +8,6 @@ const PIX_ALL_ORGA_ID = 203;
 const DEFAULT_PASSWORD = 'pix123';
 
 function usersBuilder({ databaseBuilder }) {
-
   const now = new Date('2022-06-10');
   databaseBuilder.factory.buildUser.withRawPassword({
     id: 1,
@@ -123,7 +122,7 @@ function usersBuilder({ databaseBuilder }) {
   });
   databaseBuilder.factory.buildAuthenticationMethod.withIdentityProvider({
     userId: pixUserWithPoleEmploiAuthenticationMethod.id,
-    identityProvider: OidcIdentityProviders.POLE_EMPLOI.service.code,
+    identityProvider: OidcIdentityProviders.POLE_EMPLOI.code,
   });
 
   const userWithPoleEmploiAuthenticationMethod = databaseBuilder.factory.buildUser.withoutPixAuthenticationMethod({
@@ -133,7 +132,7 @@ function usersBuilder({ databaseBuilder }) {
   });
   databaseBuilder.factory.buildAuthenticationMethod.withIdentityProvider({
     userId: userWithPoleEmploiAuthenticationMethod.id,
-    identityProvider: OidcIdentityProviders.POLE_EMPLOI.service.code,
+    identityProvider: OidcIdentityProviders.POLE_EMPLOI.code,
   });
 
   const pixUserWithCnavAuthenticationMethod = databaseBuilder.factory.buildUser.withRawPassword({
@@ -146,7 +145,7 @@ function usersBuilder({ databaseBuilder }) {
   });
   databaseBuilder.factory.buildAuthenticationMethod.withIdentityProvider({
     userId: pixUserWithCnavAuthenticationMethod.id,
-    identityProvider: OidcIdentityProviders.CNAV.service.code,
+    identityProvider: OidcIdentityProviders.CNAV.code,
   });
 
   const userWithCnavAuthenticationMethod = databaseBuilder.factory.buildUser.withoutPixAuthenticationMethod({
@@ -156,7 +155,7 @@ function usersBuilder({ databaseBuilder }) {
   });
   databaseBuilder.factory.buildAuthenticationMethod.withIdentityProvider({
     userId: userWithCnavAuthenticationMethod.id,
-    identityProvider: OidcIdentityProviders.CNAV.service.code,
+    identityProvider: OidcIdentityProviders.CNAV.code,
   });
 
   const userWithMultiplesAuthenticationMethods = databaseBuilder.factory.buildUser.withRawPassword({
@@ -169,11 +168,11 @@ function usersBuilder({ databaseBuilder }) {
   });
   databaseBuilder.factory.buildAuthenticationMethod.withIdentityProvider({
     userId: userWithMultiplesAuthenticationMethods.id,
-    identityProvider: OidcIdentityProviders.POLE_EMPLOI.service.code,
+    identityProvider: OidcIdentityProviders.POLE_EMPLOI.code,
   });
   databaseBuilder.factory.buildAuthenticationMethod.withIdentityProvider({
     userId: userWithMultiplesAuthenticationMethods.id,
-    identityProvider: OidcIdentityProviders.CNAV.service.code,
+    identityProvider: OidcIdentityProviders.CNAV.code,
   });
   databaseBuilder.factory.buildAuthenticationMethod.withGarAsIdentityProvider({
     externalIdentifier: `${userWithMultiplesAuthenticationMethods.firstName}.${userWithMultiplesAuthenticationMethods.lastName}.${userWithMultiplesAuthenticationMethods.id}`,
@@ -230,7 +229,7 @@ function usersBuilder({ databaseBuilder }) {
   });
 }
 
-module.exports = {
+export {
   usersBuilder,
   PIX_SUPER_ADMIN_ID,
   PIX_SUPPORT_ID,

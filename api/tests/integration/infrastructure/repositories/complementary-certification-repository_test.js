@@ -1,5 +1,5 @@
-const { expect, databaseBuilder, domainBuilder } = require('../../../test-helper');
-const complementaryCertificationRepository = require('../../../../lib/infrastructure/repositories/complementary-certification-repository');
+import { expect, databaseBuilder, domainBuilder } from '../../../test-helper.js';
+import * as complementaryCertificationRepository from '../../../../lib/infrastructure/repositories/complementary-certification-repository.js';
 
 describe('Integration | Repository | complementary-certification-repository', function () {
   describe('#findAll', function () {
@@ -60,7 +60,7 @@ describe('Integration | Repository | complementary-certification-repository', fu
       });
     });
 
-    describe('when there are no complementary certifications', function () {
+    describe('when there are no complementary certification', function () {
       it('should return an empty array', async function () {
         // given when
         const complementaryCertifications = await complementaryCertificationRepository.findAll();

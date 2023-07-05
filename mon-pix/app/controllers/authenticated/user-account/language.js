@@ -1,20 +1,26 @@
 import Controller from '@ember/controller';
 import { action } from '@ember/object';
-import { inject as service } from '@ember/service';
+import { tracked } from '@glimmer/tracking';
+import { service } from '@ember/service';
 
 export default class UserAccountPersonalInformationController extends Controller {
   @service currentUser;
-  @service dayjs;
-  @service intl;
   @service currentDomain;
+  @service locale;
+
+  @tracked shouldDisplayLanguageUpdatedMessage = false;
 
   @action
   async onLanguageChange(language) {
     if (!this.currentDomain.isFranceDomain) {
       await this.currentUser.user.save({ adapterOptions: { lang: language } });
 
-      this.intl.setLocale(language);
-      this.dayjs.setLocale(language);
+      this.locale.setLocale(language);
+      this._displayLanguageUpdatedMessage();
     }
+  }
+
+  _displayLanguageUpdatedMessage() {
+    this.shouldDisplayLanguageUpdatedMessage = true;
   }
 }

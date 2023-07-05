@@ -8,8 +8,11 @@ module('Integration | Component | TargetProfiles::Organizations', function (hook
   setupRenderingTest(hooks);
 
   hooks.beforeEach(function () {
+    const currentUser = this.owner.lookup('service:currentUser');
+    currentUser.adminMember = { isSuperAdmin: true };
     this.triggerFiltering = () => {};
     this.goToOrganizationPage = () => {};
+    this.detachOrganizations = () => {};
   });
 
   test('it should display the organizations', async function (assert) {
@@ -26,6 +29,7 @@ module('Integration | Component | TargetProfiles::Organizations', function (hook
   @organizations={{this.organizations}}
   @goToOrganizationPage={{this.goToOrganizationPage}}
   @triggerFiltering={{this.triggerFiltering}}
+  @detachOrganizations={{this.detachOrganizations}}
 />`
     );
 
@@ -47,6 +51,7 @@ module('Integration | Component | TargetProfiles::Organizations', function (hook
   @organizations={{this.organizations}}
   @goToOrganizationPage={{this.goToOrganizationPage}}
   @triggerFiltering={{this.triggerFiltering}}
+  @detachOrganizations={{this.detachOrganizations}}
 />`
     );
 
@@ -68,6 +73,7 @@ module('Integration | Component | TargetProfiles::Organizations', function (hook
   @organizations={{this.organizations}}
   @goToOrganizationPage={{this.goToOrganizationPage}}
   @triggerFiltering={{this.triggerFiltering}}
+  @detachOrganizations={{this.detachOrganizations}}
 />`
     );
 
@@ -84,6 +90,7 @@ module('Integration | Component | TargetProfiles::Organizations', function (hook
   @organizations={{this.organizations}}
   @goToOrganizationPage={{this.goToOrganizationPage}}
   @triggerFiltering={{this.triggerFiltering}}
+  @detachOrganizations={{this.detachOrganizations}}
 />`
     );
     await fillByLabel('Rattacher une ou plusieurs organisation(s)', '1, 2');
@@ -102,12 +109,82 @@ module('Integration | Component | TargetProfiles::Organizations', function (hook
   @organizations={{this.organizations}}
   @goToOrganizationPage={{this.goToOrganizationPage}}
   @triggerFiltering={{this.triggerFiltering}}
+  @detachOrganizations={{this.detachOrganizations}}
 />`
     );
     await fillByLabel("Rattacher les organisations d'un profil cible existant", 1);
     await clickByName('Valider le rattachement à partir de ce profil cible');
 
     assert.dom('[placeholder="1135"]').hasValue('1');
+  });
+
+  test('it should show a column to detach organization from profile-cible', async function (assert) {
+    // given
+    const organization1 = EmberObject.create({ id: 123, name: 'Orga1', externalId: 'O1' });
+    const organizations = [organization1];
+    organizations.meta = { page: 1, pageSize: 1 };
+    this.organizations = organizations;
+
+    // when
+    const screen = await render(
+      hbs`<TargetProfiles::Organizations
+  @organizations={{this.organizations}}
+  @goToOrganizationPage={{this.goToOrganizationPage}}
+  @triggerFiltering={{this.triggerFiltering}}
+  @detachOrganizations={{this.detachOrganizations}}
+/>`
+    );
+
+    const detachButton = await screen.queryByRole('button', { name: 'Détacher' });
+    assert.dom(detachButton).exists();
+  });
+
+  test('it should not show a column to detach organization from profile-cible if not super-admin', async function (assert) {
+    // given
+    const currentUser = this.owner.lookup('service:currentUser');
+    currentUser.adminMember = { isSuperAdmin: false };
+
+    const organization1 = EmberObject.create({ id: 123, name: 'Orga1', externalId: 'O1' });
+    const organizations = [organization1];
+    organizations.meta = { page: 1, pageSize: 1 };
+    this.organizations = organizations;
+
+    // when
+    const screen = await render(
+      hbs`<TargetProfiles::Organizations
+  @organizations={{this.organizations}}
+  @goToOrganizationPage={{this.goToOrganizationPage}}
+  @triggerFiltering={{this.triggerFiltering}}
+  @detachOrganizations={{this.detachOrganizations}}
+/>`
+    );
+
+    const detachButton = await screen.queryByRole('button', { name: 'Détacher' });
+    assert.dom(detachButton).doesNotExist();
+  });
+
+  test('it should show a column to detach organization from profile-cible if metier', async function (assert) {
+    // given
+    const currentUser = this.owner.lookup('service:currentUser');
+    currentUser.adminMember = { isSuperAdmin: false, isMetier: true };
+
+    const organization1 = EmberObject.create({ id: 123, name: 'Orga1', externalId: 'O1' });
+    const organizations = [organization1];
+    organizations.meta = { page: 1, pageSize: 1 };
+    this.organizations = organizations;
+
+    // when
+    const screen = await render(
+      hbs`<TargetProfiles::Organizations
+  @organizations={{this.organizations}}
+  @goToOrganizationPage={{this.goToOrganizationPage}}
+  @triggerFiltering={{this.triggerFiltering}}
+  @detachOrganizations={{this.detachOrganizations}}
+/>`
+    );
+
+    const detachButton = await screen.queryByRole('button', { name: 'Détacher' });
+    assert.dom(detachButton).exists();
   });
 
   test('it should disable buttons when the inputs are empty', async function (assert) {
@@ -122,6 +199,7 @@ module('Integration | Component | TargetProfiles::Organizations', function (hook
   @organizations={{this.organizations}}
   @goToOrganizationPage={{this.goToOrganizationPage}}
   @triggerFiltering={{this.triggerFiltering}}
+  @detachOrganizations={{this.detachOrganizations}}
 />`
     );
 

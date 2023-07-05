@@ -1,5 +1,5 @@
 import Controller from '@ember/controller';
-import { inject as service } from '@ember/service';
+import { service } from '@ember/service';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 
@@ -10,6 +10,8 @@ export default class AuthenticatedCertificationsController extends Controller {
   @service currentUser;
   @service notifications;
   @service intl;
+
+  @tracked selectedLanguage = this.intl.primaryLocale;
 
   @tracked selectedDivision = '';
 
@@ -36,7 +38,7 @@ export default class AuthenticatedCertificationsController extends Controller {
       const organizationId = this.currentUser.organization.id;
       const url = `/api/organizations/${organizationId}/certification-results?division=${encodeURIComponent(
         this.selectedDivision
-      )}`;
+      )}&lang=${this.selectedLanguage}`;
 
       let token = '';
 
@@ -52,7 +54,7 @@ export default class AuthenticatedCertificationsController extends Controller {
           { autoClear: false }
         );
       } else {
-        this.notifications.error(error.message, { autoClear: false });
+        this.notifications.sendError(error.message, { autoClear: false });
       }
     }
   }
@@ -90,7 +92,7 @@ export default class AuthenticatedCertificationsController extends Controller {
           { autoClear: false }
         );
       } else {
-        this.notifications.error(error.message, { autoClear: false });
+        this.notifications.sendError(error.message, { autoClear: false });
       }
     }
   }

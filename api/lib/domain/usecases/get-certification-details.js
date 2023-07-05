@@ -1,6 +1,7 @@
-const CertificationDetails = require('../read-models/CertificationDetails.js');
+import { CertificationDetails } from '../read-models/CertificationDetails.js';
+import { CertificationVersion } from '../models/CertificationVersion.js';
 
-module.exports = async function getCertificationDetails({
+const getCertificationDetails = async function ({
   certificationCourseId,
   competenceMarkRepository,
   certificationAssessmentRepository,
@@ -24,6 +25,8 @@ module.exports = async function getCertificationDetails({
   }
 };
 
+export { getCertificationDetails };
+
 async function _computeCertificationDetailsOnTheFly(
   certificationAssessment,
   placementProfileService,
@@ -36,7 +39,7 @@ async function _computeCertificationDetailsOnTheFly(
   const placementProfile = await placementProfileService.getPlacementProfile({
     userId: certificationAssessment.userId,
     limitDate: certificationAssessment.createdAt,
-    isV2Certification: certificationAssessment.isV2Certification,
+    version: CertificationVersion.V2,
   });
 
   return CertificationDetails.fromCertificationAssessmentScore({
@@ -54,7 +57,7 @@ async function _retrievePersistedCertificationDetails(
   const placementProfile = await placementProfileService.getPlacementProfile({
     userId: certificationAssessment.userId,
     limitDate: certificationAssessment.createdAt,
-    isV2Certification: certificationAssessment.isV2Certification,
+    version: CertificationVersion.V2,
   });
 
   return CertificationDetails.from({

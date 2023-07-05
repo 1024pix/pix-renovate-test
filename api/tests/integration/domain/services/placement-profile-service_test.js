@@ -1,7 +1,9 @@
-const { expect, databaseBuilder, mockLearningContent, learningContentBuilder } = require('../../../test-helper');
-const placementProfileService = require('../../../../lib/domain/services/placement-profile-service');
-const KnowledgeElement = require('../../../../lib/domain/models/KnowledgeElement');
-const { ENGLISH_SPOKEN } = require('../../../../lib/domain/constants').LOCALE;
+import { expect, databaseBuilder, mockLearningContent, learningContentBuilder } from '../../../test-helper.js';
+import * as placementProfileService from '../../../../lib/domain/services/placement-profile-service.js';
+import { KnowledgeElement } from '../../../../lib/domain/models/KnowledgeElement.js';
+import { LOCALE } from '../../../../lib/domain/constants.js';
+
+const { ENGLISH_SPOKEN } = LOCALE;
 
 describe('Integration | Service | Placement Profile Service', function () {
   let userId, assessmentId;
@@ -86,7 +88,7 @@ describe('Integration | Service | Placement Profile Service', function () {
       },
     ];
 
-    const learningContentObjects = learningContentBuilder.buildLearningContent.fromAreas(learningContent);
+    const learningContentObjects = learningContentBuilder.fromAreas(learningContent);
     mockLearningContent(learningContentObjects);
 
     userId = databaseBuilder.factory.buildUser().id;
@@ -130,7 +132,7 @@ describe('Integration | Service | Placement Profile Service', function () {
         const actualPlacementProfile = await placementProfileService.getPlacementProfile({
           userId,
           limitDate,
-          isV2Certification: false,
+          version: 1,
         });
 
         // then
@@ -168,14 +170,13 @@ describe('Integration | Service | Placement Profile Service', function () {
   });
 
   context('V2 Profile', function () {
-    const isV2Certification = true;
     describe('#getPlacementProfile', function () {
       it('should assign 0 pixScore and level of 0 to user competence when not assessed', async function () {
         // when
         const actualPlacementProfile = await placementProfileService.getPlacementProfile({
           userId,
           limitDate: '2020-10-27 08:44:25',
-          isV2Certification,
+          version: 2,
         });
 
         // then
@@ -215,7 +216,7 @@ describe('Integration | Service | Placement Profile Service', function () {
         const actualPlacementProfile = await placementProfileService.getPlacementProfile({
           userId,
           limitDate: new Date(),
-          isV2Certification,
+          version: 2,
           locale: ENGLISH_SPOKEN,
         });
 
@@ -229,7 +230,7 @@ describe('Integration | Service | Placement Profile Service', function () {
         const actualPlacementProfile = await placementProfileService.getPlacementProfile({
           userId,
           limitDate: new Date(),
-          isV2Certification,
+          version: 2,
         });
 
         // then
@@ -257,7 +258,7 @@ describe('Integration | Service | Placement Profile Service', function () {
           const actualPlacementProfile = await placementProfileService.getPlacementProfile({
             userId,
             limitDate: new Date(),
-            isV2Certification,
+            version: 2,
           });
 
           // then
@@ -318,7 +319,7 @@ describe('Integration | Service | Placement Profile Service', function () {
           const actualPlacementProfile = await placementProfileService.getPlacementProfile({
             userId,
             limitDate: new Date(),
-            isV2Certification,
+            version: 2,
           });
 
           // then
@@ -339,7 +340,7 @@ describe('Integration | Service | Placement Profile Service', function () {
             const actualPlacementProfile = await placementProfileService.getPlacementProfile({
               userId,
               limitDate: new Date(),
-              isV2Certification,
+              version: 2,
               allowExcessPixAndLevels: true,
             });
 
@@ -366,7 +367,7 @@ describe('Integration | Service | Placement Profile Service', function () {
             const actualPlacementProfile = await placementProfileService.getPlacementProfile({
               userId,
               limitDate: new Date(),
-              isV2Certification,
+              version: 2,
               allowExcessPixAndLevels: false,
             });
 
@@ -404,7 +405,7 @@ describe('Integration | Service | Placement Profile Service', function () {
           const actualPlacementProfile = await placementProfileService.getPlacementProfile({
             userId,
             limitDate: new Date(),
-            isV2Certification,
+            version: 2,
           });
 
           // then

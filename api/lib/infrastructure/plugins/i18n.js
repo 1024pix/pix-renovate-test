@@ -1,4 +1,6 @@
-const hapiI18n = require('hapi-i18n');
+import hapiI18n from 'hapi-i18n';
+import * as url from 'url';
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 const plugin = hapiI18n;
 const options = {
   locales: ['en', 'fr'],
@@ -8,9 +10,10 @@ const options = {
   languageHeaderField: 'Accept-Language',
   objectNotation: true,
   updateFiles: false,
+  mustacheConfig: {
+    tags: ['{', '}'],
+    disable: false,
+  },
 };
 
-module.exports = {
-  plugin,
-  options,
-};
+export { plugin, options };

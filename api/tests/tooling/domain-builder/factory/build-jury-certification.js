@@ -1,6 +1,6 @@
-const JuryCertification = require('../../../../lib/domain/models/JuryCertification');
-const buildCertificationIssueReport = require('./build-certification-issue-report');
-const buildCompetenceMark = require('./build-competence-mark');
+import { JuryCertification } from '../../../../lib/domain/models/JuryCertification.js';
+import { buildCertificationIssueReport } from './build-certification-issue-report.js';
+import { buildCompetenceMark } from './build-competence-mark.js';
 
 const buildJuryCertification = function ({
   certificationCourseId = 123,
@@ -27,8 +27,8 @@ const buildJuryCertification = function ({
   commentForJury = 'comment jury',
   competenceMarks = [buildCompetenceMark()],
   certificationIssueReports = [buildCertificationIssueReport()],
-  commonComplementaryCertificationCourseResults = [],
-  complementaryCertificationCourseResultsWithExternal = {},
+  commonComplementaryCertificationCourseResult = null,
+  complementaryCertificationCourseResultWithExternal = {},
 } = {}) {
   return new JuryCertification({
     certificationCourseId,
@@ -55,9 +55,9 @@ const buildJuryCertification = function ({
     commentForJury,
     competenceMarks,
     certificationIssueReports,
-    commonComplementaryCertificationCourseResults,
-    complementaryCertificationCourseResultsWithExternal,
+    commonComplementaryCertificationCourseResult,
+    complementaryCertificationCourseResultWithExternal,
   });
 };
 
-module.exports = buildJuryCertification;
+export { buildJuryCertification };

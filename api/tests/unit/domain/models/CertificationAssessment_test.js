@@ -1,14 +1,15 @@
-const _ = require('lodash');
-const CertificationAssessment = require('../../../../lib/domain/models/CertificationAssessment');
-const AnswerStatus = require('../../../../lib/domain/models/AnswerStatus');
-const NeutralizationAttempt = require('../../../../lib/domain/models/NeutralizationAttempt');
-const CertificationAnswerStatusChangeAttempt = require('../../../../lib/domain/models/CertificationAnswerStatusChangeAttempt');
-const { expect, domainBuilder } = require('../../../test-helper');
-const {
+import _ from 'lodash';
+import { CertificationAssessment } from '../../../../lib/domain/models/CertificationAssessment.js';
+import { AnswerStatus } from '../../../../lib/domain/models/AnswerStatus.js';
+import { NeutralizationAttempt } from '../../../../lib/domain/models/NeutralizationAttempt.js';
+import { CertificationAnswerStatusChangeAttempt } from '../../../../lib/domain/models/CertificationAnswerStatusChangeAttempt.js';
+import { expect, domainBuilder } from '../../../test-helper.js';
+
+import {
   ObjectValidationError,
   ChallengeToBeNeutralizedNotFoundError,
   ChallengeToBeDeneutralizedNotFoundError,
-} = require('../../../../lib/domain/errors');
+} from '../../../../lib/domain/errors.js';
 
 describe('Unit | Domain | Models | CertificationAssessment', function () {
   describe('constructor', function () {
@@ -21,7 +22,7 @@ describe('Unit | Domain | Models | CertificationAssessment', function () {
         createdAt: new Date('2020-01-01'),
         completedAt: new Date('2020-01-01'),
         state: CertificationAssessment.states.STARTED,
-        isV2Certification: true,
+        version: 2,
         certificationChallenges: ['challenge'],
         certificationAnswersByDate: ['answer'],
       };
@@ -83,9 +84,9 @@ describe('Unit | Domain | Models | CertificationAssessment', function () {
       );
     });
 
-    it('should throw an ObjectValidationError when isV2Certification is not valid', function () {
+    it('should throw an ObjectValidationError when version is not valid', function () {
       // when
-      expect(() => new CertificationAssessment({ ...validArguments, isV2Certification: 'glouglou' })).to.throw(
+      expect(() => new CertificationAssessment({ ...validArguments, version: 'glouglou' })).to.throw(
         ObjectValidationError
       );
     });
@@ -161,7 +162,7 @@ describe('Unit | Domain | Models | CertificationAssessment', function () {
         createdAt: new Date('2020-01-01'),
         completedAt: new Date('2020-01-01'),
         state: CertificationAssessment.states.STARTED,
-        isV2Certification: true,
+        version: 2,
         certificationChallenges: [
           challengeToBeNeutralized,
           domainBuilder.buildCertificationChallengeWithType({ challengeId: 'rec2', isNeutralized: false }),
@@ -193,7 +194,7 @@ describe('Unit | Domain | Models | CertificationAssessment', function () {
         createdAt: new Date('2020-01-01'),
         completedAt: new Date('2020-01-01'),
         state: CertificationAssessment.states.STARTED,
-        isV2Certification: true,
+        version: 2,
         certificationChallenges: [
           domainBuilder.buildCertificationChallengeWithType({ challengeId: 'rec2', isNeutralized: false }),
           domainBuilder.buildCertificationChallengeWithType({ challengeId: 'rec3', isNeutralized: false }),
@@ -223,7 +224,7 @@ describe('Unit | Domain | Models | CertificationAssessment', function () {
         createdAt: new Date('2020-01-01'),
         completedAt: new Date('2020-01-01'),
         state: CertificationAssessment.states.STARTED,
-        isV2Certification: true,
+        version: 2,
         certificationChallenges: [
           challengeToBeDeneutralized,
           domainBuilder.buildCertificationChallengeWithType({ challengeId: 'rec2', isNeutralized: true }),
@@ -255,7 +256,7 @@ describe('Unit | Domain | Models | CertificationAssessment', function () {
         createdAt: new Date('2020-01-01'),
         completedAt: new Date('2020-01-01'),
         state: CertificationAssessment.states.STARTED,
-        isV2Certification: true,
+        version: 2,
         certificationChallenges: [
           domainBuilder.buildCertificationChallengeWithType({ challengeId: 'rec2', isNeutralized: false }),
           domainBuilder.buildCertificationChallengeWithType({ challengeId: 'rec3', isNeutralized: false }),
@@ -285,7 +286,7 @@ describe('Unit | Domain | Models | CertificationAssessment', function () {
         createdAt: new Date('2020-01-01'),
         completedAt: new Date('2020-01-01'),
         state: CertificationAssessment.states.STARTED,
-        isV2Certification: true,
+        version: 2,
         certificationChallenges: [challengeKoToBeNeutralized],
         certificationAnswersByDate: [
           domainBuilder.buildAnswer({
@@ -318,7 +319,7 @@ describe('Unit | Domain | Models | CertificationAssessment', function () {
         createdAt: new Date('2020-01-01'),
         completedAt: new Date('2020-01-01'),
         state: CertificationAssessment.states.STARTED,
-        isV2Certification: true,
+        version: 2,
         certificationChallenges: [challengeSkippedToBeNeutralized],
         certificationAnswersByDate: [
           domainBuilder.buildAnswer({
@@ -351,7 +352,7 @@ describe('Unit | Domain | Models | CertificationAssessment', function () {
         createdAt: new Date('2020-01-01'),
         completedAt: new Date('2020-01-01'),
         state: CertificationAssessment.states.STARTED,
-        isV2Certification: true,
+        version: 2,
         certificationChallenges: [challengeSkippedToBeNeutralized],
         certificationAnswersByDate: [
           domainBuilder.buildAnswer({
@@ -384,7 +385,7 @@ describe('Unit | Domain | Models | CertificationAssessment', function () {
         createdAt: new Date('2020-01-01'),
         completedAt: new Date('2020-01-01'),
         state: CertificationAssessment.states.STARTED,
-        isV2Certification: true,
+        version: 2,
         certificationChallenges: [challengeNotToBeNeutralized],
         certificationAnswersByDate: [
           domainBuilder.buildAnswer({
@@ -412,7 +413,7 @@ describe('Unit | Domain | Models | CertificationAssessment', function () {
         createdAt: new Date('2020-01-01'),
         completedAt: new Date('2020-01-01'),
         state: CertificationAssessment.states.STARTED,
-        isV2Certification: true,
+        version: 2,
         certificationChallenges: [
           domainBuilder.buildCertificationChallengeWithType({ challengeId: 'rec2', isNeutralized: false }),
           domainBuilder.buildCertificationChallengeWithType({ challengeId: 'rec3', isNeutralized: false }),

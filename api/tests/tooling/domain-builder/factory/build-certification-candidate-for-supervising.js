@@ -1,7 +1,8 @@
-const CertificationCandidateForSupervising = require('../../../../lib/domain/models/CertificationCandidateForSupervising');
+import { CertificationCandidateForSupervising } from '../../../../lib/domain/models/CertificationCandidateForSupervising.js';
 
-module.exports = function buildCertificationCandidateForSupervising({
+const buildCertificationCandidateForSupervising = function ({
   id = 123,
+  userId = 345,
   firstName = 'Monkey',
   lastName = 'D Luffy',
   birthdate = '1997-07-22',
@@ -9,10 +10,13 @@ module.exports = function buildCertificationCandidateForSupervising({
   authorizedToStart = false,
   assessmentStatus = null,
   startDateTime = new Date('2022-10-01T12:00:00Z'),
-  complementaryCertification,
+  theoricalEndDateTime,
+  enrolledComplementaryCertification,
+  stillValidBadgeAcquisitions = [],
 } = {}) {
   return new CertificationCandidateForSupervising({
     id,
+    userId,
     firstName,
     lastName,
     birthdate,
@@ -20,6 +24,10 @@ module.exports = function buildCertificationCandidateForSupervising({
     authorizedToStart,
     assessmentStatus,
     startDateTime,
-    complementaryCertification,
+    theoricalEndDateTime,
+    enrolledComplementaryCertification,
+    stillValidBadgeAcquisitions,
   });
 };
+
+export { buildCertificationCandidateForSupervising };

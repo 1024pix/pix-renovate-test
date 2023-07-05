@@ -1,6 +1,6 @@
 {
   "name": "pix-e2e",
-  "version": "0.456.0",
+  "version": "1.12.0",
   "description": "Permet d'exécuter des tests de bout en bout sur la plateforme Pix",
   "homepage": "https://github.com/1024pix/pix#readme",
   "author": "GIP Pix",
@@ -38,10 +38,10 @@
   "devDependencies": {
     "axe-core": "^4.4.3",
     "cypress": "^8.7.0",
-    "cypress-axe": "^0.13.0",
+    "cypress-axe": "^0.14.0",
     "cypress-cucumber-preprocessor": "^4.1.1",
     "cypress-visual-regression": "^1.5.7",
-    "eslint": "^7.20.0",
+    "eslint": "^8.0.0",
     "eslint-plugin-cypress": "^2.11.2",
     "npm-run-all": "4.1.5"
   },

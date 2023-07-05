@@ -1,10 +1,8 @@
 import { module, test } from 'qunit';
 import sinon from 'sinon';
 import setupIntlRenderingTest from '../../../../../helpers/setup-intl-rendering';
-import { contains } from '../../../../../helpers/contains';
-import { clickByLabel } from '../../../../../helpers/click-by-label';
-// eslint-disable-next-line no-restricted-imports
-import { render } from '@ember/test-helpers';
+import { click } from '@ember/test-helpers';
+import { render } from '@1024pix/ember-testing-library';
 import { hbs } from 'ember-cli-htmlbars';
 
 module('Integration | Component | routes/campaigns/profiles_collection/send-profile', function (hooks) {
@@ -17,11 +15,12 @@ module('Integration | Component | routes/campaigns/profiles_collection/send-prof
       this.set('campaignParticipation', { isShared: false });
 
       // when
-      await render(
+      const screen = await render(
         hbs`<Routes::Campaigns::ProfilesCollection::SendProfile @isDisabled={{this.isDisabled}} @campaignParticipation={{this.campaignParticipation}} />`
       );
 
-      assert.notOk(contains(this.intl.t('pages.send-profile.form.send')));
+      // then
+      assert.notOk(screen.queryByRole('button', { name: this.intl.t('pages.send-profile.form.send') }));
     });
   });
 
@@ -32,13 +31,15 @@ module('Integration | Component | routes/campaigns/profiles_collection/send-prof
       this.set('isDisabled', false);
       this.set('sendProfile', sendProfile);
       this.set('campaignParticipation', { isShared: false });
-
-      // when
-      await render(
+      const screen = await render(
         hbs`<Routes::Campaigns::ProfilesCollection::SendProfile @isDisabled={{this.isDisabled}} @campaignParticipation={{this.campaignParticipation}} @sendProfile={{this.sendProfile}} />`
       );
-      await clickByLabel(this.intl.t('pages.send-profile.form.send'));
 
+      // when
+      const sendProfileButtons = screen.getAllByRole('button', { name: this.intl.t('pages.send-profile.form.send') });
+      await click(sendProfileButtons[0]);
+
+      // then
       sinon.assert.called(sendProfile);
       assert.ok(true);
     });

@@ -1,12 +1,12 @@
-const DomainTransaction = require('../../infrastructure/DomainTransaction.js');
-
-const AuthenticationMethod = require('../../domain/models/AuthenticationMethod.js');
-const UserToCreate = require('../models/UserToCreate.js');
+import { DomainTransaction } from '../../infrastructure/DomainTransaction.js';
+import { AuthenticationMethod } from '../../domain/models/AuthenticationMethod.js';
+import { NON_OIDC_IDENTITY_PROVIDERS } from '../constants/identity-providers.js';
+import { UserToCreate } from '../models/UserToCreate.js';
 
 function _buildPasswordAuthenticationMethod({ userId, hashedPassword }) {
   return new AuthenticationMethod({
     userId,
-    identityProvider: AuthenticationMethod.identityProviders.PIX,
+    identityProvider: NON_OIDC_IDENTITY_PROVIDERS.PIX.code,
     authenticationComplement: new AuthenticationMethod.PixAuthenticationComplement({
       password: hashedPassword,
       shouldChangePassword: false,
@@ -17,7 +17,7 @@ function _buildPasswordAuthenticationMethod({ userId, hashedPassword }) {
 function _buildGARAuthenticationMethod({ externalIdentifier, user }) {
   return new AuthenticationMethod({
     externalIdentifier,
-    identityProvider: AuthenticationMethod.identityProviders.GAR,
+    identityProvider: NON_OIDC_IDENTITY_PROVIDERS.GAR.code,
     userId: user.id,
     authenticationComplement: new AuthenticationMethod.GARAuthenticationComplement({
       firstName: user.firstName,
@@ -115,8 +115,4 @@ async function createAndReconcileUserToOrganizationLearner({
   });
 }
 
-module.exports = {
-  createAndReconcileUserToOrganizationLearner,
-  createUserWithPassword,
-  updateUsernameAndAddPassword,
-};
+export { createAndReconcileUserToOrganizationLearner, createUserWithPassword, updateUsernameAndAddPassword };

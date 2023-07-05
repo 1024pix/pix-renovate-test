@@ -1,13 +1,13 @@
-const {
+import {
   databaseBuilder,
   expect,
   generateValidRequestAuthorizationHeader,
   knex,
   generateIdTokenForExternalUser,
-} = require('../../../test-helper');
+} from '../../../test-helper.js';
 
-const createServer = require('../../../../server');
-const AuthenticationMethod = require('../../../../lib/domain/models/AuthenticationMethod');
+import { createServer } from '../../../../server.js';
+import { NON_OIDC_IDENTITY_PROVIDERS } from '../../../../lib/domain/constants/identity-providers.js';
 
 describe('Acceptance | Controller | sco-organization-learners', function () {
   let server;
@@ -408,7 +408,7 @@ describe('Acceptance | Controller | sco-organization-learners', function () {
           expect(response.payload).to.contains('access-token');
           const result = await knex('authentication-methods').where({
             userId: user.id,
-            identityProvider: AuthenticationMethod.identityProviders.GAR,
+            identityProvider: NON_OIDC_IDENTITY_PROVIDERS.GAR.code,
           });
           const garAuthenticationMethod = result[0];
           expect(garAuthenticationMethod.externalIdentifier).to.equal(externalUser.samlId);
@@ -455,7 +455,7 @@ describe('Acceptance | Controller | sco-organization-learners', function () {
           expect(response.payload).to.contains('access-token');
           const result = await knex('authentication-methods').where({
             userId: userWithSamlIdOnly.id,
-            identityProvider: AuthenticationMethod.identityProviders.GAR,
+            identityProvider: NON_OIDC_IDENTITY_PROVIDERS.GAR.code,
           });
           const garAuthenticationMethod = result[0];
           expect(garAuthenticationMethod.externalIdentifier).to.equal(externalUser.samlId);

@@ -1,6 +1,6 @@
-const _ = require('lodash');
-const CompetenceMark = require('./CompetenceMark.js');
-const ComplementaryCertificationCourseResult = require('./ComplementaryCertificationCourseResult.js');
+import _ from 'lodash';
+import { CompetenceMark } from './CompetenceMark.js';
+import { ComplementaryCertificationCourseResult } from './ComplementaryCertificationCourseResult.js';
 
 const status = {
   REJECTED: 'rejected',
@@ -128,24 +128,6 @@ class CertificationResult {
     ];
   }
 
-  getUniqComplementaryCertificationCourseResultHeaders() {
-    return this.getUniqComplementaryCertificationCourseResultLabels().map((label) => `Certification ${label}`);
-  }
-
-  getComplementaryCertificationStatus(sessionComplementaryCertificationsLabel) {
-    let status = 'Non passée';
-    if (this.isCancelled()) {
-      return 'Annulée';
-    }
-    const complementaryCertificationCourseResult = this.complementaryCertificationCourseResults.find(
-      ({ label }) => label === sessionComplementaryCertificationsLabel
-    );
-    if (complementaryCertificationCourseResult) {
-      status = complementaryCertificationCourseResult.acquired ? 'Validée' : 'Rejetée';
-    }
-    return status;
-  }
-
   _getCertificationCourseResultByPartnerKeys(partnerKeys) {
     return this.complementaryCertificationCourseResults.find(({ partnerKey }) => partnerKeys.includes(partnerKey));
   }
@@ -153,4 +135,4 @@ class CertificationResult {
 
 CertificationResult.status = status;
 CertificationResult.emitters = emitters;
-module.exports = CertificationResult;
+export { CertificationResult };

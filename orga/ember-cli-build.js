@@ -11,16 +11,14 @@ module.exports = function (defaults) {
     babel: {
       sourceMaps: 'inline',
     },
+    'ember-simple-auth': {
+      useSessionSetupMethod: true,
+    },
     'ember-cli-template-lint': {
       testGenerator: 'qunit', // or 'mocha', etc.
     },
-
     'ember-cli-babel': {
       includePolyfill: true,
-    },
-    'ember-dayjs': {
-      locales: ['fr', 'en'], // English is automatically included. No need to add.
-      plugins: ['duration', 'relativeTime'],
     },
   });
 

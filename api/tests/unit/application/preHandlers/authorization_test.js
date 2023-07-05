@@ -1,9 +1,9 @@
-const { expect, sinon, domainBuilder, catchErr, hFake } = require('../../../test-helper');
-const { NotFoundError } = require('../../../../lib/application/http-errors');
-const {
+import { expect, sinon, domainBuilder, catchErr, hFake } from '../../../test-helper.js';
+import { NotFoundError } from '../../../../lib/application/http-errors.js';
+import {
   verifyCertificationSessionAuthorization,
   verifySessionAuthorization,
-} = require('../../../../lib/application/preHandlers/authorization');
+} from '../../../../lib/application/preHandlers/authorization.js';
 
 describe('Unit | Pre-handler | Authorization', function () {
   const userId = 1;
@@ -53,7 +53,7 @@ describe('Unit | Pre-handler | Authorization', function () {
 
         // then
         expect(error).to.be.instanceOf(NotFoundError);
-        expect(error.message).to.equal("La session n'existe pas ou son accès est restreint");
+        expect(error.message).to.equal("Session does not exist or it's access is restricted.");
       });
     });
   });
@@ -104,7 +104,7 @@ describe('Unit | Pre-handler | Authorization', function () {
 
         // then
         expect(error).to.be.instanceOf(NotFoundError);
-        expect(error.message).to.equal("La session n'existe pas ou son accès est restreint");
+        expect(error.message).to.equal("Session does not exist or it's access is restricted.");
       });
     });
   });

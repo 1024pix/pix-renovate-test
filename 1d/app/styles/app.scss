@@ -1,0 +1,25 @@
+@charset "utf-8";
+@import 'globals/fonts';
+@import 'globals/buttons';
+@import 'components/challenge-actions';
+@import 'components/challenge-embed-simulator';
+@import 'components/answer';
+@import 'components/challenge-instruction';
+@import 'components/challenge-item';
+@import 'components/home';
+@import 'components/mission';
+@import 'components/card';
+@import 'components/warning';
+
+body {
+  text-align: center;
+  background-color: #F4F5F7;
+  color: #07142E;
+  font-family: $font-nunito;
+  font-weight: 600;
+}
+
+b {
+  font-weight: bold;
+}
+

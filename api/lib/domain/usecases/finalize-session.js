@@ -1,13 +1,14 @@
-const {
+import {
   SessionAlreadyFinalizedError,
   SessionWithoutStartedCertificationError,
   SessionWithAbortReasonOnCompletedCertificationCourseError,
   SessionWithMissingAbortReasonError,
-} = require('../errors.js');
-const SessionFinalized = require('../events/SessionFinalized.js');
-const bluebird = require('bluebird');
+} from '../errors.js';
 
-module.exports = async function finalizeSession({
+import { SessionFinalized } from '../events/SessionFinalized.js';
+import bluebird from 'bluebird';
+
+const finalizeSession = async function ({
   sessionId,
   examinerGlobalComment,
   certificationReports,
@@ -26,7 +27,7 @@ module.exports = async function finalizeSession({
   const abortReasonCount = _countAbortReasons(certificationReports);
 
   if (isSessionAlreadyFinalized) {
-    throw new SessionAlreadyFinalizedError('Cannot finalize session more than once');
+    throw new SessionAlreadyFinalizedError();
   }
 
   if (hasNoStartedCertification) {
@@ -73,6 +74,8 @@ module.exports = async function finalizeSession({
     sessionTime: finalizedSession.time,
   });
 };
+
+export { finalizeSession };
 
 function _hasAbortReasonForCompletedCertificationCourse({ abortReasonCount, uncompletedCertificationCount }) {
   return abortReasonCount > uncompletedCertificationCount;

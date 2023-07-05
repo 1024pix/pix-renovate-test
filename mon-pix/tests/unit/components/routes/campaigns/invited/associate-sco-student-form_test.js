@@ -22,7 +22,7 @@ module('Unit | Component | routes/campaigns/invited/associate-sco-student-form',
     sessionStub = { set: sinon.stub() };
     onSubmitStub = sinon.stub();
     eventStub = { preventDefault: sinon.stub() };
-    component = createComponent('component:routes/campaigns/invited/associate-sco-student-form', {
+    component = createComponent('routes/campaigns/invited/associate-sco-student-form', {
       onSubmit: onSubmitStub,
       campaignCode: 123,
     });
@@ -43,7 +43,9 @@ module('Unit | Component | routes/campaigns/invited/associate-sco-student-form',
 
     test('should create a sco-organization-learner', async function (assert) {
       // given
-      storeStub.createRecord.returns({ unloadRecord: () => {} });
+      storeStub.createRecord.returns({
+        unloadRecord: () => {},
+      });
 
       // when
       await component.actions.submit.call(component, attributes);
@@ -61,7 +63,9 @@ module('Unit | Component | routes/campaigns/invited/associate-sco-student-form',
 
     test('should call onSubmit with withReconciliation adapterOption to false', async function (assert) {
       // given
-      const scoOrganizationLearner = { unloadRecord: () => {} };
+      const scoOrganizationLearner = {
+        unloadRecord: () => {},
+      };
       storeStub.createRecord.returns(scoOrganizationLearner);
 
       // when
@@ -88,7 +92,9 @@ module('Unit | Component | routes/campaigns/invited/associate-sco-student-form',
     module('When user is logged in with email', function () {
       test('should open information modal and set reconciliationWarning', async function (assert) {
         // given
-        const scoOrganizationLearner = { unloadRecord: () => {} };
+        const scoOrganizationLearner = {
+          unloadRecord: () => {},
+        };
         storeStub.createRecord.returns(scoOrganizationLearner);
         const connectionMethod = 'test@example.net';
         component.currentUser.user.email = connectionMethod;
@@ -110,7 +116,9 @@ module('Unit | Component | routes/campaigns/invited/associate-sco-student-form',
     module('When user is logged in with username', function () {
       test('should open information modal and set reconciliationWarning', async function (assert) {
         // given
-        const scoOrganizationLearner = { unloadRecord: () => {} };
+        const scoOrganizationLearner = {
+          unloadRecord: () => {},
+        };
         storeStub.createRecord.returns(scoOrganizationLearner);
         const connectionMethod = 'john.doe3001';
         component.currentUser.user.username = connectionMethod;
@@ -150,7 +158,7 @@ module('Unit | Component | routes/campaigns/invited/associate-sco-student-form',
 
         // then
         sinon.assert.calledOnce(record.unloadRecord);
-        assert.strictEqual(component.errorMessage.string, expectedErrorMessage);
+        assert.strictEqual(component.errorMessage.toString(), expectedErrorMessage);
         assert.ok(true);
       });
 
@@ -220,7 +228,7 @@ module('Unit | Component | routes/campaigns/invited/associate-sco-student-form',
       module('When user has an invalid reconciliation', function () {
         test('should return a bad request error and display the invalid reconciliation error message', async function (assert) {
           // given
-          const expectedErrorMessage = this.intl.t('pages.join.sco.invalid-reconciliation-error');
+          const expectedErrorMessage = this.intl.t('pages.join.sco.invalid-reconciliation-error', { htmlSafe: true });
           const error = { status: '400' };
 
           onSubmitStub.rejects({ errors: [error] });
@@ -229,7 +237,7 @@ module('Unit | Component | routes/campaigns/invited/associate-sco-student-form',
           await component.actions.submit.call(component, attributes);
 
           // then
-          assert.strictEqual(component.errorMessage.string, expectedErrorMessage);
+          assert.deepEqual(component.errorMessage, expectedErrorMessage);
         });
       });
 
@@ -272,7 +280,9 @@ module('Unit | Component | routes/campaigns/invited/associate-sco-student-form',
 
     test('should create a sco-organization-learner', async function (assert) {
       // given
-      storeStub.createRecord.returns({ unloadRecord: () => {} });
+      storeStub.createRecord.returns({
+        unloadRecord: () => {},
+      });
 
       // when
       await component.actions.associate.call(component, eventStub);
@@ -290,7 +300,9 @@ module('Unit | Component | routes/campaigns/invited/associate-sco-student-form',
 
     test('should call onSubmit with withReconciliation adapterOption to true', async function (assert) {
       // given
-      const scoOrganizationLearner = { unloadRecord: () => {} };
+      const scoOrganizationLearner = {
+        unloadRecord: () => {},
+      };
       storeStub.createRecord.returns(scoOrganizationLearner);
 
       // when

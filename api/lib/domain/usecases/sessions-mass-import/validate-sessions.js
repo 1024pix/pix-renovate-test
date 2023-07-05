@@ -1,11 +1,9 @@
-const Session = require('../../models/Session');
-const SessionMassImportReport = require('../../models/SessionMassImportReport');
-const sessionsImportValidationService = require('../../services/sessions-mass-import/sessions-import-validation-service');
-const temporarySessionsStorageForMassImportService = require('../../services/sessions-mass-import/temporary-sessions-storage-for-mass-import-service');
-const CertificationCandidate = require('../../models/CertificationCandidate');
-const bluebird = require('bluebird');
+import { Session } from '../../models/Session.js';
+import { SessionMassImportReport } from '../../models/SessionMassImportReport.js';
+import { CertificationCandidate } from '../../models/CertificationCandidate.js';
+import bluebird from 'bluebird';
 
-module.exports = async function validateSessions({
+const validateSessions = async function ({
   sessions,
   userId,
   certificationCenterId,
@@ -17,6 +15,8 @@ module.exports = async function validateSessions({
   certificationCourseRepository,
   sessionCodeService,
   i18n,
+  sessionsImportValidationService,
+  temporarySessionsStorageForMassImportService,
 }) {
   const { name: certificationCenter, isSco } = await certificationCenterRepository.get(certificationCenterId);
   const sessionsMassImportReport = new SessionMassImportReport();
@@ -55,6 +55,7 @@ module.exports = async function validateSessions({
         certificationCpfCityRepository,
         complementaryCertificationRepository,
         translate,
+        sessionsImportValidationService,
       });
 
       session.certificationCandidates = validatedCertificationCandidates;
@@ -76,6 +77,8 @@ module.exports = async function validateSessions({
   return sessionsMassImportReport;
 };
 
+export { validateSessions };
+
 async function _createValidCertificationCandidates({
   certificationCandidates,
   sessionId,
@@ -85,6 +88,7 @@ async function _createValidCertificationCandidates({
   certificationCpfCityRepository,
   complementaryCertificationRepository,
   translate,
+  sessionsImportValidationService,
 }) {
   const { uniqueCandidates, duplicateCandidateErrors } =
     sessionsImportValidationService.getUniqueCandidates(certificationCandidates);
@@ -119,12 +123,12 @@ async function _createValidCertificationCandidates({
     } else {
       domainCertificationCandidate.updateBirthInformation(cpfBirthInformation);
 
-      if (domainCertificationCandidate.complementaryCertifications.length) {
+      if (domainCertificationCandidate.complementaryCertification) {
         const complementaryCertification = await complementaryCertificationRepository.getByLabel({
-          label: domainCertificationCandidate.complementaryCertifications[0],
+          label: domainCertificationCandidate.complementaryCertification,
         });
 
-        domainCertificationCandidate.complementaryCertifications = [complementaryCertification];
+        domainCertificationCandidate.complementaryCertification = complementaryCertification;
       }
     }
 

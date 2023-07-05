@@ -1,25 +1,26 @@
-const _ = require('lodash');
-const bluebird = require('bluebird');
+import _ from 'lodash';
+import bluebird from 'bluebird';
 
-const UserCompetence = require('../models/UserCompetence.js');
-const PlacementProfile = require('../models/PlacementProfile.js');
-const assessmentRepository = require('../../infrastructure/repositories/assessment-repository.js');
-const skillRepository = require('../../infrastructure/repositories/skill-repository.js');
-const assessmentResultRepository = require('../../infrastructure/repositories/assessment-result-repository.js');
-const knowledgeElementRepository = require('../../infrastructure/repositories/knowledge-element-repository.js');
-const competenceRepository = require('../../infrastructure/repositories/competence-repository.js');
-const scoringService = require('./scoring/scoring-service.js');
+import { UserCompetence } from '../models/UserCompetence.js';
+import { PlacementProfile } from '../models/PlacementProfile.js';
+import * as assessmentRepository from '../../infrastructure/repositories/assessment-repository.js';
+import * as skillRepository from '../../infrastructure/repositories/skill-repository.js';
+import * as assessmentResultRepository from '../../infrastructure/repositories/assessment-result-repository.js';
+import * as knowledgeElementRepository from '../../infrastructure/repositories/knowledge-element-repository.js';
+import * as competenceRepository from '../../infrastructure/repositories/competence-repository.js';
+import * as scoringService from './scoring/scoring-service.js';
+import { CertificationVersion } from '../models/CertificationVersion.js';
 
 async function getPlacementProfile({
   userId,
   limitDate,
-  isV2Certification = true,
+  version = CertificationVersion.V2,
   allowExcessPixAndLevels = true,
   locale,
 }) {
   const pixCompetences = await competenceRepository.listPixCompetencesOnly({ locale });
-  if (isV2Certification) {
-    return _generatePlacementProfileV2({
+  if (version !== CertificationVersion.V1) {
+    return _generatePlacementProfile({
       userId,
       profileDate: limitDate,
       competences: pixCompetences,
@@ -105,7 +106,7 @@ function _createUserCompetencesV2({
   });
 }
 
-async function _generatePlacementProfileV2({ userId, profileDate, competences, allowExcessPixAndLevels }) {
+async function _generatePlacementProfile({ userId, profileDate, competences, allowExcessPixAndLevels }) {
   const knowledgeElementsByCompetence = await knowledgeElementRepository.findUniqByUserIdGroupedByCompetenceId({
     userId,
     limitDate: profileDate,
@@ -181,8 +182,4 @@ function _matchingDirectlyValidatedSkillsForCompetence(knowledgeElementsForCompe
   return _.compact(competenceSkills);
 }
 
-module.exports = {
-  getPlacementProfile,
-  getPlacementProfilesWithSnapshotting,
-  getPlacementProfileWithSnapshotting,
-};
+export { getPlacementProfile, getPlacementProfilesWithSnapshotting, getPlacementProfileWithSnapshotting };

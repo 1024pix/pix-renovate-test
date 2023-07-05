@@ -1,10 +1,9 @@
-const { expect, sinon, domainBuilder } = require('../../../../test-helper');
-const sessionsImportValidationService = require('../../../../../lib/domain/services/sessions-mass-import/sessions-import-validation-service');
-const { CpfBirthInformationValidation } = require('../../../../../lib/domain/services/certification-cpf-service');
-const {
-  CERTIFICATION_CANDIDATES_ERRORS,
-} = require('../../../../../lib/domain/constants/certification-candidates-errors');
-const noop = require('lodash/noop');
+import { expect, sinon, domainBuilder } from '../../../../test-helper.js';
+import * as sessionsImportValidationService from '../../../../../lib/domain/services/sessions-mass-import/sessions-import-validation-service.js';
+import { CpfBirthInformationValidation } from '../../../../../lib/domain/services/certification-cpf-service.js';
+import { CERTIFICATION_CANDIDATES_ERRORS } from '../../../../../lib/domain/constants/certification-candidates-errors.js';
+import lodash from 'lodash';
+const { noop } = lodash;
 
 describe('Unit | Service | sessions import validation Service', function () {
   describe('#validateSession', function () {
@@ -454,6 +453,38 @@ describe('Unit | Service | sessions import validation Service', function () {
       });
     });
 
+    context("when candidate's extraTimePourcentage is below than 1", function () {
+      it('should return a report', async function () {
+        // given
+        const isSco = false;
+        const candidate = _buildValidCandidateData();
+        candidate.extraTimePercentage = 0.33;
+        const cpfBirthInformationValidation = new CpfBirthInformationValidation();
+        cpfBirthInformationValidation.success({ ...candidate });
+        const certificationCpfServiceStub = {
+          getBirthInformation: sinon.stub().resolves(cpfBirthInformationValidation),
+        };
+
+        // when
+        const { certificationCandidateErrors } =
+          await sessionsImportValidationService.getValidatedCandidateBirthInformation({
+            candidate,
+            isSco,
+            line: 1,
+            dependencies: { certificationCpfService: certificationCpfServiceStub },
+          });
+
+        // then
+        expect(certificationCandidateErrors).to.deep.equal([
+          {
+            code: 'CANDIDATE_EXTRA_TIME_OUT_OF_RANGE',
+            line: 1,
+            isBlocking: true,
+          },
+        ]);
+      });
+    });
+
     context('when candidate has missing billing information', function () {
       context('when the parsed candidate is not sco', function () {
         context('when billing mode is null', function () {
@@ -731,7 +762,7 @@ function _buildValidCandidateData({ lineNumber = 0, candidateNumber = 2 } = { ca
     resultRecipientEmail: 'robindahood@email.fr',
     email: 'robindahood2@email.fr',
     externalId: 'htehte',
-    extraTimePercentage: '20',
+    extraTimePercentage: 20,
     billingMode: 'PAID',
     line: lineNumber,
   });

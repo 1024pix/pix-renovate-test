@@ -1,4 +1,4 @@
-const SkillSetResult = require('./SkillSetResult.js');
+import { SkillSetResult } from './SkillSetResult.js';
 
 class BadgeResult {
   constructor(badge, participationResults) {
@@ -13,6 +13,7 @@ class BadgeResult {
     this.isAlwaysVisible = badge.isAlwaysVisible;
     this.isCertifiable = badge.isCertifiable;
     this.isValid = badge.isValid;
+    this.acquisitionPercentage = badge.acquisitionPercentage;
 
     this.skillSetResults = badge.badgeCompetences.map((badgeCompetence) =>
       _buildSkillSetResult(badgeCompetence, knowledgeElements)
@@ -27,4 +28,4 @@ function _buildSkillSetResult(badgeCompetence, knowledgeElements) {
   return new SkillSetResult(badgeCompetence, competenceKnowledgeElements);
 }
 
-module.exports = BadgeResult;
+export { BadgeResult };

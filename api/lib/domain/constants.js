@@ -1,23 +1,25 @@
-const settings = require('../config.js');
+import { config } from '../config.js';
 
 const PIX_COUNT_BY_LEVEL = 8;
 const COMPETENCES_COUNT = 16;
-const MAX_REACHABLE_PIX_BY_COMPETENCE = settings.features.maxReachableLevel * PIX_COUNT_BY_LEVEL;
+const MAX_REACHABLE_PIX_BY_COMPETENCE = config.features.maxReachableLevel * PIX_COUNT_BY_LEVEL;
 
-const MAX_REACHABLE_LEVEL = settings.features.maxReachableLevel;
+const MAX_REACHABLE_LEVEL = config.features.maxReachableLevel;
 const MAX_REACHABLE_PIX_SCORE = MAX_REACHABLE_PIX_BY_COMPETENCE * COMPETENCES_COUNT;
 const MAX_CHALLENGES_PER_COMPETENCE_FOR_CERTIFICATION = 3;
 const MAX_CHALLENGES_PER_AREA_FOR_CERTIFICATION_PLUS = 4;
 const MAX_MASTERY_RATE = 1;
-const MINIMUM_DELAY_IN_DAYS_FOR_RESET = settings.features.dayBeforeCompetenceResetV2;
-const MINIMUM_DELAY_IN_DAYS_BEFORE_IMPROVING = settings.features.dayBeforeImproving;
-const MINIMUM_DELAY_IN_DAYS_BEFORE_RETRYING = settings.features.dayBeforeRetrying;
+const MINIMUM_DELAY_IN_DAYS_FOR_RESET = config.features.dayBeforeCompetenceResetV2;
+const MINIMUM_DELAY_IN_DAYS_BEFORE_IMPROVING = config.features.dayBeforeImproving;
+const MINIMUM_DELAY_IN_DAYS_BEFORE_RETRYING = config.features.dayBeforeRetrying;
 
 const MINIMUM_CERTIFIABLE_COMPETENCES_FOR_CERTIFIABILITY = 5;
 const MINIMUM_COMPETENCE_LEVEL_FOR_CERTIFIABILITY = 1;
 const MINIMUM_REPRODUCIBILITY_RATE_TO_BE_CERTIFIED = 50;
 const MINIMUM_REPRODUCIBILITY_RATE_TO_BE_TRUSTED = 80;
 const UNCERTIFIED_LEVEL = -1;
+
+const MAX_NEXT_GEN_CERTIFICATION_CHALLENGES = 20;
 
 const MAX_LEVEL_TO_BE_AN_EASY_TUBE = 3;
 const DEFAULT_LEVEL_FOR_FIRST_CHALLENGE = 2;
@@ -48,6 +50,7 @@ const PIX_CERTIF = {
   SCOPE: 'pix-certif',
   NOT_LINKED_CERTIFICATION_MSG:
     "L'accès à Pix Certif est limité aux centres de certification Pix. Contactez le référent de votre centre de certification si vous pensez avoir besoin d'y accéder.",
+  DEFAULT_SESSION_DURATION_MINUTES: 105,
 };
 
 const LOCALE = {
@@ -140,13 +143,14 @@ const constants = {
   ORGANIZATION_FEATURE,
 };
 
-module.exports = {
+export {
   constants,
   PIX_COUNT_BY_LEVEL,
   COMPETENCES_COUNT,
   MAX_REACHABLE_LEVEL,
   MAX_REACHABLE_PIX_SCORE,
   MAX_REACHABLE_PIX_BY_COMPETENCE,
+  MAX_NEXT_GEN_CERTIFICATION_CHALLENGES,
   MAX_CHALLENGES_PER_COMPETENCE_FOR_CERTIFICATION,
   MAX_CHALLENGES_PER_AREA_FOR_CERTIFICATION_PLUS,
   MAX_MASTERY_RATE,

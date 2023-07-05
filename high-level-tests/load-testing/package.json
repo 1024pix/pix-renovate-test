@@ -1,6 +1,6 @@
 {
   "name": "pix-load-testing",
-  "version": "1.455.0",
+  "version": "2.12.0",
   "description": "Permet d'exécuter des tests de charge sur l'API de la plateforme Pix.",
   "homepage": "https://github.com/1024pix/pix/tree/dev/high-level-tests/load-testing#readme",
   "author": "GIP Pix",
@@ -39,6 +39,7 @@
     "test": "npm run lint && npm run test:js"
   },
   "devDependencies": {
+    "@faker-js/faker": "^5.5.3",
     "chai": "^4.3.4",
     "js2xmlparser": "^4.0.1",
     "mocha": "^9.1.0",
@@ -49,9 +50,8 @@
     "artillery": "^2.0.0-31",
     "artillery-plugin-expect": "^1.5.0",
     "artillery-plugin-publish-metrics": "^1.4.0",
-    "eslint": "^7.32.0",
+    "eslint": "^8.0.0",
     "eslint-plugin-yaml": "^0.5.0",
-    "faker": "^5.5.3",
     "lodash": "^4.17.21"
   }
 }

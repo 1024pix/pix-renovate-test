@@ -1,7 +1,7 @@
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import ChallengeItemGeneric from './challenge-item-generic';
-import { inject as service } from '@ember/service';
+import { service } from '@ember/service';
 import generateRandomString from 'mon-pix/utils/generate-random-string';
 import proposalsAsBlocks from 'mon-pix/utils/proposals-as-blocks';
 import { isEmbedAllowedOrigin } from 'mon-pix/utils/embed-allowed-origins';
@@ -10,12 +10,12 @@ export default class ChallengeItemQroc extends ChallengeItemGeneric {
   @service intl;
 
   @tracked autoReplyAnswer = '';
-  @tracked qcrocProposalAnswerValue = '';
+  @tracked qrocProposalAnswerValue = '';
   postMessageHandler = null;
 
   constructor() {
     super(...arguments);
-    this.qcrocProposalAnswerValue = this.userAnswer;
+    this.qrocProposalAnswerValue = this.userAnswer;
     if (this.args.challenge.autoReply) {
       this._addEventListener();
     }
@@ -31,9 +31,9 @@ export default class ChallengeItemQroc extends ChallengeItemGeneric {
   }
 
   _getAnswerValue() {
-    const qcrocProposalAnswerValueBis =
-      document.querySelector('[data-uid="qroc-proposal-uid"]')?.value || this.qcrocProposalAnswerValue;
-    return this.showProposal ? qcrocProposalAnswerValueBis : this.autoReplyAnswer;
+    const qrocProposalAnswerValueBis =
+      document.querySelector('[data-uid="qroc-proposal-uid"]')?.value || this.qrocProposalAnswerValue;
+    return this.showProposal ? qrocProposalAnswerValueBis : this.autoReplyAnswer;
   }
 
   _getErrorMessage() {
@@ -103,7 +103,7 @@ export default class ChallengeItemQroc extends ChallengeItemGeneric {
   @action
   onChangeSelect(value) {
     this.errorMessage = null;
-    this.qcrocProposalAnswerValue = value;
+    this.qrocProposalAnswerValue = value;
   }
 
   @action

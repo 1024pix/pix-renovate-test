@@ -1,6 +1,8 @@
-const { expect, databaseBuilder, generateValidRequestAuthorizationHeader, knex } = require('../../../test-helper');
-const createServer = require('../../../../server');
-const fs = require('fs');
+import { expect, databaseBuilder, generateValidRequestAuthorizationHeader, knex } from '../../../test-helper.js';
+import { createServer } from '../../../../server.js';
+import fs from 'fs';
+import * as url from 'url';
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 describe('Acceptance | Controller | session-controller-import-certification-candidates-from-attendance-sheet', function () {
   let server;
@@ -122,7 +124,7 @@ describe('Acceptance | Controller | session-controller-import-certification-cand
     });
 
     context('when at least one candidate is already linked to a user', function () {
-      it('should respond with a 400 when user cant import the candidates', async function () {
+      it('should respond with a 403 when user cant import the candidates', async function () {
         // given
         const odsFileName = 'files/1.5/import-certification-candidates-reports-categorization-test-ok.ods';
         const odsFilePath = `${__dirname}/${odsFileName}`;
@@ -136,7 +138,7 @@ describe('Acceptance | Controller | session-controller-import-certification-cand
         const response = await server.inject(options);
 
         // then
-        expect(response.statusCode).to.equal(400);
+        expect(response.statusCode).to.equal(403);
       });
     });
   });

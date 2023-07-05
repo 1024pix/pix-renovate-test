@@ -35,15 +35,22 @@
 
     .page-actions {
       display: flex;
+      align-items: center;
       gap: 1rem;
+
+      &__link {
+        font-size: 0.875rem;
+        color: $pix-primary;
+
+        svg {
+          margin-right: 2px;
+        }
+      }
     }
   }
 
   .page-body {
-    top: 60px;
-    left: 80px;
-    right: 0;
-    bottom: 0;
+    inset: 60px 0 0 80px;
     padding: 10px;
 
     .page-section {

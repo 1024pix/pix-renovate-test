@@ -1,7 +1,7 @@
 import Controller from '@ember/controller';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
-import { inject as service } from '@ember/service';
+import { service } from '@ember/service';
 
 export default class ActivityController extends Controller {
   @service router;
@@ -42,15 +42,15 @@ export default class ActivityController extends Controller {
   }
 
   @action
-  async deleteCampaignParticipant(campaignId, campaignParticipantActivity) {
+  async deleteCampaignParticipation(campaignId, campaignParticipantActivity) {
     try {
       await campaignParticipantActivity.destroyRecord({
         adapterOptions: { campaignId, campaignParticipationId: campaignParticipantActivity.id },
       });
       this.send('refreshModel');
-      this.notifications.success(this.intl.t('pages.campaign-activity.delete-participation-modal.success'));
+      this.notifications.sendSuccess(this.intl.t('pages.campaign-activity.delete-participation-modal.success'));
     } catch (error) {
-      this.notifications.error(this.intl.t('pages.campaign-activity.delete-participation-modal.error'));
+      this.notifications.sendError(this.intl.t('pages.campaign-activity.delete-participation-modal.error'));
     }
   }
 }

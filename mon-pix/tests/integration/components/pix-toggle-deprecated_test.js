@@ -1,7 +1,8 @@
 import { module, test } from 'qunit';
 import setupIntlRenderingTest from '../../helpers/setup-intl-rendering';
 // eslint-disable-next-line no-restricted-imports
-import { find, render, click } from '@ember/test-helpers';
+import { find, click } from '@ember/test-helpers';
+import { render } from '@1024pix/ember-testing-library';
 import { hbs } from 'ember-cli-htmlbars';
 
 module('Integration | Component | pix-toggle-deprecated', function (hooks) {
@@ -16,7 +17,7 @@ module('Integration | Component | pix-toggle-deprecated', function (hooks) {
     this.set('isFirstOn', 'true');
 
     await render(
-      hbs`{{pix-toggle-deprecated onToggle=this.onToggle valueFirstLabel=this.valueFirstLabel valueSecondLabel=this.valueSecondLabel}}`
+      hbs`<PixToggleDeprecated @onToggle={{this.onToggle}} @valueFirstLabel={{this.valueFirstLabel}} @valueSecondLabel={{this.valueSecondLabel}} />`
     );
   });
 

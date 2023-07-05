@@ -1,6 +1,7 @@
-const AuthenticationMethod = require('../../models/AuthenticationMethod.js');
+import { AuthenticationMethod } from '../../models/AuthenticationMethod.js';
+import { NON_OIDC_IDENTITY_PROVIDERS } from '../../constants/identity-providers.js';
 
-module.exports = async function updateUserForAccountRecovery({
+const updateUserForAccountRecovery = async function ({
   password,
   temporaryKey,
   userRepository,
@@ -30,7 +31,7 @@ module.exports = async function updateUserForAccountRecovery({
   } else {
     const authenticationMethodFromPix = new AuthenticationMethod({
       userId,
-      identityProvider: AuthenticationMethod.identityProviders.PIX,
+      identityProvider: NON_OIDC_IDENTITY_PROVIDERS.PIX.code,
       authenticationComplement: new AuthenticationMethod.PixAuthenticationComplement({
         password: hashedPassword,
         shouldChangePassword: false,
@@ -59,3 +60,5 @@ module.exports = async function updateUserForAccountRecovery({
   });
   await accountRecoveryDemandRepository.markAsBeingUsed(temporaryKey, domainTransaction);
 };
+
+export { updateUserForAccountRecovery };

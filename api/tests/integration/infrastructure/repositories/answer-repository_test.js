@@ -1,8 +1,8 @@
-const { expect, knex, domainBuilder, databaseBuilder, catchErr } = require('../../../test-helper');
-const AnswerStatus = require('../../../../lib/domain/models/AnswerStatus');
-const KnowledgeElement = require('../../../../lib/domain/models/KnowledgeElement');
-const { ChallengeAlreadyAnsweredError, NotFoundError } = require('../../../../lib/domain/errors');
-const answerRepository = require('../../../../lib/infrastructure/repositories/answer-repository');
+import { expect, knex, domainBuilder, databaseBuilder, catchErr } from '../../../test-helper.js';
+import { AnswerStatus } from '../../../../lib/domain/models/AnswerStatus.js';
+import { KnowledgeElement } from '../../../../lib/domain/models/KnowledgeElement.js';
+import { ChallengeAlreadyAnsweredError, NotFoundError } from '../../../../lib/domain/errors.js';
+import * as answerRepository from '../../../../lib/infrastructure/repositories/answer-repository.js';
 
 describe('Integration | Repository | answerRepository', function () {
   describe('#get', function () {
@@ -420,7 +420,7 @@ describe('Integration | Repository | answerRepository', function () {
       const challengeIds = await answerRepository.findChallengeIdsFromAnswerIds([456, 123, 789, 159]);
 
       // then
-      expect(challengeIds).to.deepEqualArray(['recABC', 'recDEF', 'recGHI']);
+      expect(challengeIds).to.have.same.members(['recABC', 'recDEF', 'recGHI']);
     });
   });
 
@@ -581,6 +581,34 @@ describe('Integration | Repository | answerRepository', function () {
         expect(answerInDB[0].id).to.be.equal(alreadyCreatedAnswerId);
         expect(knowledgeElementsInDB).to.have.length(0);
       });
+    });
+  });
+
+  describe('#save', function () {
+    afterEach(async function () {
+      await knex('answers').delete();
+    });
+
+    it('should save and return the answer', async function () {
+      // given
+
+      const { id: assessmentId } = databaseBuilder.factory.buildAssessment();
+      await databaseBuilder.commit();
+
+      const answerToSave = domainBuilder.buildAnswer({
+        assessmentId,
+        result: AnswerStatus.OK,
+        resultDetails: 'some details',
+        value: 'Fruits',
+        challengeId: 'recChallenge123',
+      });
+
+      // when
+      const savedAnswer = await answerRepository.save(answerToSave);
+
+      // then
+      const answerInDB = await answerRepository.get(savedAnswer.id);
+      expect(savedAnswer).to.deep.equal(answerInDB);
     });
   });
 });

@@ -1,29 +1,33 @@
-const { v4: uuidv4 } = require('uuid');
-const settings = require('../../../config.js');
-const OidcAuthenticationService = require('./oidc-authentication-service.js');
-const { temporaryStorage } = require('../../../infrastructure/temporary-storage/index.js');
+import { v4 as uuidv4 } from 'uuid';
+import { config } from '../../../config.js';
+import { OidcAuthenticationService } from './oidc-authentication-service.js';
+import { temporaryStorage } from '../../../infrastructure/temporary-storage/index.js';
+import { FWB } from '../../constants/oidc-identity-providers.js';
 
+const configKey = FWB.configKey;
 const logoutUrlTemporaryStorage = temporaryStorage.withPrefix('logout-url:');
 
 class FwbOidcAuthenticationService extends OidcAuthenticationService {
   constructor() {
     super({
+      identityProvider: FWB.code,
+      configKey,
       source: 'fwb',
-      identityProvider: 'FWB',
       slug: 'fwb',
       organizationName: 'Fédération Wallonie-Bruxelles',
+      additionalRequiredProperties: ['logoutUrl'],
       hasLogoutUrl: true,
-      jwtOptions: { expiresIn: settings.fwb.accessTokenLifespanMs / 1000 },
-      clientSecret: settings.fwb.clientSecret,
-      clientId: settings.fwb.clientId,
-      tokenUrl: settings.fwb.tokenUrl,
-      authenticationUrl: settings.fwb.authenticationUrl,
+      jwtOptions: { expiresIn: config.fwb.accessTokenLifespanMs / 1000 },
+      clientSecret: config.fwb.clientSecret,
+      clientId: config.fwb.clientId,
+      tokenUrl: config.fwb.tokenUrl,
+      authenticationUrl: config.fwb.authenticationUrl,
       authenticationUrlParameters: [{ key: 'scope', value: 'openid profile' }],
-      userInfoUrl: settings.fwb.userInfoUrl,
+      userInfoUrl: config.fwb.userInfoUrl,
     });
 
-    this.logoutUrl = settings.fwb.logoutUrl;
-    this.temporaryStorage = settings.fwb.temporaryStorage;
+    this.logoutUrl = config.fwb.logoutUrl;
+    this.temporaryStorage = config.fwb.temporaryStorage;
   }
 
   async getRedirectLogoutUrl({ userId, logoutUrlUUID }) {
@@ -53,4 +57,4 @@ class FwbOidcAuthenticationService extends OidcAuthenticationService {
   }
 }
 
-module.exports = FwbOidcAuthenticationService;
+export { FwbOidcAuthenticationService };

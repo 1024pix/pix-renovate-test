@@ -1,16 +1,19 @@
-const { domainBuilder, sinon, expect, catchErr } = require('../../../test-helper');
+import { domainBuilder, sinon, expect, catchErr } from '../../../test-helper.js';
+import { publishSession } from '../../../../lib/domain/services/session-publication-service.js';
+import { FinalizedSession } from '../../../../lib/domain/models/FinalizedSession.js';
 
-const { publishSession } = require('../../../../lib/domain/services/session-publication-service');
-const FinalizedSession = require('../../../../lib/domain/models/FinalizedSession');
-const {
+import {
   SendingEmailToResultRecipientError,
   SessionAlreadyPublishedError,
   SendingEmailToRefererError,
-} = require('../../../../lib/domain/errors');
-const EmailingAttempt = require('../../../../lib/domain/models/EmailingAttempt');
+} from '../../../../lib/domain/errors.js';
+
+import { EmailingAttempt } from '../../../../lib/domain/models/EmailingAttempt.js';
+import { getI18n } from '../../../tooling/i18n/i18n.js';
 
 describe('Unit | UseCase | session-publication-service', function () {
   const sessionId = 123;
+  let i18n;
   let certificationRepository;
   let sessionRepository;
   let finalizedSessionRepository;
@@ -20,6 +23,7 @@ describe('Unit | UseCase | session-publication-service', function () {
   let clock;
   let mailService;
   beforeEach(function () {
+    i18n = getI18n();
     clock = sinon.useFakeTimers(now);
     certificationRepository = {
       publishCertificationCoursesBySessionId: sinon.stub(),
@@ -129,6 +133,7 @@ describe('Unit | UseCase | session-publication-service', function () {
 
         // when
         await publishSession({
+          i18n,
           sessionId,
           certificationCenterRepository,
           certificationRepository,
@@ -157,6 +162,7 @@ describe('Unit | UseCase | session-publication-service', function () {
 
         // when
         await publishSession({
+          i18n,
           sessionId,
           certificationCenterRepository,
           certificationRepository,
@@ -194,16 +200,27 @@ describe('Unit | UseCase | session-publication-service', function () {
         });
         finalizedSessionRepository.get.withArgs({ sessionId }).resolves(finalizedSession);
         mailService.sendCertificationResultEmail
-          .withArgs({ sessionId, resultRecipientEmail: 'email1@example.net', daysBeforeExpiration: 30 })
+          .withArgs({
+            sessionId,
+            resultRecipientEmail: 'email1@example.net',
+            daysBeforeExpiration: 30,
+            translate: i18n,
+          })
           .returns('token-1');
         mailService.sendCertificationResultEmail
-          .withArgs({ sessionId, resultRecipientEmail: 'email2@example.net', daysBeforeExpiration: 30 })
+          .withArgs({
+            sessionId,
+            resultRecipientEmail: 'email2@example.net',
+            daysBeforeExpiration: 30,
+            translate: i18n,
+          })
           .returns('token-2');
         mailService.sendCertificationResultEmail.onCall(0).resolves(EmailingAttempt.success(recipient1));
         mailService.sendCertificationResultEmail.onCall(1).resolves(EmailingAttempt.success(recipient2));
 
         // when
         await publishSession({
+          i18n,
           sessionId,
           certificationCenterRepository,
           certificationRepository,
@@ -248,6 +265,7 @@ describe('Unit | UseCase | session-publication-service', function () {
 
           // when
           await publishSession({
+            i18n,
             sessionId,
             certificationCenterRepository,
             certificationRepository,
@@ -442,6 +460,7 @@ describe('Unit | UseCase | session-publication-service', function () {
 
         // when
         const error = await catchErr(publishSession)({
+          i18n,
           sessionId,
           certificationCenterRepository,
           certificationRepository,
@@ -459,6 +478,7 @@ describe('Unit | UseCase | session-publication-service', function () {
           certificationCenterName: 'certificationCenter',
           sessionDate: originalSession.date,
           email: 'email1@example.net',
+          translate: i18n.__,
         });
         expect(mailService.sendCertificationResultEmail).to.have.been.calledWith({
           sessionId,
@@ -467,6 +487,7 @@ describe('Unit | UseCase | session-publication-service', function () {
           certificationCenterName: 'certificationCenter',
           sessionDate: originalSession.date,
           email: 'email2@example.net',
+          translate: i18n.__,
         });
         expect(sessionRepository.flagResultsAsSentToPrescriber).to.not.have.been.called;
         expect(error).to.be.an.instanceOf(SendingEmailToResultRecipientError);

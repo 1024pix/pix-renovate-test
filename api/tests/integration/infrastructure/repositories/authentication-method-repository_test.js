@@ -1,9 +1,10 @@
-const { catchErr, databaseBuilder, domainBuilder, expect, knex, sinon } = require('../../../test-helper');
-const { AlreadyExistingEntityError, AuthenticationMethodNotFoundError } = require('../../../../lib/domain/errors');
-const AuthenticationMethod = require('../../../../lib/domain/models/AuthenticationMethod');
-const OidcIdentityProviders = require('../../../../lib/domain/constants/oidc-identity-providers');
-const authenticationMethodRepository = require('../../../../lib/infrastructure/repositories/authentication-method-repository');
-const DomainTransaction = require('../../../../lib/infrastructure/DomainTransaction');
+import { catchErr, databaseBuilder, domainBuilder, expect, knex, sinon } from '../../../test-helper.js';
+import { AlreadyExistingEntityError, AuthenticationMethodNotFoundError } from '../../../../lib/domain/errors.js';
+import { AuthenticationMethod } from '../../../../lib/domain/models/AuthenticationMethod.js';
+import { NON_OIDC_IDENTITY_PROVIDERS } from '../../../../lib/domain/constants/identity-providers.js';
+import * as OidcIdentityProviders from '../../../../lib/domain/constants/oidc-identity-providers.js';
+import * as authenticationMethodRepository from '../../../../lib/infrastructure/repositories/authentication-method-repository.js';
+import { DomainTransaction } from '../../../../lib/infrastructure/DomainTransaction.js';
 
 describe('Integration | Repository | AuthenticationMethod', function () {
   const hashedPassword = 'ABCDEF1234';
@@ -286,7 +287,7 @@ describe('Integration | Repository | AuthenticationMethod', function () {
       const authenticationMethodsByUserIdAndIdentityProvider =
         await authenticationMethodRepository.findOneByUserIdAndIdentityProvider({
           userId,
-          identityProvider: AuthenticationMethod.identityProviders.GAR,
+          identityProvider: NON_OIDC_IDENTITY_PROVIDERS.GAR.code,
         });
 
       // then
@@ -303,7 +304,7 @@ describe('Integration | Repository | AuthenticationMethod', function () {
       const authenticationMethodsByUserIdAndIdentityProvider =
         await authenticationMethodRepository.findOneByUserIdAndIdentityProvider({
           userId,
-          identityProvider: AuthenticationMethod.identityProviders.GAR,
+          identityProvider: NON_OIDC_IDENTITY_PROVIDERS.GAR.code,
         });
 
       // then
@@ -324,7 +325,7 @@ describe('Integration | Repository | AuthenticationMethod', function () {
         // when
         const pixAuthenticationMethod = await authenticationMethodRepository.findOneByUserIdAndIdentityProvider({
           userId: user.id,
-          identityProvider: AuthenticationMethod.identityProviders.PIX,
+          identityProvider: NON_OIDC_IDENTITY_PROVIDERS.PIX.code,
         });
 
         // then
@@ -352,7 +353,7 @@ describe('Integration | Repository | AuthenticationMethod', function () {
         // when
         const pixAuthenticationMethod = await authenticationMethodRepository.findOneByUserIdAndIdentityProvider({
           userId: user.id,
-          identityProvider: OidcIdentityProviders.POLE_EMPLOI.service.code,
+          identityProvider: OidcIdentityProviders.POLE_EMPLOI.code,
         });
 
         // then
@@ -380,7 +381,7 @@ describe('Integration | Repository | AuthenticationMethod', function () {
         // when
         const garAuthenticationMethod = await authenticationMethodRepository.findOneByUserIdAndIdentityProvider({
           userId: user.id,
-          identityProvider: AuthenticationMethod.identityProviders.GAR,
+          identityProvider: NON_OIDC_IDENTITY_PROVIDERS.GAR.code,
         });
 
         // then
@@ -414,7 +415,7 @@ describe('Integration | Repository | AuthenticationMethod', function () {
       const authenticationMethodsByTypeAndValue =
         await authenticationMethodRepository.findOneByExternalIdentifierAndIdentityProvider({
           externalIdentifier,
-          identityProvider: AuthenticationMethod.identityProviders.GAR,
+          identityProvider: NON_OIDC_IDENTITY_PROVIDERS.GAR.code,
         });
 
       // then
@@ -426,7 +427,7 @@ describe('Integration | Repository | AuthenticationMethod', function () {
       const authenticationMethodsByTypeAndValue =
         await authenticationMethodRepository.findOneByExternalIdentifierAndIdentityProvider({
           externalIdentifier: 'samlId',
-          identityProvider: AuthenticationMethod.identityProviders.GAR,
+          identityProvider: NON_OIDC_IDENTITY_PROVIDERS.GAR.code,
         });
 
       // then
@@ -459,7 +460,7 @@ describe('Integration | Repository | AuthenticationMethod', function () {
         // when
         await authenticationMethodRepository.updateExternalIdentifierByUserIdAndIdentityProvider({
           userId,
-          identityProvider: AuthenticationMethod.identityProviders.GAR,
+          identityProvider: NON_OIDC_IDENTITY_PROVIDERS.GAR.code,
           externalIdentifier: 'new_value',
         });
 
@@ -484,7 +485,7 @@ describe('Integration | Repository | AuthenticationMethod', function () {
         const updatedAuthenticationMethod =
           await authenticationMethodRepository.updateExternalIdentifierByUserIdAndIdentityProvider({
             userId,
-            identityProvider: AuthenticationMethod.identityProviders.GAR,
+            identityProvider: NON_OIDC_IDENTITY_PROVIDERS.GAR.code,
             externalIdentifier: 'new_value',
           });
 
@@ -499,7 +500,7 @@ describe('Integration | Repository | AuthenticationMethod', function () {
       it('should throw an AuthenticationMethodNotFoundError', async function () {
         // given
         const userId = 12345;
-        const identityProvider = AuthenticationMethod.identityProviders.GAR;
+        const identityProvider = NON_OIDC_IDENTITY_PROVIDERS.GAR.code;
         const externalIdentifier = 'new_saml_id';
 
         // when
@@ -648,7 +649,7 @@ describe('Integration | Repository | AuthenticationMethod', function () {
       // then
       const expectedAuthenticationMethod = await authenticationMethodRepository.findOneByUserIdAndIdentityProvider({
         userId,
-        identityProvider: AuthenticationMethod.identityProviders.PIX,
+        identityProvider: NON_OIDC_IDENTITY_PROVIDERS.PIX.code,
       });
       expect(createdAuthenticationMethod).to.deepEqualInstance(expectedAuthenticationMethod);
     });
@@ -665,11 +666,11 @@ describe('Integration | Repository | AuthenticationMethod', function () {
       // when
       const foundAuthenticationMethodPIX = await authenticationMethodRepository.findOneByUserIdAndIdentityProvider({
         userId,
-        identityProvider: AuthenticationMethod.identityProviders.PIX,
+        identityProvider: NON_OIDC_IDENTITY_PROVIDERS.PIX.code,
       });
       const foundAuthenticationMethodGAR = await authenticationMethodRepository.findOneByUserIdAndIdentityProvider({
         userId,
-        identityProvider: AuthenticationMethod.identityProviders.GAR,
+        identityProvider: NON_OIDC_IDENTITY_PROVIDERS.GAR.code,
       });
 
       // then
@@ -794,7 +795,7 @@ describe('Integration | Repository | AuthenticationMethod', function () {
         const userId = databaseBuilder.factory.buildUser().id;
         authenticationMethod = databaseBuilder.factory.buildAuthenticationMethod.withIdentityProvider({
           id: 123,
-          identityProvider: OidcIdentityProviders.POLE_EMPLOI.service.code,
+          identityProvider: OidcIdentityProviders.POLE_EMPLOI.code,
           externalIdentifier: 'identifier',
           accessToken: 'to_be_updated',
           refreshToken: 'to_be_updated',
@@ -822,7 +823,7 @@ describe('Integration | Repository | AuthenticationMethod', function () {
         await authenticationMethodRepository.updateAuthenticationComplementByUserIdAndIdentityProvider({
           authenticationComplement,
           userId,
-          identityProvider: OidcIdentityProviders.POLE_EMPLOI.service.code,
+          identityProvider: OidcIdentityProviders.POLE_EMPLOI.code,
         });
 
         // then
@@ -849,7 +850,7 @@ describe('Integration | Repository | AuthenticationMethod', function () {
           await authenticationMethodRepository.updateAuthenticationComplementByUserIdAndIdentityProvider({
             authenticationComplement,
             userId,
-            identityProvider: OidcIdentityProviders.POLE_EMPLOI.service.code,
+            identityProvider: OidcIdentityProviders.POLE_EMPLOI.code,
           });
 
         // then
@@ -878,7 +879,7 @@ describe('Integration | Repository | AuthenticationMethod', function () {
         )({
           authenticationComplement,
           userId,
-          identityProvider: OidcIdentityProviders.POLE_EMPLOI.service.code,
+          identityProvider: OidcIdentityProviders.POLE_EMPLOI.code,
         });
 
         // then
@@ -934,7 +935,7 @@ describe('Integration | Repository | AuthenticationMethod', function () {
       // when
       await authenticationMethodRepository.removeByUserIdAndIdentityProvider({
         userId,
-        identityProvider: AuthenticationMethod.identityProviders.GAR,
+        identityProvider: NON_OIDC_IDENTITY_PROVIDERS.GAR.code,
       });
 
       // then
@@ -1037,7 +1038,7 @@ describe('Integration | Repository | AuthenticationMethod', function () {
       expect(result).to.be.instanceOf(AuthenticationMethod);
       expect(result.id).to.be.equal(garAuthenticationMethodId);
       expect(result.userId).to.be.equal(userId);
-      expect(result.identityProvider).to.be.equal(AuthenticationMethod.identityProviders.GAR);
+      expect(result.identityProvider).to.be.equal(NON_OIDC_IDENTITY_PROVIDERS.GAR.code);
     });
 
     describe('when authentication method belongs to another user', function () {
@@ -1130,7 +1131,7 @@ describe('Integration | Repository | AuthenticationMethod', function () {
       // when
       await authenticationMethodRepository.updateAuthenticationMethodUserId({
         originUserId,
-        identityProvider: AuthenticationMethod.identityProviders.GAR,
+        identityProvider: NON_OIDC_IDENTITY_PROVIDERS.GAR.code,
         targetUserId,
       });
 

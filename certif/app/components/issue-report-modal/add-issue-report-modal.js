@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { inject as service } from '@ember/service';
+import { service } from '@ember/service';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import {
@@ -152,6 +152,26 @@ export default class AddIssueReportModal extends Component {
     this.showCategoryMissingError = false;
     this.showIssueReportSubmitError = false;
     this.categories.forEach((category) => category.toggle(selectedCategory.name));
+  }
+
+  @action
+  updateCandidateInformationChangeCategory(event) {
+    this.candidateInformationChangeCategory.description = event.target.value;
+  }
+
+  @action
+  updateNonBlockingCandidateIssueCategory(event) {
+    this.nonBlockingCandidateIssueCategory.description = event.target.value;
+  }
+
+  @action
+  updateNonBlockingTechnicalIssueCategory(event) {
+    this.nonBlockingTechnicalIssueCategory.description = event.target.value;
+  }
+
+  @action
+  updateSignatureIssueCategory(event) {
+    this.signatureIssueCategory.description = event.target.value;
   }
 
   @action

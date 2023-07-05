@@ -1,9 +1,8 @@
-import { findAll, currentURL } from '@ember/test-helpers';
+import { findAll, currentURL, click, fillIn } from '@ember/test-helpers';
 import { module, test } from 'qunit';
 import { authenticate } from '../helpers/authentication';
 import setupIntl from '../helpers/setup-intl';
 import { clickByLabel } from '../helpers/click-by-label';
-import { click, fillIn } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import { currentSession } from 'ember-simple-auth/test-support';
 import { setupMirage } from 'ember-cli-mirage/test-support';
@@ -75,7 +74,7 @@ module('Acceptance | Campaigns | Campaigns Result', function (hooks) {
 
         // then
         assert.ok(screen.getByText(competenceResultName));
-        assert.ok(screen.getByText(COMPETENCE_MASTERY_PERCENTAGE));
+        assert.strictEqual(screen.getByRole('progressbar').textContent.trim(), COMPETENCE_MASTERY_PERCENTAGE);
       });
 
       module('When the campaign is restricted and organization learner is disabled', function (hooks) {
@@ -125,7 +124,7 @@ module('Acceptance | Campaigns | Campaigns Result', function (hooks) {
 
         // then
         assert.ok(screen.getByText(skillSetResultName));
-        assert.ok(screen.getByText(BADGE_SKILL_SET_MASTERY_PERCENTAGE));
+        assert.strictEqual(screen.getByRole('progressbar').textContent.trim(), BADGE_SKILL_SET_MASTERY_PERCENTAGE);
       });
 
       test('should display the Pix emploi badge when badge is acquired', async function (assert) {
@@ -154,21 +153,24 @@ module('Acceptance | Campaigns | Campaigns Result', function (hooks) {
         assert.notOk(screen.queryByText(this.intl.t('pages.skill-review.badges-title')));
       });
 
-      test('should display acquired badges', async function (assert) {
+      test('should display acquired and isAlwaysVisible badges', async function (assert) {
         // given
         const acquiredBadge = server.create('campaign-participation-badge', {
           altMessage: 'Yon won a Yellow badge',
           imageUrl: '/images/badges/yellow.svg',
           message: 'Congrats, you won a Yellow badge',
+          acquisitionPercentage: 100,
           isAcquired: true,
           isValid: true,
           isCertifiable: false,
+          isAlwaysVisible: true,
         });
         const unacquiredDisplayedBadge = server.create('campaign-participation-badge', {
           altMessage: 'Yon won a green badge',
           imageUrl: '/images/badges/green.svg',
           message: 'Congrats, you won a Green badge',
           isAcquired: false,
+          acquisitionPercentage: 20,
           isValid: true,
           isAlwaysVisible: true,
           isCertifiable: false,
@@ -178,19 +180,86 @@ module('Acceptance | Campaigns | Campaigns Result', function (hooks) {
           imageUrl: '/images/badges/pink.svg',
           message: 'Congrats, you won a pink badge',
           isAcquired: false,
+          acquisitionPercentage: 0,
           isValid: true,
           isAlwaysVisible: false,
           isCertifiable: true,
         });
+        const acquiredIsValidCertifiableBadge = server.create('campaign-participation-badge', {
+          altMessage: 'Yon won a blue badge',
+          imageUrl: '/images/badges/blue.svg',
+          message: 'Congrats, you won a blue badge',
+          acquisitionPercentage: 63,
+          isAcquired: true,
+          isValid: true,
+          isCertifiable: true,
+          isAlwaysVisible: false,
+        });
+        const acquiredCertifiableNotValidBadge = server.create('campaign-participation-badge', {
+          altMessage: 'Yon won a white badge',
+          imageUrl: '/images/badges/white.svg',
+          message: 'Congrats, you won a white badge',
+          isAcquired: true,
+          acquisitionPercentage: 88,
+          isValid: false,
+          isAlwaysVisible: false,
+          isCertifiable: true,
+        });
+        const unacquiredCertifiableHiddenBadge = server.create('campaign-participation-badge', {
+          altMessage: 'Yon won a red badge',
+          imageUrl: '/images/badges/red.svg',
+          message: 'Congrats, you won a red badge',
+          isAcquired: false,
+          acquisitionPercentage: 0,
+          isValid: true,
+          isAlwaysVisible: false,
+          isCertifiable: true,
+        });
+        const unacquiredCertifiableDisplayedBadge = server.create('campaign-participation-badge', {
+          altMessage: 'Yon won a brown badge',
+          imageUrl: '/images/badges/brown.svg',
+          message: 'Congrats, you won a brown badge',
+          isAcquired: false,
+          acquisitionPercentage: 67,
+          isValid: true,
+          isAlwaysVisible: true,
+          isCertifiable: true,
+        });
         campaignParticipationResult.update({
-          campaignParticipationBadges: [acquiredBadge, unacquiredDisplayedBadge, unacquiredHiddenBadge],
+          campaignParticipationBadges: [
+            acquiredBadge,
+            unacquiredDisplayedBadge,
+            unacquiredHiddenBadge,
+            acquiredIsValidCertifiableBadge,
+            acquiredCertifiableNotValidBadge,
+            unacquiredCertifiableHiddenBadge,
+            unacquiredCertifiableDisplayedBadge,
+          ],
         });
 
         // when
-        await visit(`/campagnes/${campaign.code}/evaluation/resultats`);
+        const screen = await visit(`/campagnes/${campaign.code}/evaluation/resultats`);
 
         // then
-        assert.strictEqual(findAll('.badge-card').length, 1);
+        assert.strictEqual(findAll('.badge-card').length, 2);
+        assert.strictEqual(
+          screen
+            .getAllByRole('progressbar', { name: 'Pourcentage de réussite du résultat thématique' })[0]
+            .textContent.trim(),
+          '88%'
+        );
+        assert.strictEqual(
+          screen
+            .getAllByRole('progressbar', { name: 'Pourcentage de réussite du résultat thématique' })[1]
+            .textContent.trim(),
+          '67%'
+        );
+        assert.strictEqual(
+          screen
+            .getAllByRole('progressbar', { name: 'Pourcentage de réussite du résultat thématique' })[2]
+            .textContent.trim(),
+          '20%'
+        );
       });
 
       module('when campaign has stages', function () {

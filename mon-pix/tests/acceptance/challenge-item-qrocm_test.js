@@ -1,9 +1,9 @@
 // eslint-disable-next-line no-restricted-imports
-import { click, find, findAll, currentURL, fillIn, triggerEvent, visit } from '@ember/test-helpers';
+import { click, find, findAll, currentURL, fillIn, triggerEvent } from '@ember/test-helpers';
 import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
 import { setupMirage } from 'ember-cli-mirage/test-support';
-import { clickByName, visit as visitScreen } from '@1024pix/ember-testing-library';
+import { clickByName, visit } from '@1024pix/ember-testing-library';
 
 module('Acceptance | Displaying a QROCM challenge', function (hooks) {
   setupApplicationTest(hooks);
@@ -31,8 +31,8 @@ module('Acceptance | Displaying a QROCM challenge', function (hooks) {
         );
 
         assert.dom('.challenge-response__proposal').exists({ count: 2 });
-        assert.false(findAll('.challenge-response__proposal')[0].disabled);
-        assert.false(findAll('.challenge-response__proposal')[1].disabled);
+        assert.false(findAll('.challenge-response__proposal input')[0].disabled);
+        assert.false(findAll('.challenge-response__proposal input')[1].disabled);
         assert.ok(find('div[data-test="qrocm-label-0"]').innerHTML.includes('Station <strong>1</strong> :'));
         assert.ok(find('div[data-test="qrocm-label-1"]').innerHTML.includes('Station <em>2</em> :'));
 
@@ -81,7 +81,7 @@ module('Acceptance | Displaying a QROCM challenge', function (hooks) {
       test('should not be able to validate with the initial option', async function (assert) {
         // given
         server.create('challenge', 'forCompetenceEvaluation', 'QROCMWithSelect');
-        await visitScreen(`/assessments/${assessment.id}/challenges/0`);
+        await visit(`/assessments/${assessment.id}/challenges/0`);
 
         // when
         await click(find('.challenge-actions__action-validate'));
@@ -94,7 +94,7 @@ module('Acceptance | Displaying a QROCM challenge', function (hooks) {
       test('should not be able to validate the empty option', async function (assert) {
         // given
         server.create('challenge', 'forCompetenceEvaluation', 'QROCMWithSelect');
-        const screen = await visitScreen(`/assessments/${assessment.id}/challenges/0`);
+        const screen = await visit(`/assessments/${assessment.id}/challenges/0`);
 
         // when
         await clickByName('saladAriaLabel');
@@ -109,7 +109,7 @@ module('Acceptance | Displaying a QROCM challenge', function (hooks) {
       test('should validate an option and redirect to next page', async function (assert) {
         // given
         server.create('challenge', 'forCompetenceEvaluation', 'QROCMWithSelect');
-        const screen = await visitScreen(`/assessments/${assessment.id}/challenges/0`);
+        const screen = await visit(`/assessments/${assessment.id}/challenges/0`);
 
         // when
         await clickByName('saladAriaLabel');
@@ -143,10 +143,10 @@ module('Acceptance | Displaying a QROCM challenge', function (hooks) {
         // then
         assert.ok(find('div[data-test="qrocm-label-0"]').innerHTML.includes('Station <strong>1</strong> :'));
         assert.ok(find('div[data-test="qrocm-label-1"]').innerHTML.includes('Station <em>2</em> :'));
-        assert.strictEqual(findAll('.challenge-response__proposal')[0].value, 'Republique');
-        assert.true(findAll('.challenge-response__proposal')[0].disabled);
-        assert.strictEqual(findAll('.challenge-response__proposal')[1].value, 'Chatelet');
-        assert.true(findAll('.challenge-response__proposal')[1].disabled);
+        assert.strictEqual(findAll('.challenge-response__proposal input')[0].value, 'Republique');
+        assert.true(findAll('.challenge-response__proposal input')[0].disabled);
+        assert.strictEqual(findAll('.challenge-response__proposal input')[1].value, 'Chatelet');
+        assert.true(findAll('.challenge-response__proposal input')[1].disabled);
 
         assert.dom('.challenge-actions__action-continue').exists();
         assert.dom('.challenge-actions__action-validate').doesNotExist();
@@ -166,7 +166,7 @@ module('Acceptance | Displaying a QROCM challenge', function (hooks) {
         });
 
         // when
-        const screen = await visitScreen(`/assessments/${assessment.id}/challenges/0`);
+        const screen = await visit(`/assessments/${assessment.id}/challenges/0`);
 
         // then
         assert.strictEqual(screen.getByLabelText('saladAriaLabel').innerText, 'mango');
@@ -207,12 +207,15 @@ module('Acceptance | Displaying a QROCM challenge', function (hooks) {
         assessmentId: assessment.id,
         challengeId: qrocmDepChallenge.id,
         correction: correctionDep,
+        resultDetails:
+          'answersEvaluation:\n  - false\n  - false\nsolutionsWithoutGoodAnswers:\n  - Versailles-Chantiers\n  - Poissy\n',
       });
       correctionInd = server.create('correction', {
         solution: 'titre:\n- Le petit prince\nauteur:\n- Saint-Exupéry',
         hint: 'Sortir de paris !',
         tutorials: [tutorial],
         learningMoreTutorials: [learningMoreTutorial],
+        answersEvaluation: [],
       });
       server.create('answer', {
         value: "titre: 'Le rouge et le noir'\nauteur: 'Stendhal'\n",
@@ -227,6 +230,7 @@ module('Acceptance | Displaying a QROCM challenge', function (hooks) {
         hint: 'Sortir de paris !',
         tutorials: [tutorial],
         learningMoreTutorials: [learningMoreTutorial],
+        answersEvaluation: [],
       });
       server.create('answer', {
         value: "banana: 'potato'\n",
@@ -270,9 +274,9 @@ module('Acceptance | Displaying a QROCM challenge', function (hooks) {
       );
 
       const goodAnswers = find('.correction-qrocm__solution-text');
-      const badAnswersFromUserResult = findAll('.correction-qrocm__answer');
+      const badAnswersFromUserResult = findAll('.correction-qrocm-answer__input');
 
-      assert.strictEqual(goodAnswers.textContent.trim(), 'Versailles-Chantiers et Poissy');
+      assert.strictEqual(goodAnswers.textContent.trim(), 'Versailles-Chantiers');
       assert.strictEqual(badAnswersFromUserResult[0].value, 'Republique');
       assert.strictEqual(badAnswersFromUserResult[1].value, 'Chatelet');
 
@@ -298,7 +302,7 @@ module('Acceptance | Displaying a QROCM challenge', function (hooks) {
       );
 
       const goodAnswers = findAll('.correction-qrocm__solution-text');
-      const badAnswersFromUserResult = findAll('.correction-qrocm__answer');
+      const badAnswersFromUserResult = findAll('.correction-qrocm-answer__input');
 
       assert.strictEqual(goodAnswers[0].textContent.trim(), 'Le petit prince');
       assert.strictEqual(goodAnswers[1].textContent.trim(), 'Saint-Exupéry');
@@ -327,7 +331,7 @@ module('Acceptance | Displaying a QROCM challenge', function (hooks) {
       );
 
       const goodAnswers = findAll('.correction-qrocm__solution-text');
-      const badAnswersFromUserResult = findAll('.correction-qrocm__answer');
+      const badAnswersFromUserResult = findAll('.correction-qrocm-answer__input');
 
       assert.strictEqual(goodAnswers[0].textContent.trim(), 'mango');
       assert.strictEqual(badAnswersFromUserResult[0].value, 'potato');

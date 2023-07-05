@@ -1,7 +1,9 @@
-const { expect, HttpTestServer, sinon } = require('../../../test-helper');
-const moduleUnderTest = require('../../../../lib/application/answers');
-const answerController = require('../../../../lib/application/answers/answer-controller');
-const { features } = require('../../../../lib/config');
+import { expect, HttpTestServer, sinon } from '../../../test-helper.js';
+import * as moduleUnderTest from '../../../../lib/application/answers/index.js';
+import { answerController } from '../../../../lib/application/answers/answer-controller.js';
+import { config } from '../../../../lib/config.js';
+
+const { features } = config;
 
 describe('Unit | Application | Router | answer-router', function () {
   describe('POST /api/answers', function () {
@@ -60,6 +62,72 @@ describe('Unit | Application | Router | answer-router', function () {
 
       // then
       expect(response.statusCode).to.not.equal(400);
+    });
+  });
+  describe('POST /api/pix1d/answers', function () {
+    it('should return 201', async function () {
+      // given
+      sinon.stub(answerController, 'saveForPix1D').callsFake((request, h) => h.response().created());
+      const httpTestServer = new HttpTestServer();
+      await httpTestServer.register(moduleUnderTest);
+
+      const payload = {
+        data: {
+          attributes: {
+            value: 'test',
+            result: null,
+            'result-details': null,
+          },
+          relationships: {},
+          challenge: {
+            data: {
+              id: 'hee',
+            },
+          },
+          assessment: {
+            data: {
+              id: '12345678',
+            },
+          },
+          type: 'answers',
+        },
+      };
+
+      // when
+      const response = await httpTestServer.request('POST', '/api/pix1d/answers', payload);
+
+      // then
+      expect(response.statusCode).to.equal(201);
+    });
+
+    it('should return an error 400 if something goes wrong', async function () {
+      // given
+      sinon.stub(answerController, 'saveForPix1D').callsFake((request, h) => h.response().created());
+      const httpTestServer = new HttpTestServer();
+      await httpTestServer.register(moduleUnderTest);
+      const value = 'X';
+      const unexpectedTimeout = 133;
+
+      const payload = {
+        data: {
+          attributes: {
+            value,
+            result: null,
+            'result-details': null,
+            timeout: unexpectedTimeout,
+          },
+          relationships: {},
+          assessment: {},
+          challenge: {},
+          type: 'answers',
+        },
+      };
+
+      // when
+      const response = await httpTestServer.request('POST', '/api/pix1d/answers', payload);
+
+      // then
+      expect(response.statusCode).to.equal(400);
     });
   });
 

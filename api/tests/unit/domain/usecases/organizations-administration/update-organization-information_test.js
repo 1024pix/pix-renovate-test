@@ -1,10 +1,11 @@
-const { expect, sinon, catchErr, domainBuilder } = require('../../../../test-helper');
-const { updateOrganizationInformation } = require('../../../../../lib/domain/usecases/index.js');
-const { NotFoundError } = require('../../../../../lib/domain/errors');
-const Tag = require('../../../../../lib/domain/models/Tag');
-const OrganizationTag = require('../../../../../lib/domain/models/OrganizationTag');
-const OrganizationForAdmin = require('../../../../../lib/domain/models/organizations-administration/Organization');
-const OidcIdentityProviders = require('../../../../../lib/domain/constants/oidc-identity-providers');
+import { expect, sinon, catchErr, domainBuilder } from '../../../../test-helper.js';
+import { NotFoundError } from '../../../../../lib/domain/errors.js';
+import { Tag } from '../../../../../lib/domain/models/Tag.js';
+import { OrganizationTag } from '../../../../../lib/domain/models/OrganizationTag.js';
+import { OrganizationForAdmin } from '../../../../../lib/domain/models/organizations-administration/Organization.js';
+import * as OidcIdentityProviders from '../../../../../lib/domain/constants/oidc-identity-providers.js';
+import { usecases } from '../../../../../lib/domain/usecases/index.js';
+const { updateOrganizationInformation } = usecases;
 
 describe('Unit | UseCase | organizations-administration | update-organization-information', function () {
   let dataProtectionOfficerRepository;
@@ -31,7 +32,7 @@ describe('Unit | UseCase | organizations-administration | update-organization-in
     };
     organizationTagRepository = {
       create: sinon.stub(),
-      delete: sinon.stub(),
+      remove: sinon.stub(),
       findOneByOrganizationIdAndTagId: sinon.stub(),
     };
     tagRepository = {
@@ -51,7 +52,7 @@ describe('Unit | UseCase | organizations-administration | update-organization-in
       const givenOrganization = _buildOrganizationWithNullAttributes({
         id: organizationId,
         name: newName,
-        identityProviderForCampaigns: OidcIdentityProviders.CNAV.service.code,
+        identityProviderForCampaigns: OidcIdentityProviders.CNAV.code,
       });
       const originalOrganization = _buildOriginalOrganization(organizationId);
 
@@ -72,7 +73,7 @@ describe('Unit | UseCase | organizations-administration | update-organization-in
       expect(organizationForAdminRepository.update).to.have.been.calledWithMatch({
         ...originalOrganization,
         name: newName,
-        identityProviderForCampaigns: OidcIdentityProviders.CNAV.service.code,
+        identityProviderForCampaigns: OidcIdentityProviders.CNAV.code,
       });
     });
 
@@ -436,7 +437,7 @@ describe('Unit | UseCase | organizations-administration | update-organization-in
         // given
         const organizationTagToAdd = new OrganizationTag({ organizationId, tagId });
         expect(organizationTagRepository.create).to.have.been.calledWith(organizationTagToAdd);
-        expect(organizationTagRepository.delete).to.have.not.been.called;
+        expect(organizationTagRepository.remove).to.have.not.been.called;
       });
 
       it('should allow to unassign a tag to organization', async function () {
@@ -477,7 +478,7 @@ describe('Unit | UseCase | organizations-administration | update-organization-in
         });
 
         // given
-        expect(organizationTagRepository.delete).to.have.been.calledWith({
+        expect(organizationTagRepository.remove).to.have.been.calledWith({
           organizationTagId: organizationTagToRemove.id,
         });
         expect(organizationTagRepository.create).to.have.not.been.called;

@@ -1,9 +1,10 @@
-const { ForbiddenAccess } = require('../errors.js');
-const sessionValidator = require('../validators/session-validator.js');
-const sessionCodeService = require('../services/session-code-service.js');
-const Session = require('../models/Session.js');
+import { ForbiddenAccess } from '../errors.js';
+import * as sessionValidator from '../validators/session-validator.js';
+import * as sessionCodeService from '../services/session-code-service.js';
+import { Session } from '../models/Session.js';
+import { CertificationVersion } from '../models/CertificationVersion.js';
 
-module.exports = async function createSession({
+const createSession = async function ({
   userId,
   session,
   certificationCenterRepository,
@@ -22,12 +23,17 @@ module.exports = async function createSession({
   }
 
   const accessCode = dependencies.sessionCodeService.getNewSessionCode();
-  const { name: certificationCenter } = await certificationCenterRepository.get(certificationCenterId);
+  const { isV3Pilot, name: certificationCenterName } = await certificationCenterRepository.get(certificationCenterId);
+  const version = isV3Pilot ? CertificationVersion.V3 : CertificationVersion.V2;
+
   const domainSession = new Session({
     ...session,
     accessCode,
-    certificationCenter,
+    certificationCenter: certificationCenterName,
+    version,
   });
 
   return sessionRepository.save(domainSession);
 };
+
+export { createSession };

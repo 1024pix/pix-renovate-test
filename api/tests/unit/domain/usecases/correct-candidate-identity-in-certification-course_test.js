@@ -1,9 +1,8 @@
-const { expect, sinon, domainBuilder, catchErr } = require('../../../test-helper');
-const CertificationCourse = require('../../../../lib/domain/models/CertificationCourse');
-
-const correctCandidateIdentityInCertificationCourse = require('../../../../lib/domain/usecases/correct-candidate-identity-in-certification-course');
-const { CpfBirthInformationValidation } = require('../../../../lib/domain/services/certification-cpf-service');
-const { CpfBirthInformationValidationError } = require('../../../../lib/domain/errors');
+import { catchErr, domainBuilder, expect, sinon } from '../../../test-helper.js';
+import { CertificationCourse } from '../../../../lib/domain/models/CertificationCourse.js';
+import { correctCandidateIdentityInCertificationCourse } from '../../../../lib/domain/usecases/correct-candidate-identity-in-certification-course.js';
+import { CpfBirthInformationValidation } from '../../../../lib/domain/services/certification-cpf-service.js';
+import { CertificationCandidatesError } from '../../../../lib/domain/errors.js';
 
 describe('Unit | UseCase | correct-candidate-identity-in-certification-course', function () {
   let certificationCourseRepository;
@@ -95,7 +94,7 @@ describe('Unit | UseCase | correct-candidate-identity-in-certification-course', 
     );
   });
 
-  it('should throws a CpfBirthInformationValidationError if birth information validation fails', async function () {
+  it('should throws a CertificationCandidatesError if birth information validation fails', async function () {
     // given
     const sex = 'F';
     const birthCountry = 'FRANCE';
@@ -151,7 +150,7 @@ describe('Unit | UseCase | correct-candidate-identity-in-certification-course', 
     });
 
     // then
-    expect(error).to.be.an.instanceOf(CpfBirthInformationValidationError);
+    expect(error).to.be.an.instanceOf(CertificationCandidatesError);
     expect(error.message).to.equal('Failure message');
   });
 });

@@ -1,12 +1,12 @@
-const {
+import {
   expect,
   databaseBuilder,
   generateValidRequestAuthorizationHeader,
   insertUserWithRoleSuperAdmin,
   knex,
-} = require('../../../test-helper');
+} from '../../../test-helper.js';
 
-const createServer = require('../../../../server');
+import { createServer } from '../../../../server.js';
 
 describe('Acceptance | Controller | users-controller-update-user-details-for-administration', function () {
   let server;
@@ -114,6 +114,7 @@ describe('Acceptance | Controller | users-controller-update-user-details-for-adm
               email: 'emailUpdated@example.net',
               username: 'usernameUpdated',
               lang: 'en',
+              locale: 'fr-FR',
             },
           },
         },
@@ -133,6 +134,7 @@ describe('Acceptance | Controller | users-controller-update-user-details-for-adm
             email: 'emailUpdated@example.net',
             username: 'usernameUpdated',
             lang: 'en',
+            locale: 'fr-FR',
             cgu: user.cgu,
             'pix-certif-terms-of-service-accepted': user.pixCertifTermsOfServiceAccepted,
             'pix-orga-terms-of-service-accepted': user.pixOrgaTermsOfServiceAccepted,

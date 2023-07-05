@@ -1,5 +1,5 @@
-const Joi = require('joi');
-const _ = require('lodash');
+import Joi from 'joi';
+import _ from 'lodash';
 
 const postgreSQLSequenceDefaultStart = 1;
 const postgreSQLSequenceEnd = 2 ** 31 - 1;
@@ -59,7 +59,7 @@ const typesPositiveInteger32bits = [
 ];
 
 const typesAlphanumeric = ['courseId', 'tutorialId'];
-const typesAlphanumeric255 = ['challengeId', 'competenceId', 'frameworkId', 'tubeId'];
+const typesAlphanumeric255 = ['challengeId', 'competenceId', 'frameworkId', 'tubeId', 'missionId'];
 
 _assignValueToExport(typesPositiveInteger32bits, implementationType.positiveInteger32bits);
 _assignValueToExport(typesAlphanumeric, implementationType.alphanumeric);
@@ -70,4 +70,4 @@ valuesToExport.positiveInteger32bits = {
   max: postgreSQLSequenceEnd,
 };
 
-module.exports = valuesToExport;
+export { valuesToExport as identifiersType };

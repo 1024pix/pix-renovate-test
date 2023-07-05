@@ -1,12 +1,14 @@
 import Controller from '@ember/controller';
 import { action } from '@ember/object';
-import { inject as service } from '@ember/service';
+import { service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
 export default class ListController extends Controller {
   @service currentUser;
-  @service intl;
   @service router;
+  @service store;
+  @service notifications;
+  @service intl;
 
   @tracked pageNumber = 1;
   @tracked pageSize = 50;
@@ -48,20 +50,29 @@ export default class ListController extends Controller {
     this.router.transitionTo('authenticated.organization-participants.organization-participant', learnerId);
   }
 
-  get certificabilityOptions() {
-    return [
-      {
-        value: 'not-available',
-        label: this.intl.t('pages.sco-organization-participants.table.column.is-certifiable.not-available'),
-      },
-      {
-        value: 'eligible',
-        label: this.intl.t('pages.sco-organization-participants.table.column.is-certifiable.eligible'),
-      },
-      {
-        value: 'non-eligible',
-        label: this.intl.t('pages.sco-organization-participants.table.column.is-certifiable.non-eligible'),
-      },
-    ];
+  @action
+  async deleteOrganizationLearners(listLearners) {
+    try {
+      await this.store.adapterFor('organization-participant').deleteParticipants(
+        this.currentUser.organization.id,
+        listLearners.map(({ id }) => id)
+      );
+      this.send('refreshModel');
+      this.notifications.sendSuccess(
+        this.intl.t('pages.organization-participants.action-bar.success-message', {
+          count: listLearners.length,
+          firstname: listLearners[0].firstName,
+          lastname: listLearners[0].lastName,
+        })
+      );
+    } catch {
+      this.notifications.sendError(
+        this.intl.t('pages.organization-participants.action-bar.error-message', {
+          count: listLearners.length,
+          firstname: listLearners[0].firstName,
+          lastname: listLearners[0].lastName,
+        })
+      );
+    }
   }
 }

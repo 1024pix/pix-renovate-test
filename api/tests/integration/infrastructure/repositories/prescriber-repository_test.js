@@ -1,14 +1,14 @@
-const { expect, databaseBuilder, catchErr } = require('../../../test-helper');
-const bcrypt = require('bcrypt');
-const settings = require('../../../../lib/config');
-
-const { ForbiddenAccess, UserNotFoundError } = require('../../../../lib/domain/errors');
-const prescriberRepository = require('../../../../lib/infrastructure/repositories/prescriber-repository');
-const Prescriber = require('../../../../lib/domain/read-models/Prescriber');
-const Membership = require('../../../../lib/domain/models/Membership');
-const UserOrgaSettings = require('../../../../lib/domain/models/UserOrgaSettings');
-const Organization = require('../../../../lib/domain/models/Organization');
-const Tag = require('../../../../lib/domain/models/Tag');
+import { expect, databaseBuilder, catchErr } from '../../../test-helper.js';
+import bcrypt from 'bcrypt';
+import { config as settings } from '../../../../lib/config.js';
+import { ForbiddenAccess, UserNotFoundError } from '../../../../lib/domain/errors.js';
+import * as prescriberRepository from '../../../../lib/infrastructure/repositories/prescriber-repository.js';
+import { Prescriber } from '../../../../lib/domain/read-models/Prescriber.js';
+import { Membership } from '../../../../lib/domain/models/Membership.js';
+import { UserOrgaSettings } from '../../../../lib/domain/models/UserOrgaSettings.js';
+import { Organization } from '../../../../lib/domain/models/Organization.js';
+import { Tag } from '../../../../lib/domain/models/Tag.js';
+import * as apps from '../../../../lib/domain/constants.js';
 
 describe('Integration | Infrastructure | Repository | Prescriber', function () {
   const userToInsert = {
@@ -323,6 +323,39 @@ describe('Integration | Infrastructure | Repository | Prescriber', function () {
 
           // then
           expect(foundPrescriber.participantCount).to.equal(2);
+        });
+      });
+
+      describe('#enableMultipleSendingAssessment', function () {
+        it('should return activated feature for current organization', async function () {
+          // given
+          expectedPrescriber.userOrgaSettings = userOrgaSettings;
+          const feature = databaseBuilder.factory.buildFeature({
+            key: apps.ORGANIZATION_FEATURE.MULTIPLE_SENDING_ASSESSMENT,
+          });
+          databaseBuilder.factory.buildOrganizationFeature({ featureId: feature.id, organizationId: organization.id });
+          await databaseBuilder.commit();
+
+          // when
+          const foundPrescriber = await prescriberRepository.getPrescriber(user.id);
+
+          // then
+          expect(foundPrescriber.enableMultipleSendingAssessment).to.be.true;
+        });
+
+        it('should return deactivated feature for current organization', async function () {
+          // given
+          expectedPrescriber.userOrgaSettings = userOrgaSettings;
+          databaseBuilder.factory.buildFeature({
+            key: apps.ORGANIZATION_FEATURE.MULTIPLE_SENDING_ASSESSMENT,
+          });
+          await databaseBuilder.commit();
+
+          // when
+          const foundPrescriber = await prescriberRepository.getPrescriber(user.id);
+
+          // then
+          expect(foundPrescriber.enableMultipleSendingAssessment).to.be.false;
         });
       });
     });

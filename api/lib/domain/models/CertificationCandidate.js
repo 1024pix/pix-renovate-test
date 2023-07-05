@@ -1,14 +1,17 @@
-const isNil = require('lodash/isNil');
-const endsWith = require('lodash/endsWith');
-const BaseJoi = require('joi');
-const JoiDate = require('@joi/date');
-const Joi = BaseJoi.extend(JoiDate);
-const {
-  InvalidCertificationCandidate,
+import lodash from 'lodash';
+
+import BaseJoi from 'joi';
+import JoiDate from '@joi/date';
+import {
   CertificationCandidatePersonalInfoFieldMissingError,
   CertificationCandidatePersonalInfoWrongFormat,
-} = require('../errors.js');
-const { CERTIFICATION_CANDIDATES_ERRORS } = require('../constants/certification-candidates-errors');
+  CertificationCandidatesError,
+} from '../errors.js';
+
+import { CERTIFICATION_CANDIDATES_ERRORS } from '../constants/certification-candidates-errors.js';
+
+const Joi = BaseJoi.extend(JoiDate);
+const { isNil, endsWith } = lodash;
 
 const BILLING_MODES = {
   FREE: 'FREE',
@@ -16,86 +19,50 @@ const BILLING_MODES = {
   PREPAID: 'PREPAID',
 };
 
-const certificationCandidateValidationJoiSchema_v1_5 = Joi.object({
-  firstName: Joi.string().required().empty(null),
-  lastName: Joi.string().required().empty(null),
-  sex: Joi.string().valid('M', 'F').required().empty(['', null]),
-  birthPostalCode: Joi.string().empty(['', null]),
-  birthINSEECode: Joi.string().empty(['', null]),
-  birthCountry: Joi.string().required().empty(null),
-  email: Joi.string().email().allow(null).empty('').optional(),
-  resultRecipientEmail: Joi.string().email().empty(['', null]).optional(),
-  externalId: Joi.string().allow(null).empty(['', null]).optional(),
-  birthdate: Joi.date().format('YYYY-MM-DD').greater('1900-01-01').required().empty(null),
-  extraTimePercentage: Joi.number().allow(null).optional(),
-  sessionId: Joi.when('$isSessionsMassImport', {
-    is: false,
-    then: Joi.number().required().empty(['', null]),
-  }),
-  complementaryCertifications: Joi.array().max(1).required(),
-  billingMode: Joi.when('$isSco', {
-    is: false,
-    then: Joi.string()
-      .valid(...Object.values(BILLING_MODES))
-      .required(),
-  }),
-  prepaymentCode: Joi.when('billingMode', {
-    is: 'PREPAID',
-    then: Joi.string().required().empty(['', null]),
-    otherwise: Joi.valid(null),
-  }),
-}).assert(
-  '.birthPostalCode',
-  Joi.when('..birthINSEECode', {
-    is: Joi.exist(),
-    then: Joi.string().forbidden(),
-    otherwise: Joi.string().required(),
-  })
-);
-
-const certificationCandidateValidationForMassImportJoiSchema = Joi.object({
+const certificationCandidateValidationJoiSchema = Joi.object({
   firstName: Joi.string().required().empty(['', null]).messages({
     'any.required': CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_FIRST_NAME_REQUIRED.code,
+    'string.base': CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_FIRST_NAME_MUST_BE_A_STRING.code,
   }),
   lastName: Joi.string().required().empty(['', null]).messages({
     'any.required': CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_LAST_NAME_REQUIRED.code,
+    'string.base': CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_LAST_NAME_MUST_BE_A_STRING.code,
   }),
   sex: Joi.string().valid('M', 'F').required().empty(['', null]).messages({
     'any.required': CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_SEX_REQUIRED.code,
     'any.only': CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_SEX_NOT_VALID.code,
   }),
-  birthPostalCode: Joi.string().allow(null).empty(['', null]).optional(),
-  birthINSEECode: Joi.string().allow(null).empty(['', null]).optional(),
-  birthCity: Joi.string().allow(null).empty(['', null]).optional(),
-  birthCountry: Joi.string().empty(['', null]),
   email: Joi.string().email().allow(null).empty('').optional().messages({
     'string.email': CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_EMAIL_NOT_VALID.code,
   }),
   resultRecipientEmail: Joi.string().email().empty(['', null]).optional().messages({
     'string.email': CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_RESULT_RECIPIENT_EMAIL_NOT_VALID.code,
   }),
-  externalId: Joi.string().allow(null).empty(['', null]).optional(),
+  externalId: Joi.string().allow(null).empty(['', null]).optional().messages({
+    'string.base': CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_EXTERNAL_ID_MUST_BE_A_STRING.code,
+  }),
   birthdate: Joi.date().format('YYYY-MM-DD').greater('1900-01-01').required().empty(['', null]).messages({
     'any.required': CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_BIRTHDATE_REQUIRED.code,
     'date.format': CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_BIRTHDATE_FORMAT_NOT_VALID.code,
     'date.greater': CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_BIRTHDATE_MUST_BE_GREATER.code,
   }),
-  extraTimePercentage: Joi.number().integer().allow(null).optional().min(1).max(100).messages({
+  extraTimePercentage: Joi.number().allow(null).optional().min(0).less(10).messages({
     'number.base': CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_EXTRA_TIME_INTEGER.code,
-    'number.min': CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_EXTRA_TIME_BELOW_ONE.code,
-    'number.max': CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_EXTRA_TIME_BELOW_ONE.code,
-    'number.integer': CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_EXTRA_TIME_INTEGER.code,
+    'number.min': CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_EXTRA_TIME_OUT_OF_RANGE.code,
+    'number.less': CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_EXTRA_TIME_OUT_OF_RANGE.code,
   }),
-
   sessionId: Joi.when('$isSessionsMassImport', {
     is: false,
     then: Joi.number().required().empty(['', null]).messages({
-      'string.empty': CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_SESSION_ID_REQUIRED.code,
+      'any.required': CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_SESSION_ID_REQUIRED.code,
+      'number.base': CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_SESSION_ID_NOT_A_NUMBER.code,
     }),
   }),
-  complementaryCertifications: Joi.array().max(1).required().messages({
-    'array.max': CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_MAX_ONE_COMPLEMENTARY_CERTIFICATION.code,
-  }),
+  complementaryCertification: Joi.object({
+    id: Joi.number().required(),
+    label: Joi.string().required().empty(null),
+    key: Joi.string().required().empty(null),
+  }).allow(null),
   billingMode: Joi.when('$isSco', {
     is: false,
     then: Joi.string()
@@ -142,7 +109,11 @@ const certificationCandidateParticipationJoiSchema = Joi.object({
   sessionId: Joi.number().required(),
   userId: Joi.any().allow(null).optional(),
   organizationLearnerId: Joi.any().allow(null).optional(),
-  complementaryCertifications: Joi.array(),
+  complementaryCertification: Joi.object({
+    id: Joi.number().required(),
+    label: Joi.string().required().empty(null),
+    key: Joi.string().required().empty(null),
+  }).allow(null),
   billingMode: Joi.string()
     .valid(...Object.values(BILLING_MODES))
     .empty(null),
@@ -170,7 +141,7 @@ class CertificationCandidate {
     sessionId,
     userId,
     organizationLearnerId = null,
-    complementaryCertifications = [],
+    complementaryCertification = null,
     billingMode = null,
     prepaymentCode = null,
   } = {}) {
@@ -193,7 +164,7 @@ class CertificationCandidate {
     this.sessionId = sessionId;
     this.userId = userId;
     this.organizationLearnerId = organizationLearnerId;
-    this.complementaryCertifications = complementaryCertifications;
+    this.complementaryCertification = complementaryCertification;
     this.billingMode = billingMode;
     this.prepaymentCode = prepaymentCode;
   }
@@ -227,25 +198,25 @@ class CertificationCandidate {
   }
 
   validate(isSco = false) {
-    const { error } = certificationCandidateValidationJoiSchema_v1_5.validate(this, {
+    const { error } = certificationCandidateValidationJoiSchema.validate(this, {
       allowUnknown: true,
       context: {
-        isSessionsMassImport: false,
         isSco,
+        isSessionsMassImport: false,
       },
     });
     if (error) {
-      throw InvalidCertificationCandidate.fromJoiErrorDetail(error.details[0]);
+      throw new CertificationCandidatesError({ code: error.details?.[0]?.message });
     }
   }
 
   validateForMassSessionImport(isSco = false) {
-    const { error } = certificationCandidateValidationForMassImportJoiSchema.validate(this, {
+    const { error } = certificationCandidateValidationJoiSchema.validate(this, {
       abortEarly: false,
       allowUnknown: true,
       context: {
-        isSessionsMassImport: true,
         isSco,
+        isSessionsMassImport: true,
       },
     });
     if (error) {
@@ -287,7 +258,7 @@ class CertificationCandidate {
   }
 
   isGranted(key) {
-    return this.complementaryCertifications.some((comp) => comp.key === key);
+    return this.complementaryCertification?.key === key;
   }
 
   isBillingModePrepaid() {
@@ -301,4 +272,4 @@ class CertificationCandidate {
 
 CertificationCandidate.BILLING_MODES = BILLING_MODES;
 
-module.exports = CertificationCandidate;
+export { CertificationCandidate };

@@ -1,12 +1,13 @@
-const { expect, sinon, domainBuilder, catchErr } = require('../../../test-helper');
-const addCertificationCandidateToSession = require('../../../../lib/domain/usecases/add-certification-candidate-to-session');
-const { CpfBirthInformationValidation } = require('../../../../lib/domain/services/certification-cpf-service');
-const {
+import { catchErr, domainBuilder, expect, sinon } from '../../../test-helper.js';
+import { addCertificationCandidateToSession } from '../../../../lib/domain/usecases/add-certification-candidate-to-session.js';
+import { CpfBirthInformationValidation } from '../../../../lib/domain/services/certification-cpf-service.js';
+
+import {
   CertificationCandidateByPersonalInfoTooManyMatchesError,
-  CpfBirthInformationValidationError,
-  CertificationCandidateAddError,
   CertificationCandidateOnFinalizedSessionError,
-} = require('../../../../lib/domain/errors');
+  CertificationCandidatesError,
+} from '../../../../lib/domain/errors.js';
+import { CERTIFICATION_CANDIDATES_ERRORS } from '../../../../lib/domain/constants/certification-candidates-errors.js';
 
 describe('Unit | UseCase | add-certification-candidate-to-session', function () {
   let certificationCandidateRepository;
@@ -47,7 +48,7 @@ describe('Unit | UseCase | add-certification-candidate-to-session', function () 
       const error = await catchErr(addCertificationCandidateToSession)({
         sessionId,
         certificationCandidate,
-        complementaryCertifications: [],
+        complementaryCertification: null,
         certificationCandidateRepository,
         certificationCpfService,
         certificationCpfCountryRepository,
@@ -62,7 +63,7 @@ describe('Unit | UseCase | add-certification-candidate-to-session', function () 
   });
 
   context('when certification candidate does not pass JOI validation', function () {
-    it('should throw a CertificationCandidateAddError error', async function () {
+    it('should throw a CertificationCandidatesError error', async function () {
       // given
       const session = domainBuilder.buildSession.created();
       sessionRepository.get.resolves(session);
@@ -76,7 +77,7 @@ describe('Unit | UseCase | add-certification-candidate-to-session', function () 
       const err = await catchErr(addCertificationCandidateToSession)({
         sessionId,
         certificationCandidate,
-        complementaryCertifications: [],
+        complementaryCertification: null,
         certificationCandidateRepository,
         certificationCpfService,
         certificationCpfCountryRepository,
@@ -85,7 +86,7 @@ describe('Unit | UseCase | add-certification-candidate-to-session', function () 
       });
 
       // then
-      expect(err).to.be.instanceOf(CertificationCandidateAddError);
+      expect(err).to.be.instanceOf(CertificationCandidatesError);
       expect(certificationCandidateRepository.saveInSession).not.to.have.been.called;
     });
   });
@@ -106,7 +107,7 @@ describe('Unit | UseCase | add-certification-candidate-to-session', function () 
         const err = await catchErr(addCertificationCandidateToSession)({
           sessionId,
           certificationCandidate,
-          complementaryCertifications: [],
+          complementaryCertification: null,
           certificationCandidateRepository,
           certificationCpfService,
           certificationCpfCountryRepository,
@@ -126,15 +127,15 @@ describe('Unit | UseCase | add-certification-candidate-to-session', function () 
     });
 
     context('when no candidate exists with personal info', function () {
-      it('should save the certification candidate and the complementary certifications', async function () {
+      it('should save the certification candidate and the complementary certification', async function () {
         // given
         const session = domainBuilder.buildSession.created();
         sessionRepository.get.resolves(session);
         sessionRepository.isSco.resolves(false);
-        const complementaryCertifications = [domainBuilder.buildComplementaryCertification()];
+        const complementaryCertification = domainBuilder.buildComplementaryCertification();
         const certificationCandidate = domainBuilder.buildCertificationCandidate.pro({
           sessionId: null,
-          complementaryCertifications,
+          complementaryCertification,
         });
         const cpfBirthInformationValidation = new CpfBirthInformationValidation();
         cpfBirthInformationValidation.success({
@@ -151,7 +152,7 @@ describe('Unit | UseCase | add-certification-candidate-to-session', function () 
         await addCertificationCandidateToSession({
           sessionId,
           certificationCandidate,
-          complementaryCertifications,
+          complementaryCertification,
           certificationCandidateRepository,
           certificationCpfService,
           certificationCpfCountryRepository,
@@ -180,7 +181,7 @@ describe('Unit | UseCase | add-certification-candidate-to-session', function () 
           birthINSEECode: 'INSEE_CODE',
           birthPostalCode: null,
           birthCity: 'CITY',
-          complementaryCertifications: [],
+          complementaryCertification: null,
         });
         certificationCandidateRepository.findBySessionIdAndPersonalInfo.resolves([]);
         certificationCpfService.getBirthInformation.resolves(cpfBirthInformationValidation);
@@ -190,7 +191,7 @@ describe('Unit | UseCase | add-certification-candidate-to-session', function () 
         await addCertificationCandidateToSession({
           sessionId,
           certificationCandidate,
-          complementaryCertifications: [],
+          complementaryCertification: null,
           certificationCandidateRepository,
           certificationCpfService,
           certificationCpfCountryRepository,
@@ -217,7 +218,7 @@ describe('Unit | UseCase | add-certification-candidate-to-session', function () 
           birthINSEECode: 'INSEE_CODE',
           birthPostalCode: null,
           birthCity: 'CITY',
-          complementaryCertifications: [],
+          complementaryCertification: null,
         });
         certificationCandidateRepository.findBySessionIdAndPersonalInfo.resolves([]);
         certificationCpfService.getBirthInformation.resolves(cpfBirthInformationValidation);
@@ -227,7 +228,7 @@ describe('Unit | UseCase | add-certification-candidate-to-session', function () 
         await addCertificationCandidateToSession({
           sessionId,
           certificationCandidate,
-          complementaryCertifications: [],
+          complementaryCertification: null,
           certificationCandidateRepository,
           certificationCpfService,
           certificationCpfCountryRepository,
@@ -240,16 +241,19 @@ describe('Unit | UseCase | add-certification-candidate-to-session', function () 
       });
 
       context('when birth information validation fail', function () {
-        it('should throw a CpfBirthInformationValidationError', async function () {
+        it('should throw a CertificationCandidatesError', async function () {
           // given
           const session = domainBuilder.buildSession.created();
           sessionRepository.get.resolves(session);
           sessionRepository.isSco.resolves(false);
           const certificationCandidate = domainBuilder.buildCertificationCandidate.pro({
             sessionId: null,
-            complementaryCertifications: [],
+            complementaryCertification: null,
           });
-          const certificationCandidateError = { code: '', getMessage: () => 'Failure message' };
+          const certificationCandidateError = {
+            code: CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_BIRTH_CITY_REQUIRED.code,
+            getMessage: () => 'Failure message',
+          };
           const cpfBirthInformationValidation = new CpfBirthInformationValidation();
           cpfBirthInformationValidation.failure({
             certificationCandidateError,
@@ -261,7 +265,7 @@ describe('Unit | UseCase | add-certification-candidate-to-session', function () 
           const error = await catchErr(addCertificationCandidateToSession)({
             sessionId,
             certificationCandidate,
-            complementaryCertifications: [],
+            complementaryCertification: null,
             certificationCandidateRepository,
             certificationCpfService,
             certificationCpfCountryRepository,
@@ -270,9 +274,8 @@ describe('Unit | UseCase | add-certification-candidate-to-session', function () 
           });
 
           // then
-          expect(error).to.be.an.instanceOf(CpfBirthInformationValidationError);
-          expect(error.message).to.equal('Failure message');
-          expect(certificationCandidateRepository.saveInSession).not.to.have.been.called;
+          expect(error).to.be.an.instanceOf(CertificationCandidatesError);
+          expect(error.code).to.equal(CERTIFICATION_CANDIDATES_ERRORS.CANDIDATE_BIRTH_CITY_REQUIRED.code);
         });
       });
     });

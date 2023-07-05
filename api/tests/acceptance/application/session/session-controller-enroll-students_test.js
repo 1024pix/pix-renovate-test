@@ -1,11 +1,6 @@
-const {
-  sinon,
-  expect,
-  databaseBuilder,
-  generateValidRequestAuthorizationHeader,
-  knex,
-} = require('../../../test-helper');
-const createServer = require('../../../../server');
+import { sinon, expect, databaseBuilder, generateValidRequestAuthorizationHeader, knex } from '../../../test-helper.js';
+
+import { createServer } from '../../../../server.js';
 
 describe('Acceptance | Controller | session-controller-enrol-students-to-session', function () {
   let server;
@@ -144,7 +139,7 @@ describe('Acceptance | Controller | session-controller-enrol-students-to-session
                 'result-recipient-email': null,
                 'organization-learner-id': organizationLearner.id,
                 sex: 'M',
-                'complementary-certifications': [],
+                'complementary-certification': null,
               },
               id: sinon.match.string,
               type: 'certification-candidates',

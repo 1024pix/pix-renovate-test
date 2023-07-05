@@ -1,7 +1,8 @@
-const { expect, domainBuilder } = require('../../../test-helper');
-const JuryCertificationSummary = require('../../../../lib/domain/read-models/JuryCertificationSummary');
-const AssessmentResult = require('../../../../lib/domain/models/AssessmentResult');
-const forIn = require('lodash/forIn');
+import { expect, domainBuilder } from '../../../test-helper.js';
+import { JuryCertificationSummary } from '../../../../lib/domain/read-models/JuryCertificationSummary.js';
+import { AssessmentResult } from '../../../../lib/domain/models/AssessmentResult.js';
+import lodash from 'lodash';
+const { forIn } = lodash;
 
 describe('Unit | Domain | Models | JuryCertificationSummary', function () {
   describe('#constructor', function () {
@@ -10,10 +11,7 @@ describe('Unit | Domain | Models | JuryCertificationSummary', function () {
       const notImpactfulIssueReport = domainBuilder.buildCertificationIssueReport.notImpactful({ resolvedAt: null });
       const data = {
         certificationIssueReports: [notImpactfulIssueReport],
-        complementaryCertificationTakenLabels: [
-          'Pix+ Édu 2nd degré Initié (entrée dans le métier)',
-          'Pix+ Droit Expert',
-        ],
+        complementaryCertificationTakenLabel: 'Pix+ Droit Expert',
         completedAt: new Date('2020-01-01'),
         createdAt: new Date('2020-01-02'),
         firstName: 'Mad',
@@ -33,10 +31,7 @@ describe('Unit | Domain | Models | JuryCertificationSummary', function () {
       // then
       expect(juryCertificationSummary).to.deep.equal({
         certificationIssueReports: [notImpactfulIssueReport],
-        complementaryCertificationTakenLabels: [
-          'Pix+ Édu 2nd degré Initié (entrée dans le métier)',
-          'Pix+ Droit Expert',
-        ],
+        complementaryCertificationTakenLabel: 'Pix+ Droit Expert',
         completedAt: new Date('2020-01-01'),
         createdAt: new Date('2020-01-02'),
         firstName: 'Mad',

@@ -1,9 +1,8 @@
-const { databaseBuilder, expect, knex, domainBuilder, catchErr } = require('../../../../test-helper');
-const _ = require('lodash');
-const { NotFoundError } = require('../../../../../lib/domain/errors');
-const Session = require('../../../../../lib/domain/models/Session');
-const { statuses } = require('../../../../../lib/domain/models/Session');
-const sessionRepository = require('../../../../../lib/infrastructure/repositories/sessions/session-repository');
+import { databaseBuilder, expect, knex, domainBuilder, catchErr } from '../../../../test-helper.js';
+import _ from 'lodash';
+import { NotFoundError } from '../../../../../lib/domain/errors.js';
+import { Session, statuses } from '../../../../../lib/domain/models/Session.js';
+import * as sessionRepository from '../../../../../lib/infrastructure/repositories/sessions/session-repository.js';
 
 describe('Integration | Repository | Session', function () {
   describe('#save', function () {
@@ -29,6 +28,7 @@ describe('Integration | Repository | Session', function () {
         assignedCertificationOfficerId: null,
         accessCode: 'XXXX',
         supervisorPassword: 'AB2C7',
+        version: 2,
       });
 
       await databaseBuilder.commit();
@@ -146,6 +146,7 @@ describe('Integration | Repository | Session', function () {
         time: '12:00:00',
         description: 'CertificationPix pour les jeunes',
         accessCode: 'NJR10',
+        version: 2,
       });
       await databaseBuilder.commit();
 
@@ -204,18 +205,16 @@ describe('Integration | Repository | Session', function () {
       expect(actualSession.certificationCandidates).to.deep.equal([]);
     });
 
-    it('should return candidates complementary certifications', async function () {
+    it('should return candidates complementary certification', async function () {
       // given
       const session = databaseBuilder.factory.buildSession();
+
       const pixPlusFoot = databaseBuilder.factory.buildComplementaryCertification({ label: 'Pix+ Foot', key: 'FOOT' });
       const pixPlusRugby = databaseBuilder.factory.buildComplementaryCertification({
         label: 'Pix+ Rugby',
         key: 'RUGBY',
       });
-      const pixPlusTennis = databaseBuilder.factory.buildComplementaryCertification({
-        label: 'Pix+ Tennis',
-        key: 'TENNIS',
-      });
+
       const firstCandidate = databaseBuilder.factory.buildCertificationCandidate({
         lastName: 'Jackson',
         firstName: 'Michael',
@@ -226,6 +225,7 @@ describe('Integration | Repository | Session', function () {
         firstName: 'Ziggy',
         sessionId: session.id,
       });
+
       databaseBuilder.factory.buildComplementaryCertificationSubscription({
         certificationCandidateId: firstCandidate.id,
         complementaryCertificationId: pixPlusRugby.id,
@@ -234,10 +234,7 @@ describe('Integration | Repository | Session', function () {
         certificationCandidateId: secondCandidate.id,
         complementaryCertificationId: pixPlusFoot.id,
       });
-      databaseBuilder.factory.buildComplementaryCertificationSubscription({
-        certificationCandidateId: secondCandidate.id,
-        complementaryCertificationId: pixPlusTennis.id,
-      });
+
       await databaseBuilder.commit();
 
       // when
@@ -245,16 +242,15 @@ describe('Integration | Repository | Session', function () {
 
       // then
       const [firstCandidateFromSession, secondCandidateFromSession] = actualSession.certificationCandidates;
-      expect(firstCandidateFromSession.complementaryCertifications).to.deep.equal([
-        domainBuilder.buildComplementaryCertification(pixPlusRugby),
-      ]);
-      expect(secondCandidateFromSession.complementaryCertifications).to.deep.equal([
-        domainBuilder.buildComplementaryCertification(pixPlusFoot),
-        domainBuilder.buildComplementaryCertification(pixPlusTennis),
-      ]);
+      expect(firstCandidateFromSession.complementaryCertification).to.deep.equal(
+        domainBuilder.buildComplementaryCertification(pixPlusRugby)
+      );
+      expect(secondCandidateFromSession.complementaryCertification).to.deep.equal(
+        domainBuilder.buildComplementaryCertification(pixPlusFoot)
+      );
     });
 
-    it('should return an empty candidates complementary certifications if there is no complementary certifications', async function () {
+    it('should return an empty candidates complementary certifications if there is no complementary certification', async function () {
       // given
       const session = databaseBuilder.factory.buildSession();
       databaseBuilder.factory.buildCertificationCandidate({
@@ -274,8 +270,8 @@ describe('Integration | Repository | Session', function () {
 
       // then
       const [firstCandidateFromSession, secondCandidateFromSession] = actualSession.certificationCandidates;
-      expect(firstCandidateFromSession.complementaryCertifications).to.deep.equal([]);
-      expect(secondCandidateFromSession.complementaryCertifications).to.deep.equal([]);
+      expect(firstCandidateFromSession.complementaryCertification).to.equal(null);
+      expect(secondCandidateFromSession.complementaryCertification).to.equal(null);
     });
 
     it('should return a Not found error when no session was found', async function () {
@@ -556,7 +552,7 @@ describe('Integration | Repository | Session', function () {
           await databaseBuilder.commit();
 
           // when
-          await sessionRepository.delete(sessionId);
+          await sessionRepository.remove(sessionId);
 
           // then
           const foundSession = await knex('sessions').select('id').where({ id: sessionId }).first();
@@ -582,7 +578,7 @@ describe('Integration | Repository | Session', function () {
             await databaseBuilder.commit();
 
             // when
-            await sessionRepository.delete(sessionId);
+            await sessionRepository.remove(sessionId);
 
             // then
             const foundSession = await knex('sessions').select('id').where({ id: sessionId }).first();
@@ -605,7 +601,7 @@ describe('Integration | Repository | Session', function () {
           await databaseBuilder.commit();
 
           // when
-          await sessionRepository.delete(sessionId);
+          await sessionRepository.remove(sessionId);
 
           // then
           const foundSession = await knex('sessions').select('id').where({ id: sessionId }).first();
@@ -623,7 +619,7 @@ describe('Integration | Repository | Session', function () {
           await databaseBuilder.commit();
 
           // when
-          await sessionRepository.delete(sessionId);
+          await sessionRepository.remove(sessionId);
 
           // then
           const foundSession = await knex('sessions').select('id').where({ id: sessionId }).first();
@@ -638,7 +634,7 @@ describe('Integration | Repository | Session', function () {
         const sessionId = 123456;
 
         // when
-        const error = await catchErr(sessionRepository.delete)(sessionId);
+        const error = await catchErr(sessionRepository.remove)(sessionId);
 
         // then
         expect(error).to.be.instanceOf(NotFoundError);

@@ -1,9 +1,16 @@
-/* eslint-disable node/no-process-env*/
-const path = require('path');
-const moment = require('moment');
-const ms = require('ms');
+import * as dotenv from 'dotenv';
+dotenv.config();
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable n/no-process-env */
+import path from 'path';
+import moment from 'moment';
+import ms from 'ms';
 
-const { getArrayOfStrings } = require('../lib/infrastructure/utils/string-utils.js');
+import { getArrayOfStrings } from '../lib/infrastructure/utils/string-utils.js';
+
+import * as url from 'url';
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 function parseJSONEnv(varName) {
   if (process.env[varName]) {
@@ -71,7 +78,6 @@ const configuration = (function () {
       pixApp: process.env.DOMAIN_PIX_APP || 'https://app.pix',
       pixOrga: process.env.DOMAIN_PIX_ORGA || 'https://orga.pix',
       pixCertif: process.env.DOMAIN_PIX_CERTIF || 'https://certif.pix',
-      pix1d: process.env.DOMAIN_PIX1D || 'https://pix1d.pix',
     },
 
     partner: {
@@ -237,6 +243,7 @@ const configuration = (function () {
     },
 
     poleEmploi: {
+      isEnabled: isFeatureEnabled(process.env.POLE_EMPLOI_ENABLED),
       clientId: process.env.POLE_EMPLOI_CLIENT_ID,
       clientSecret: process.env.POLE_EMPLOI_CLIENT_SECRET,
       tokenUrl: process.env.POLE_EMPLOI_TOKEN_URL,
@@ -254,6 +261,7 @@ const configuration = (function () {
     },
 
     cnav: {
+      isEnabled: isFeatureEnabled(process.env.CNAV_ENABLED),
       clientId: process.env.CNAV_CLIENT_ID,
       authenticationUrl: process.env.CNAV_AUTHENTICATION_URL,
       userInfoUrl: process.env.CNAV_OIDC_USER_INFO_URL,
@@ -263,6 +271,7 @@ const configuration = (function () {
     },
 
     fwb: {
+      isEnabled: isFeatureEnabled(process.env.FWB_ENABLED),
       clientId: process.env.FWB_CLIENT_ID,
       clientSecret: process.env.FWB_CLIENT_SECRET,
       tokenUrl: process.env.FWB_TOKEN_URL,
@@ -292,16 +301,16 @@ const configuration = (function () {
       redisUrl: process.env.REDIS_URL,
     },
 
-    graviteeRegisterApplicationsCredentials: [
+    apimRegisterApplicationsCredentials: [
       {
-        clientId: process.env.GRAVITEE_OSMOSE_CLIENT_ID,
-        clientSecret: process.env.GRAVITEE_OSMOSE_CLIENT_SECRET,
+        clientId: process.env.APIM_OSMOSE_CLIENT_ID,
+        clientSecret: process.env.APIM_OSMOSE_CLIENT_SECRET,
         scope: 'organizations-certifications-result',
         source: 'livretScolaire',
       },
       {
-        clientId: process.env.GRAVITEE_POLE_EMPLOI_CLIENT_ID,
-        clientSecret: process.env.GRAVITEE_POLE_EMPLOI_CLIENT_SECRET,
+        clientId: process.env.APIM_POLE_EMPLOI_CLIENT_ID,
+        clientSecret: process.env.APIM_POLE_EMPLOI_CLIENT_SECRET,
         scope: 'pole-emploi-participants-result',
         source: 'poleEmploi',
       },
@@ -380,6 +389,7 @@ const configuration = (function () {
 
     config.temporaryKey.secret = 'test-jwt-key';
 
+    config.poleEmploi.isEnabled = true;
     config.poleEmploi.clientId = 'PIX_POLE_EMPLOI_CLIENT_ID';
     config.poleEmploi.clientSecret = 'PIX_POLE_EMPLOI_CLIENT_SECRET';
     config.poleEmploi.tokenUrl = 'http://tokenUrl.fr';
@@ -393,6 +403,7 @@ const configuration = (function () {
 
     config.temporaryStorage.redisUrl = null;
 
+    config.cnav.isEnabled = true;
     config.cnav.clientId = 'PIX_CNAV_CLIENT_ID';
     config.cnav.authenticationUrl = 'http://idp.cnav/auth';
     config.cnav.userInfoUrl = 'http://userInfoUrl.fr';
@@ -403,10 +414,10 @@ const configuration = (function () {
 
     config.saml.accessTokenLifespanMs = 1000;
 
-    config.graviteeRegisterApplicationsCredentials = [
+    config.apimRegisterApplicationsCredentials = [
       {
-        clientId: 'graviteeOsmoseClientId',
-        clientSecret: 'graviteeOsmoseClientSecret',
+        clientId: 'apimOsmoseClientId',
+        clientSecret: 'apimOsmoseClientSecret',
         scope: 'organizations-certifications-result',
         source: 'livretScolaire',
       },
@@ -453,5 +464,4 @@ const configuration = (function () {
   return config;
 })();
 
-module.exports = configuration;
-/* eslint-enable node/no-process-env*/
+export { configuration as config };

@@ -1,18 +1,19 @@
-const jsonwebtoken = require('jsonwebtoken');
-const {
+import jsonwebtoken from 'jsonwebtoken';
+
+import {
   expect,
   databaseBuilder,
   knex,
   nock,
   sinon,
   generateValidRequestAuthorizationHeader,
-} = require('../../../../test-helper');
+} from '../../../../test-helper.js';
 
-const createServer = require('../../../../../server');
-const settings = require('../../../../../lib/config');
-const AuthenticationSessionContent = require('../../../../../lib/domain/models/AuthenticationSessionContent');
-const authenticationSessionService = require('../../../../../lib/domain/services/authentication/authentication-session-service');
-const OidcIdentityProviders = require('../../../../../lib/domain/constants/oidc-identity-providers');
+import { createServer } from '../../../../../server.js';
+import { config as settings } from '../../../../../lib/config.js';
+import { AuthenticationSessionContent } from '../../../../../lib/domain/models/AuthenticationSessionContent.js';
+import * as authenticationSessionService from '../../../../../lib/domain/services/authentication/authentication-session-service.js';
+import * as OidcIdentityProviders from '../../../../../lib/domain/constants/oidc-identity-providers.js';
 
 const uuidPattern = new RegExp(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i);
 
@@ -29,7 +30,7 @@ describe('Acceptance | Route | oidc | token', function () {
       payload = {
         data: {
           attributes: {
-            identity_provider: OidcIdentityProviders.POLE_EMPLOI.service.code,
+            identity_provider: OidcIdentityProviders.POLE_EMPLOI.code,
             code: 'code',
             redirect_uri: 'redirect_uri',
             state_sent: 'state',
@@ -110,7 +111,7 @@ describe('Acceptance | Route | oidc | token', function () {
       }).id;
 
       databaseBuilder.factory.buildAuthenticationMethod.withIdentityProvider({
-        identityProvider: OidcIdentityProviders.POLE_EMPLOI.service.code,
+        identityProvider: OidcIdentityProviders.POLE_EMPLOI.code,
         externalIdentifier,
         accessToken: 'access_token',
         refreshToken: 'refresh_token',
@@ -164,7 +165,7 @@ describe('Acceptance | Route | oidc | token', function () {
         }).id;
 
         databaseBuilder.factory.buildAuthenticationMethod.withIdentityProvider({
-          identityProvider: OidcIdentityProviders.POLE_EMPLOI.service.code,
+          identityProvider: OidcIdentityProviders.POLE_EMPLOI.code,
           externalIdentifier,
           accessToken: 'access_token',
           refreshToken: 'refresh_token',
@@ -258,7 +259,7 @@ describe('Acceptance | Route | oidc | token', function () {
             }).id;
 
             databaseBuilder.factory.buildAuthenticationMethod.withIdentityProvider({
-              identityProvider: OidcIdentityProviders.POLE_EMPLOI.service.code,
+              identityProvider: OidcIdentityProviders.POLE_EMPLOI.code,
               externalIdentifier,
               accessToken: 'access_token',
               refreshToken: 'refresh_token',

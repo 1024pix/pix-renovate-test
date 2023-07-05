@@ -1,11 +1,10 @@
-const Joi = require('joi');
+import Joi from 'joi';
 
-const securityPreHandlers = require('../security-pre-handlers.js');
-const certificationCourseController = require('./certification-course-controller.js');
+import { securityPreHandlers } from '../security-pre-handlers.js';
+import { certificationCourseController } from './certification-course-controller.js';
+import { identifiersType } from '../../domain/types/identifiers-type.js';
 
-const identifiersType = require('../../domain/types/identifiers-type.js');
-
-exports.register = async function (server) {
+const register = async function (server) {
   server.route([
     {
       method: 'GET',
@@ -121,6 +120,22 @@ exports.register = async function (server) {
       path: '/api/certification-courses',
       config: {
         handler: certificationCourseController.save,
+        validate: {
+          payload: Joi.object({
+            data: {
+              attributes: {
+                'access-code': Joi.string().required(),
+                'session-id': identifiersType.sessionId,
+              },
+            },
+          }),
+          headers: Joi.object({
+            'accept-language': Joi.string(),
+          }),
+          options: {
+            allowUnknown: true,
+          },
+        },
         notes: [
           '- **Route nécessitant une authentification**\n' +
             "- S'il existe déjà une certification pour l'utilisateur courant dans cette session, alors cette route renvoie la certification existante avec un code 200\n" +
@@ -225,4 +240,5 @@ exports.register = async function (server) {
   ]);
 };
 
-exports.name = 'certification-courses-api';
+const name = 'certification-courses-api';
+export { register, name };

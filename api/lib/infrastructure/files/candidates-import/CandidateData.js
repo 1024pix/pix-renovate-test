@@ -1,15 +1,15 @@
-const moment = require('moment');
-const _ = require('lodash');
+import moment from 'moment';
+import _ from 'lodash';
 const FRANCE_COUNTRY_CODE = '99100';
-const CertificationCandidate = require('../../../domain/models/CertificationCandidate.js');
-const {
+import { CertificationCandidate } from '../../../domain/models/CertificationCandidate.js';
+import {
   PIX_PLUS_DROIT,
   CLEA,
   PIX_PLUS_EDU_1ER_DEGRE,
   PIX_PLUS_EDU_2ND_DEGRE,
-} = require('../../../domain/models/ComplementaryCertification.js');
+} from '../../../domain/models/ComplementaryCertification.js';
 
-module.exports = class CandidateData {
+class CandidateData {
   constructor({
     id = null,
     firstName = null,
@@ -30,7 +30,7 @@ module.exports = class CandidateData {
     userId = null,
     organizationLearnerId = null,
     number = null,
-    complementaryCertifications = null,
+    complementaryCertification = null,
     billingMode = null,
     prepaymentCode = null,
     i18n = null,
@@ -60,17 +60,17 @@ module.exports = class CandidateData {
     this.organizationLearnerId = this._emptyStringIfNull(organizationLearnerId);
     this.billingMode = CertificationCandidate.translateBillingMode({ billingMode, translate: this.translate });
     this.prepaymentCode = this._emptyStringIfNull(prepaymentCode);
-    this.cleaNumerique = this._displayYesIfCandidateHasComplementaryCertification(complementaryCertifications, CLEA);
+    this.cleaNumerique = this._displayYesIfCandidateHasComplementaryCertification(complementaryCertification, CLEA);
     this.pixPlusDroit = this._displayYesIfCandidateHasComplementaryCertification(
-      complementaryCertifications,
+      complementaryCertification,
       PIX_PLUS_DROIT
     );
     this.pixPlusEdu1erDegre = this._displayYesIfCandidateHasComplementaryCertification(
-      complementaryCertifications,
+      complementaryCertification,
       PIX_PLUS_EDU_1ER_DEGRE
     );
     this.pixPlusEdu2ndDegre = this._displayYesIfCandidateHasComplementaryCertification(
-      complementaryCertifications,
+      complementaryCertification,
       PIX_PLUS_EDU_2ND_DEGRE
     );
     this.count = number;
@@ -96,13 +96,11 @@ module.exports = class CandidateData {
     }
   }
 
-  _displayYesIfCandidateHasComplementaryCertification(complementaryCertifications, certificationKey) {
-    if (!complementaryCertifications) {
+  _displayYesIfCandidateHasComplementaryCertification(complementaryCertification, certificationKey) {
+    if (!complementaryCertification) {
       return '';
     }
-    const hasComplementaryCertification = complementaryCertifications.some(
-      (complementaryCertification) => complementaryCertification.key === certificationKey
-    );
+    const hasComplementaryCertification = complementaryCertification.key === certificationKey;
     return hasComplementaryCertification ? this.translate('candidate-list-template.yes') : '';
   }
 
@@ -113,4 +111,6 @@ module.exports = class CandidateData {
   static empty({ number, i18n }) {
     return new CandidateData({ number, i18n });
   }
-};
+}
+
+export { CandidateData };

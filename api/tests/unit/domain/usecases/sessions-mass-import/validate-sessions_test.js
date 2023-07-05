@@ -1,13 +1,11 @@
-const { domainBuilder, expect, sinon } = require('../../../../test-helper');
-const validateSessions = require('../../../../../lib/domain/usecases/sessions-mass-import/validate-sessions');
-const Session = require('../../../../../lib/domain/models/Session');
-const sessionsImportValidationService = require('../../../../../lib/domain/services/sessions-mass-import/sessions-import-validation-service');
-const temporarySessionsStorageForMassImportService = require('../../../../../lib/domain/services/sessions-mass-import/temporary-sessions-storage-for-mass-import-service');
-const { CpfBirthInformationValidation } = require('../../../../../lib/domain/services/certification-cpf-service');
-const CertificationCandidate = require('../../../../../lib/domain/models/CertificationCandidate');
-const { CERTIFICATION_SESSIONS_ERRORS } = require('../../../../../lib/domain/constants/sessions-errors');
-const SessionMassImportReport = require('../../../../../lib/domain/models/SessionMassImportReport');
-const { getI18n } = require('../../../../tooling/i18n/i18n');
+import { domainBuilder, expect, sinon } from '../../../../test-helper.js';
+import { validateSessions } from '../../../../../lib/domain/usecases/sessions-mass-import/validate-sessions.js';
+import { Session } from '../../../../../lib/domain/models/Session.js';
+import { CpfBirthInformationValidation } from '../../../../../lib/domain/services/certification-cpf-service.js';
+import { CertificationCandidate } from '../../../../../lib/domain/models/CertificationCandidate.js';
+import { CERTIFICATION_SESSIONS_ERRORS } from '../../../../../lib/domain/constants/sessions-errors.js';
+import { SessionMassImportReport } from '../../../../../lib/domain/models/SessionMassImportReport.js';
+import { getI18n } from '../../../../tooling/i18n/i18n.js';
 
 describe('Unit | UseCase | sessions-mass-import | validate-sessions', function () {
   let accessCode;
@@ -15,13 +13,13 @@ describe('Unit | UseCase | sessions-mass-import | validate-sessions', function (
   let certificationCenterName;
   let certificationCenter;
   let certificationCenterRepository;
-  let certificationCandidateRepository;
   let certificationCourseRepository;
-  let sessionRepository;
   let complementaryCertificationRepository;
   // eslint-disable-next-line mocha/no-setup-in-describe
   const i18n = getI18n();
   let sessionCodeService;
+  let sessionsImportValidationService;
+  let temporarySessionsStorageForMassImportService;
 
   beforeEach(function () {
     accessCode = 'accessCode';
@@ -34,12 +32,17 @@ describe('Unit | UseCase | sessions-mass-import | validate-sessions', function (
     certificationCenterRepository = { get: sinon.stub() };
     complementaryCertificationRepository = { getByLabel: sinon.stub() };
     certificationCourseRepository = sinon.stub();
-    sessionRepository = sinon.stub();
     sessionCodeService = { getNewSessionCode: sinon.stub().returns(accessCode) };
-    sessionsImportValidationService.getValidatedCandidateBirthInformation = sinon.stub();
-    sessionsImportValidationService.validateSession = sinon.stub();
-    temporarySessionsStorageForMassImportService.save = sinon.stub();
     certificationCenterRepository.get.withArgs(certificationCenterId).resolves(certificationCenter);
+
+    sessionsImportValidationService = {
+      getValidatedCandidateBirthInformation: sinon.stub(),
+      validateSession: sinon.stub(),
+      getUniqueCandidates: sinon.stub(),
+    };
+    temporarySessionsStorageForMassImportService = {
+      save: sinon.stub(),
+    };
   });
 
   context('when sessions and candidates are valid', function () {
@@ -71,6 +74,11 @@ describe('Unit | UseCase | sessions-mass-import | validate-sessions', function (
         },
       ];
 
+      sessionsImportValidationService.getUniqueCandidates.returns({
+        uniqueCandidates: validSessionData.certificationCandidates,
+        duplicateCandidateErrors: [],
+      });
+
       temporarySessionsStorageForMassImportService.save.resolves(cachedValidatedSessionsKey);
 
       // when
@@ -79,9 +87,10 @@ describe('Unit | UseCase | sessions-mass-import | validate-sessions', function (
         userId,
         certificationCenterId,
         certificationCenterRepository,
-        sessionRepository,
         sessionCodeService,
         i18n,
+        sessionsImportValidationService,
+        temporarySessionsStorageForMassImportService,
       });
 
       // then
@@ -171,6 +180,18 @@ describe('Unit | UseCase | sessions-mass-import | validate-sessions', function (
           },
         ];
 
+        sessionsImportValidationService.getUniqueCandidates
+          .onFirstCall()
+          .returns({
+            uniqueCandidates: [candidate1],
+            duplicateCandidateErrors: [],
+          })
+          .onSecondCall()
+          .returns({
+            uniqueCandidates: [candidate2, candidate3],
+            duplicateCandidateErrors: [],
+          });
+
         const cpfBirthInformationValidation1 = new CpfBirthInformationValidation();
         cpfBirthInformationValidation1.success({ ...candidate1 });
         const cpfBirthInformationValidation2 = new CpfBirthInformationValidation();
@@ -178,13 +199,11 @@ describe('Unit | UseCase | sessions-mass-import | validate-sessions', function (
         const cpfBirthInformationValidation3 = new CpfBirthInformationValidation();
         cpfBirthInformationValidation3.success({ ...candidate3 });
         sessionsImportValidationService.getValidatedCandidateBirthInformation
-          .onCall(0)
-          .resolves({ cpfBirthInformation: cpfBirthInformationValidation1 });
-        sessionsImportValidationService.getValidatedCandidateBirthInformation
-          .onCall(1)
-          .resolves({ cpfBirthInformation: cpfBirthInformationValidation2 });
-        sessionsImportValidationService.getValidatedCandidateBirthInformation
-          .onCall(2)
+          .onFirstCall()
+          .resolves({ cpfBirthInformation: cpfBirthInformationValidation1 })
+          .onSecondCall()
+          .resolves({ cpfBirthInformation: cpfBirthInformationValidation2 })
+          .onThirdCall()
           .resolves({ cpfBirthInformation: cpfBirthInformationValidation3 });
 
         temporarySessionsStorageForMassImportService.save.resolves(cachedValidatedSessionsKey);
@@ -195,11 +214,11 @@ describe('Unit | UseCase | sessions-mass-import | validate-sessions', function (
           userId,
           certificationCenterId,
           certificationCenterRepository,
-          certificationCandidateRepository,
           certificationCourseRepository,
-          sessionRepository,
           sessionCodeService,
           i18n,
+          sessionsImportValidationService,
+          temporarySessionsStorageForMassImportService,
         });
 
         // then
@@ -263,14 +282,19 @@ describe('Unit | UseCase | sessions-mass-import | validate-sessions', function (
         },
       ];
 
+      sessionsImportValidationService.getUniqueCandidates.returns({
+        uniqueCandidates: validSessionData.certificationCandidates,
+        duplicateCandidateErrors: [],
+      });
+
       // when
       await validateSessions({
         sessions,
         certificationCenterId,
         certificationCenterRepository,
-        sessionRepository,
         sessionCodeService,
         i18n,
+        sessionsImportValidationService,
       });
 
       // then
@@ -296,14 +320,20 @@ describe('Unit | UseCase | sessions-mass-import | validate-sessions', function (
           certificationCandidateErrors: ['lastName required'],
         });
 
+        sessionsImportValidationService.getUniqueCandidates.returns({
+          uniqueCandidates: validSessionData.certificationCandidates,
+          duplicateCandidateErrors: [],
+        });
+
         // when
         const sessionsMassImportReport = await validateSessions({
           sessions,
           certificationCenterId,
           certificationCenterRepository,
-          sessionRepository,
           sessionCodeService,
           i18n,
+          sessionsImportValidationService,
+          temporarySessionsStorageForMassImportService,
         });
 
         // then
@@ -340,14 +370,28 @@ describe('Unit | UseCase | sessions-mass-import | validate-sessions', function (
           cpfBirthInformation: {},
         });
 
+        sessionsImportValidationService.getUniqueCandidates.returns({
+          uniqueCandidates: [firstCandidate, secondCandidate],
+          duplicateCandidateErrors: [
+            {
+              line: 3,
+              code: CERTIFICATION_SESSIONS_ERRORS.DUPLICATE_CANDIDATE_IN_SESSION.code,
+              isBlocking: false,
+            },
+          ],
+        });
+
+        certificationCenterRepository.get.withArgs(certificationCenterId).resolves(certificationCenter);
+
         // when
         const sessionsMassImportReport = await validateSessions({
           sessions,
-          certificationCenterId,
           certificationCenterRepository,
-          sessionRepository,
+          certificationCenterId,
           sessionCodeService,
           i18n,
+          sessionsImportValidationService,
+          temporarySessionsStorageForMassImportService,
         });
 
         // then

@@ -16,10 +16,10 @@ module('Unit | Component | markdown-to-html', function (hooks) {
     ].forEach(({ markdown, expectedValue }) => {
       test(`${markdown} should return ${expectedValue}`, function (assert) {
         // when
-        component = createGlimmerComponent('component:markdown-to-html', { markdown });
+        component = createGlimmerComponent('markdown-to-html', { markdown });
 
         // then
-        assert.strictEqual(component.html.string, expectedValue);
+        assert.strictEqual(component.html.toString(), expectedValue);
       });
     });
   });
@@ -38,10 +38,10 @@ module('Unit | Component | markdown-to-html', function (hooks) {
     ].forEach(({ markdown, expectedValue }) => {
       test(`${markdown} should be transform to ${expectedValue}`, function (assert) {
         // when
-        component = createGlimmerComponent('component:markdown-to-html', { markdown });
+        component = createGlimmerComponent('markdown-to-html', { markdown });
 
         // then
-        assert.strictEqual(component.html.string, expectedValue);
+        assert.strictEqual(component.html.toString(), expectedValue);
       });
     });
   });
@@ -51,11 +51,11 @@ module('Unit | Component | markdown-to-html', function (hooks) {
     const html = '<a href="/test" rel="noopener noreferrer" target="_blank">Lien vers un site</a>';
 
     // when
-    component = createGlimmerComponent('component:markdown-to-html', { markdown: html });
+    component = createGlimmerComponent('markdown-to-html', { markdown: html });
 
     // then
     const expectedHtml = `<p>${html}</p>`;
-    assert.strictEqual(component.html.string, expectedHtml);
+    assert.strictEqual(component.html.toString(), expectedHtml);
   });
 
   module('when extensions are passed in arguments', function () {
@@ -65,11 +65,11 @@ module('Unit | Component | markdown-to-html', function (hooks) {
       const extensions = 'remove-paragraph-tags';
 
       // when
-      component = createGlimmerComponent('component:markdown-to-html', { markdown, extensions });
+      component = createGlimmerComponent('markdown-to-html', { markdown, extensions });
 
       // then
       const expectedHtml = '<h1>Title 1</h1>\nCeci est un paragraphe.\n<img src="/images.png" alt="img" />';
-      assert.strictEqual(component.html.string, expectedHtml);
+      assert.strictEqual(component.html.toString(), expectedHtml);
     });
   });
 
@@ -79,11 +79,11 @@ module('Unit | Component | markdown-to-html', function (hooks) {
       const markdown = '<h1 class="foo">Test</h1>';
 
       // when
-      component = createGlimmerComponent('component:markdown-to-html', { markdown });
+      component = createGlimmerComponent('markdown-to-html', { markdown });
 
       // then
       const expectedHtml = '<h1>Test</h1>';
-      assert.strictEqual(component.html.string, expectedHtml);
+      assert.strictEqual(component.html.toString(), expectedHtml);
     });
   });
 
@@ -93,11 +93,11 @@ module('Unit | Component | markdown-to-html', function (hooks) {
       const markdown = '<h1 class="sr-only">Test</h1>';
 
       // when
-      component = createGlimmerComponent('component:markdown-to-html', { markdown });
+      component = createGlimmerComponent('markdown-to-html', { markdown });
 
       // then
       const expectedHtml = '<h1 class="sr-only">Test</h1>';
-      assert.strictEqual(component.html.string, expectedHtml);
+      assert.strictEqual(component.html.toString(), expectedHtml);
     });
   });
 });

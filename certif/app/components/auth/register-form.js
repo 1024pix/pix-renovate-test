@@ -1,5 +1,5 @@
 import { action } from '@ember/object';
-import { inject as service } from '@ember/service';
+import { service } from '@ember/service';
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import isEmpty from 'lodash/isEmpty';
@@ -42,17 +42,19 @@ class SignupFormValidation {
 
 export default class RegisterForm extends Component {
   @service intl;
-  @service url;
-  @service store;
   @service session;
+  @service store;
+  @service url;
 
   @tracked isLoading = false;
   @tracked firstName = null;
   @tracked lastName = null;
   @tracked email = null;
   @tracked password = null;
+  @tracked isTermsOfServiceValidated = false;
   @tracked cguValidationMessage = null;
   @tracked errorMessage = null;
+  @tracked selectedLanguage = this.intl.primaryLocale;
   @tracked validation = new SignupFormValidation();
 
   get cguUrl() {
@@ -78,6 +80,7 @@ export default class RegisterForm extends Component {
       lastName: this.lastName,
       firstName: this.firstName,
       email: this.email,
+      lang: this.selectedLanguage,
       password: this.password,
       cgu: true,
     });
@@ -175,11 +178,11 @@ export default class RegisterForm extends Component {
   }
 
   @action
-  validateCgu() {
+  validateCgu(event) {
+    this.isTermsOfServiceValidated = !!event.target.checked;
     this.cguValidationMessage = null;
-    const isInputChecked = Boolean(this.cgu);
 
-    if (!isInputChecked) {
+    if (!this.isTermsOfServiceValidated) {
       this.cguValidationMessage = this.intl.t('pages.login-or-register.register-form.fields.cgu.error');
     }
   }
@@ -190,7 +193,7 @@ export default class RegisterForm extends Component {
       !isEmpty(this.firstName) &&
       isEmailValid(this.email) &&
       isPasswordValid(this.password) &&
-      Boolean(this.cgu)
+      Boolean(this.isTermsOfServiceValidated)
     );
   }
 

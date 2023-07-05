@@ -1,15 +1,18 @@
-const { PDFDocument, rgb } = require('pdf-lib');
-const { readFile } = require('fs/promises');
-const pdfLibFontkit = require('@pdf-lib/fontkit');
-const moment = require('moment');
-const _ = require('lodash');
-const bluebird = require('bluebird');
-// eslint-disable-next-line no-restricted-modules
-const axios = require('axios');
+import { PDFDocument, rgb } from 'pdf-lib';
+import { readFile } from 'fs/promises';
 
-const AttestationViewModel = require('./AttestationViewModel.js');
-const { CertificationAttestationGenerationError } = require('../../../domain/errors.js');
+import pdfLibFontkit from '@pdf-lib/fontkit';
+import moment from 'moment';
+import _ from 'lodash';
+import bluebird from 'bluebird';
+import axios from 'axios';
+import * as url from 'url';
 
+import { AttestationViewModel } from './AttestationViewModel.js';
+import { CertificationAttestationGenerationError } from '../../../domain/errors.js';
+import { logger } from '../../logger.js';
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 const fonts = {
   openSansBold: 'OpenSans-Bold.ttf',
   openSansSemiBold: 'OpenSans-SemiBold.ttf',
@@ -96,7 +99,8 @@ async function _embedCertificationImage(pdfDocument, certificationImagePath) {
     response = await axios.get(certificationImagePath, {
       responseType: 'arraybuffer',
     });
-  } catch (_) {
+  } catch (error) {
+    logger.error(error);
     throw new CertificationAttestationGenerationError();
   }
   const [page] = await pdfDocument.embedPdf(response.data);
@@ -359,6 +363,5 @@ async function _finalizeDocument(pdfDocument) {
   return buffer;
 }
 
-module.exports = {
-  getCertificationAttestationsPdfBuffer,
-};
+const getCertificationAttestationsPdf = { getCertificationAttestationsPdfBuffer };
+export { getCertificationAttestationsPdfBuffer, getCertificationAttestationsPdf };

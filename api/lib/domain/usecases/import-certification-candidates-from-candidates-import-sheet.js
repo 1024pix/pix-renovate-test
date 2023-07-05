@@ -1,8 +1,8 @@
-const { CertificationCandidateAlreadyLinkedToUserError } = require('../../domain/errors.js');
-const bluebird = require('bluebird');
-const DomainTransaction = require('../../infrastructure/DomainTransaction.js');
+import { CertificationCandidateAlreadyLinkedToUserError } from '../../domain/errors.js';
+import bluebird from 'bluebird';
+import { DomainTransaction } from '../../infrastructure/DomainTransaction.js';
 
-module.exports = async function importCertificationCandidatesFromCandidatesImportSheet({
+const importCertificationCandidatesFromCandidatesImportSheet = async function ({
   sessionId,
   odsBuffer,
   i18n,
@@ -42,10 +42,11 @@ module.exports = async function importCertificationCandidatesFromCandidatesImpor
     await bluebird.mapSeries(certificationCandidates, function (certificationCandidate) {
       return certificationCandidateRepository.saveInSession({
         certificationCandidate,
-        complementaryCertifications: certificationCandidate.complementaryCertifications,
         sessionId,
         domainTransaction,
       });
     });
   });
 };
+
+export { importCertificationCandidatesFromCandidatesImportSheet };

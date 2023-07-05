@@ -1,13 +1,15 @@
-const { expect, sinon } = require('../../../test-helper');
-const getAttendanceSheet = require('../../../../lib/domain/usecases/get-attendance-sheet');
-const {
+import { expect, sinon } from '../../../test-helper.js';
+import { getAttendanceSheet } from '../../../../lib/domain/usecases/get-attendance-sheet.js';
+
+import {
   ATTENDANCE_SHEET_SESSION_TEMPLATE_VALUES,
   NON_SCO_ATTENDANCE_SHEET_CANDIDATE_TEMPLATE_VALUES,
   SCO_ATTENDANCE_SHEET_CANDIDATE_TEMPLATE_VALUES,
   EXTRA_EMPTY_CANDIDATE_ROWS,
-} = require('../../../../lib/infrastructure/files/attendance-sheet/attendance-sheet-placeholders');
-const _ = require('lodash');
-const { UserNotAuthorizedToAccessEntityError } = require('../../../../lib/domain/errors');
+} from '../../../../lib/infrastructure/files/attendance-sheet/attendance-sheet-placeholders.js';
+
+import _ from 'lodash';
+import { UserNotAuthorizedToAccessEntityError } from '../../../../lib/domain/errors.js';
 
 describe('Unit | UseCase | get-attendance-sheet-in-ods-format', function () {
   describe('getAttendanceSheet', function () {
@@ -214,7 +216,6 @@ function _buildAttendanceSheetSessionData(certificationCenterType, isOrganizatio
     certificationCenterType,
     isOrganizationManagingStudents,
     startTime: '14:00',
-    endTime: '16:00',
     date: '16/01/2018',
   };
 }

@@ -1,10 +1,21 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
-import { inject as service } from '@ember/service';
+import { service } from '@ember/service';
 
 export default class ParticipationFilters extends Component {
   @service intl;
   @service currentUser;
+
+  get isClearFiltersButtonDisabled() {
+    return (
+      !this.args.selectedStatus &&
+      (!this.displaySearchFilter || !this.args.searchFilter) &&
+      (!this.displayDivisionFilter || this.args.selectedDivisions.length === 0) &&
+      (!this.displayGroupsFilter || this.args.selectedGroups.length === 0) &&
+      (!this.displayStagesFilter || this.args.selectedStages.length === 0) &&
+      (!this.displayBadgesFilter || this.args.selectedBadges.length === 0)
+    );
+  }
 
   get displayFilters() {
     return (
@@ -44,10 +55,10 @@ export default class ParticipationFilters extends Component {
   }
 
   get stageOptions() {
-    const totalStage = this.args.campaign.stages.length;
+    const totalStage = this.args.campaign.stages.length - 1;
     return this.args.campaign.stages.map((stage, index) => ({
       value: stage.id,
-      reachedStage: index + 1,
+      reachedStage: index,
       totalStage,
     }));
   }

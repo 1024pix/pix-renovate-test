@@ -1,26 +1,33 @@
-const jsonwebtoken = require('jsonwebtoken');
-const querystring = require('querystring');
-const { v4: uuidv4 } = require('uuid');
+import lodash from 'lodash';
+import jsonwebtoken from 'jsonwebtoken';
+import querystring from 'querystring';
+import { v4 as uuidv4 } from 'uuid';
 
-const {
+import { logger } from '../../../infrastructure/logger.js';
+import {
   InvalidExternalAPIResponseError,
   OidcInvokingTokenEndpointError,
   OidcMissingFieldsError,
   OidcUserInfoFormatError,
-} = require('../../errors.js');
-const AuthenticationMethod = require('../../models/AuthenticationMethod.js');
-const AuthenticationSessionContent = require('../../models/AuthenticationSessionContent.js');
-const settings = require('../../../config.js');
-const httpAgent = require('../../../infrastructure/http/http-agent.js');
-const httpErrorsHelper = require('../../../infrastructure/http/errors-helper.js');
-const DomainTransaction = require('../../../infrastructure/DomainTransaction.js');
-const monitoringTools = require('../../../infrastructure/monitoring-tools.js');
-const { OIDC_ERRORS } = require('../../constants.js');
+} from '../../errors.js';
+import { AuthenticationMethod } from '../../models/AuthenticationMethod.js';
+import { AuthenticationSessionContent } from '../../models/AuthenticationSessionContent.js';
+import { config } from '../../../config.js';
+import { httpAgent } from '../../../infrastructure/http/http-agent.js';
+import * as httpErrorsHelper from '../../../infrastructure/http/errors-helper.js';
+import { DomainTransaction } from '../../../infrastructure/DomainTransaction.js';
+import { monitoringTools } from '../../../infrastructure/monitoring-tools.js';
+import { OIDC_ERRORS } from '../../constants.js';
+
+const DEFAULT_REQUIRED_PROPERTIES = ['clientId', 'clientSecret', 'authenticationUrl', 'userInfoUrl', 'tokenUrl'];
 
 class OidcAuthenticationService {
+  #isReady = false;
+
   constructor({
-    source,
     identityProvider,
+    configKey,
+    source,
     slug,
     organizationName,
     hasLogoutUrl = false,
@@ -31,12 +38,14 @@ class OidcAuthenticationService {
     authenticationUrl,
     authenticationUrlParameters,
     userInfoUrl,
+    additionalRequiredProperties,
   }) {
-    this.source = source;
     this.identityProvider = identityProvider;
+    this.configKey = configKey;
+    this.source = source;
     this.slug = slug;
-    this.hasLogoutUrl = hasLogoutUrl;
     this.organizationName = organizationName;
+    this.hasLogoutUrl = hasLogoutUrl;
     this.jwtOptions = jwtOptions;
     this.clientSecret = clientSecret;
     this.clientId = clientId;
@@ -44,14 +53,50 @@ class OidcAuthenticationService {
     this.authenticationUrl = authenticationUrl;
     this.authenticationUrlParameters = authenticationUrlParameters;
     this.userInfoUrl = userInfoUrl;
+
+    if (!this.configKey) {
+      logger.error(`${this.constructor.name}: Missing configKey`);
+      return;
+    }
+
+    const isEnabledInConfig = config[this.configKey].isEnabled;
+    if (!isEnabledInConfig) {
+      return;
+    }
+
+    const requiredProperties = DEFAULT_REQUIRED_PROPERTIES;
+    if (additionalRequiredProperties) {
+      requiredProperties.concat(additionalRequiredProperties);
+    }
+    const missingRequiredProperties = [];
+    requiredProperties.forEach((requiredProperty) => {
+      if (lodash.isNil(config[this.configKey][requiredProperty])) {
+        missingRequiredProperties.push(requiredProperty);
+      }
+    });
+    const isConfigValid = missingRequiredProperties.length == 0;
+    if (!isConfigValid) {
+      logger.error(
+        `Invalid config for OIDC Provider "${
+          this.identityProvider
+        }": the following required properties are missing: ${missingRequiredProperties.join(', ')}`
+      );
+      return;
+    }
+
+    this.#isReady = true;
   }
 
   get code() {
     return this.identityProvider;
   }
 
+  get isReady() {
+    return this.#isReady;
+  }
+
   createAccessToken(userId) {
-    return jsonwebtoken.sign({ user_id: userId }, settings.authentication.secret, this.jwtOptions);
+    return jsonwebtoken.sign({ user_id: userId }, config.authentication.secret, this.jwtOptions);
   }
 
   createAuthenticationComplement() {
@@ -75,7 +120,7 @@ class OidcAuthenticationService {
       url: this.tokenUrl,
       payload: querystring.stringify(data),
       headers: { 'content-type': 'application/x-www-form-urlencoded' },
-      timeout: settings.partner.fetchTimeOut,
+      timeout: config.partner.fetchTimeOut,
     });
 
     if (!httpResponse.isSuccessful) {
@@ -116,7 +161,7 @@ class OidcAuthenticationService {
     const httpResponse = await httpAgent.get({
       url: userInfoUrl,
       headers: { Authorization: `Bearer ${accessToken}` },
-      timeout: settings.partner.fetchTimeOut,
+      timeout: config.partner.fetchTimeOut,
     });
 
     if (!httpResponse.isSuccessful) {
@@ -223,4 +268,4 @@ class OidcAuthenticationService {
   }
 }
 
-module.exports = OidcAuthenticationService;
+export { OidcAuthenticationService };

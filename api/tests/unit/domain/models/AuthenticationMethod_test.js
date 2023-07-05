@@ -1,8 +1,8 @@
-const { expect } = require('../../../test-helper');
-const { ObjectValidationError } = require('../../../../lib/domain/errors');
-
-const AuthenticationMethod = require('../../../../lib/domain/models/AuthenticationMethod');
-const OidcIdentityProviders = require('../../../../lib/domain/constants/oidc-identity-providers');
+import { expect } from '../../../test-helper.js';
+import { ObjectValidationError } from '../../../../lib/domain/errors.js';
+import { AuthenticationMethod } from '../../../../lib/domain/models/AuthenticationMethod.js';
+import { NON_OIDC_IDENTITY_PROVIDERS } from '../../../../lib/domain/constants/identity-providers.js';
+import * as OidcIdentityProviders from '../../../../lib/domain/constants/oidc-identity-providers.js';
 
 describe('Unit | Domain | Models | AuthenticationMethod', function () {
   describe('buildPixAuthenticationMethod', function () {
@@ -33,7 +33,7 @@ describe('Unit | Domain | Models | AuthenticationMethod', function () {
 
       const expectedResult = {
         id,
-        identityProvider: AuthenticationMethod.identityProviders.PIX,
+        identityProvider: NON_OIDC_IDENTITY_PROVIDERS.PIX.code,
         authenticationComplement,
         externalIdentifier: undefined,
         userId,
@@ -50,7 +50,7 @@ describe('Unit | Domain | Models | AuthenticationMethod', function () {
       expect(
         () =>
           new AuthenticationMethod({
-            identityProvider: AuthenticationMethod.identityProviders.GAR,
+            identityProvider: NON_OIDC_IDENTITY_PROVIDERS.GAR.code,
             externalIdentifier: 'externalIdentifier',
             userId: 1,
           })
@@ -68,7 +68,7 @@ describe('Unit | Domain | Models | AuthenticationMethod', function () {
       expect(
         () =>
           new AuthenticationMethod({
-            identityProvider: OidcIdentityProviders.POLE_EMPLOI.service.code,
+            identityProvider: OidcIdentityProviders.POLE_EMPLOI.code,
             externalIdentifier: 'externalIdentifier',
             authenticationComplement,
             userId: 1,
@@ -81,7 +81,7 @@ describe('Unit | Domain | Models | AuthenticationMethod', function () {
       expect(
         () =>
           new AuthenticationMethod({
-            identityProvider: OidcIdentityProviders.CNAV.service.code,
+            identityProvider: OidcIdentityProviders.CNAV.code,
             externalIdentifier: 'externalIdentifier',
             userId: 1,
           })
@@ -109,7 +109,7 @@ describe('Unit | Domain | Models | AuthenticationMethod', function () {
       expect(
         () =>
           new AuthenticationMethod({
-            identityProvider: AuthenticationMethod.identityProviders.GAR,
+            identityProvider: NON_OIDC_IDENTITY_PROVIDERS.GAR.code,
             externalIdentifier: undefined,
             userId: 1,
           })
@@ -117,7 +117,7 @@ describe('Unit | Domain | Models | AuthenticationMethod', function () {
       expect(
         () =>
           new AuthenticationMethod({
-            identityProvider: OidcIdentityProviders.POLE_EMPLOI.service.code,
+            identityProvider: OidcIdentityProviders.POLE_EMPLOI.code,
             externalIdentifier: undefined,
             userId: 1,
           })
@@ -125,7 +125,7 @@ describe('Unit | Domain | Models | AuthenticationMethod', function () {
       expect(
         () =>
           new AuthenticationMethod({
-            identityProvider: OidcIdentityProviders.CNAV.service.code,
+            identityProvider: OidcIdentityProviders.CNAV.code,
             externalIdentifier: undefined,
             userId: 1,
           })
@@ -137,7 +137,7 @@ describe('Unit | Domain | Models | AuthenticationMethod', function () {
       expect(
         () =>
           new AuthenticationMethod({
-            identityProvider: AuthenticationMethod.identityProviders.PIX,
+            identityProvider: NON_OIDC_IDENTITY_PROVIDERS.PIX.code,
             authenticationComplement: undefined,
             userId: 1,
           })
@@ -149,7 +149,7 @@ describe('Unit | Domain | Models | AuthenticationMethod', function () {
       expect(
         () =>
           new AuthenticationMethod({
-            identityProvider: AuthenticationMethod.identityProviders.GAR,
+            identityProvider: NON_OIDC_IDENTITY_PROVIDERS.GAR.code,
             externalIdentifier: 'externalIdentifier',
             userId: 'not_valid',
           })
@@ -157,7 +157,7 @@ describe('Unit | Domain | Models | AuthenticationMethod', function () {
       expect(
         () =>
           new AuthenticationMethod({
-            identityProvider: AuthenticationMethod.identityProviders.GAR,
+            identityProvider: NON_OIDC_IDENTITY_PROVIDERS.GAR.code,
             externalIdentifier: 'externalIdentifier',
             userId: undefined,
           })

@@ -1,6 +1,6 @@
-const { expect, domainBuilder } = require('../../../../test-helper');
-const serializer = require('../../../../../lib/infrastructure/serializers/jsonapi/target-profile-for-admin-serializer');
-const TargetProfileForAdmin = require('../../../../../lib/domain/models/TargetProfileForAdmin');
+import { domainBuilder, expect } from '../../../../test-helper.js';
+import * as serializer from '../../../../../lib/infrastructure/serializers/jsonapi/target-profile-for-admin-serializer.js';
+import { TargetProfileForAdmin } from '../../../../../lib/domain/models/TargetProfileForAdmin.js';
 
 describe('Unit | Serializer | JSONAPI | target-profile-for-admin-serializer', function () {
   describe('#serialize', function () {
@@ -103,6 +103,7 @@ describe('Unit | Serializer | JSONAPI | target-profile-for-admin-serializer', fu
         imageUrl: 'some/image/url',
         category: 'OTHER',
         isSimplifiedAccess: true,
+        areKnowledgeElementsResettable: false,
         badges: [badge1, badge2],
         stageCollection,
         areas: [area, area2],
@@ -185,6 +186,7 @@ describe('Unit | Serializer | JSONAPI | target-profile-for-admin-serializer', fu
             'image-url': 'some/image/url',
             'is-public': true,
             'is-simplified-access': true,
+            'are-knowledge-elements-resettable': false,
             'max-level': 7,
             name: 'Mon Super profil cible',
             outdated: true,

@@ -1,9 +1,9 @@
-const { CampaignCodeError, ObjectValidationError } = require('../errors.js');
-const User = require('../models/User.js');
-const AuthenticationMethod = require('../models/AuthenticationMethod.js');
-const { STUDENT_RECONCILIATION_ERRORS } = require('../constants.js');
+import { CampaignCodeError, ObjectValidationError } from '../errors.js';
+import { User } from '../models/User.js';
+import { NON_OIDC_IDENTITY_PROVIDERS } from '../constants/identity-providers.js';
+import { STUDENT_RECONCILIATION_ERRORS } from '../constants.js';
 
-module.exports = async function createUserAndReconcileToOrganizationLearnerFromExternalUser({
+const createUserAndReconcileToOrganizationLearnerFromExternalUser = async function ({
   birthdate,
   campaignCode,
   token,
@@ -80,7 +80,7 @@ module.exports = async function createUserAndReconcileToOrganizationLearnerFromE
       await authenticationMethodRepository.updateExternalIdentifierByUserIdAndIdentityProvider({
         externalIdentifier: externalUser.samlId,
         userId: error.meta.userId,
-        identityProvider: AuthenticationMethod.identityProviders.GAR,
+        identityProvider: NON_OIDC_IDENTITY_PROVIDERS.GAR.code,
       });
       const organizationLearner = await organizationLearnerRepository.reconcileUserToOrganizationLearner({
         userId: error.meta.userId,
@@ -96,3 +96,5 @@ module.exports = async function createUserAndReconcileToOrganizationLearnerFromE
   await userRepository.updateLastLoggedAt({ userId: tokenUserId });
   return accessToken;
 };
+
+export { createUserAndReconcileToOrganizationLearnerFromExternalUser };

@@ -20,7 +20,7 @@ module('Unit | Component | routes/campaigns/join/associate-sco-student-with-medi
     storeStub = { createRecord: sinon.stub().returns(record) };
     sessionStub = { data: {}, get: sinon.stub(), set: sinon.stub() };
     onSubmitStub = sinon.stub();
-    component = createComponent('component:routes/campaigns/join/associate-sco-student-with-mediacentre-form', {
+    component = createComponent('routes/campaigns/join/associate-sco-student-with-mediacentre-form', {
       onSubmit: onSubmitStub,
       campaignCode: 123,
     });
@@ -43,7 +43,9 @@ module('Unit | Component | routes/campaigns/join/associate-sco-student-with-medi
 
     test('should create an external-user', async function (assert) {
       // given
-      storeStub.createRecord.returns({ unloadRecord: () => {} });
+      storeStub.createRecord.returns({
+        unloadRecord: () => {},
+      });
 
       // when
       await component.actions.submit.call(component, attributes);
@@ -101,7 +103,7 @@ module('Unit | Component | routes/campaigns/join/associate-sco-student-with-medi
 
         // then
         sinon.assert.calledOnce(record.unloadRecord);
-        assert.strictEqual(component.errorMessage.string, expectedErrorMessage);
+        assert.strictEqual(component.errorMessage.toString(), expectedErrorMessage);
         assert.ok(true);
       });
 
@@ -171,7 +173,7 @@ module('Unit | Component | routes/campaigns/join/associate-sco-student-with-medi
       module('When user has an invalid reconciliation', function () {
         test('should return a bad request error and display the invalid reconciliation error message', async function (assert) {
           // given
-          const expectedErrorMessage = this.intl.t('pages.join.sco.invalid-reconciliation-error');
+          const expectedErrorMessage = this.intl.t('pages.join.sco.invalid-reconciliation-error', { htmlSafe: true });
           const error = { status: '400' };
 
           onSubmitStub.rejects({ errors: [error] });
@@ -180,7 +182,7 @@ module('Unit | Component | routes/campaigns/join/associate-sco-student-with-medi
           await component.actions.submit.call(component, attributes);
 
           // then
-          assert.strictEqual(component.errorMessage.string, expectedErrorMessage);
+          assert.deepEqual(component.errorMessage, expectedErrorMessage);
         });
       });
     });

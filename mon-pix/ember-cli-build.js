@@ -16,9 +16,8 @@ module.exports = function (defaults) {
       exclude: ['png', 'svg'],
       extensions: ['js', 'css', 'jpg', 'gif', 'map'],
     },
-    'ember-dayjs': {
-      locales: ['fr', 'en'],
-      plugins: ['duration', 'relativeTime'],
+    'ember-simple-auth': {
+      useSessionSetupMethod: true,
     },
   });
 
@@ -40,6 +39,8 @@ module.exports = function (defaults) {
   return require('@embroider/compat').compatBuild(app, Webpack, {
     staticAddonTestSupportTrees: true,
     staticAddonTrees: true,
+    staticHelpers: true,
     staticModifiers: true,
+    staticComponents: true,
   });
 };

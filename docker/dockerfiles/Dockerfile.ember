@@ -1,4 +1,4 @@
-FROM node:16.18.1 as dev
+FROM node:16.20.1 as dev
 
 WORKDIR /code
 COPY . .
@@ -13,6 +13,6 @@ ENV BUILD_ENV=dev
 
 RUN npx ember build --env $BUILD_ENV
 
-FROM nginx:1.21.6 as production
+FROM nginx:1.25.1 as production
 
 COPY --from=builder /code/dist/ /usr/share/nginx/html/

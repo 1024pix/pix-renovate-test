@@ -1,5 +1,5 @@
 import { action } from '@ember/object';
-import { inject as service } from '@ember/service';
+import { service } from '@ember/service';
 import Controller from '@ember/controller';
 import { tracked } from '@glimmer/tracking';
 
@@ -32,7 +32,7 @@ export default class NewController extends Controller {
         emails.length > 1
           ? this.intl.t('pages.team-new.success.multiple-invitations')
           : this.intl.t('pages.team-new.success.invitation', { email: emails[0] });
-      this.notifications.success(message);
+      this.notifications.sendSuccess(message);
     } catch (error) {
       this._handleResponseError(error);
     }

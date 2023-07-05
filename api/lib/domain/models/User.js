@@ -1,10 +1,12 @@
-const toLower = require('lodash/toLower');
-const isNil = require('lodash/isNil');
-const dayjs = require('dayjs');
+import lodash from 'lodash';
 
-const config = require('../../config.js');
-const localeService = require('../services/locale-service');
-const AuthenticationMethod = require('./AuthenticationMethod.js');
+const { toLower, isNil } = lodash;
+
+import dayjs from 'dayjs';
+
+import { config } from '../../config.js';
+import * as localeService from '../services/locale-service.js';
+import { NON_OIDC_IDENTITY_PROVIDERS } from '../constants/identity-providers.js';
 
 class User {
   constructor(
@@ -81,7 +83,7 @@ class User {
 
   get shouldChangePassword() {
     const pixAuthenticationMethod = this.authenticationMethods.find(
-      (authenticationMethod) => authenticationMethod.identityProvider === AuthenticationMethod.identityProviders.PIX
+      (authenticationMethod) => authenticationMethod.identityProvider === NON_OIDC_IDENTITY_PROVIDERS.PIX.code
     );
 
     return pixAuthenticationMethod ? pixAuthenticationMethod.authenticationComplement.shouldChangePassword : null;
@@ -126,4 +128,4 @@ class User {
   }
 }
 
-module.exports = User;
+export { User };

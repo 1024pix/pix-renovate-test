@@ -1,8 +1,8 @@
-const { expect, sinon, domainBuilder, catchErr } = require('../../../test-helper');
-const removeAuthenticationMethod = require('../../../../lib/domain/usecases/remove-authentication-method');
-const { UserNotAuthorizedToRemoveAuthenticationMethod } = require('../../../../lib/domain/errors');
-const AuthenticationMethod = require('../../../../lib/domain/models/AuthenticationMethod');
-const OidcIdentityProviders = require('../../../../lib/domain/constants/oidc-identity-providers');
+import { expect, sinon, domainBuilder, catchErr } from '../../../test-helper.js';
+import { removeAuthenticationMethod } from '../../../../lib/domain/usecases/remove-authentication-method.js';
+import { UserNotAuthorizedToRemoveAuthenticationMethod } from '../../../../lib/domain/errors.js';
+import { NON_OIDC_IDENTITY_PROVIDERS } from '../../../../lib/domain/constants/identity-providers.js';
+import * as OidcIdentityProviders from '../../../../lib/domain/constants/oidc-identity-providers.js';
 
 describe('Unit | UseCase | remove-authentication-method', function () {
   let userRepository;
@@ -26,7 +26,7 @@ describe('Unit | UseCase | remove-authentication-method', function () {
       domainBuilder.buildAuthenticationMethod.withGarAsIdentityProvider({ userId }),
       domainBuilder.buildAuthenticationMethod.withIdentityProvider({
         userId,
-        identityProvider: OidcIdentityProviders.POLE_EMPLOI.service.code,
+        identityProvider: OidcIdentityProviders.POLE_EMPLOI.code,
       }),
     ];
   }
@@ -37,11 +37,11 @@ describe('Unit | UseCase | remove-authentication-method', function () {
       domainBuilder.buildAuthenticationMethod.withGarAsIdentityProvider({ userId }),
       domainBuilder.buildAuthenticationMethod.withIdentityProvider({
         userId,
-        identityProvider: OidcIdentityProviders.POLE_EMPLOI.service.code,
+        identityProvider: OidcIdentityProviders.POLE_EMPLOI.code,
       }),
       domainBuilder.buildAuthenticationMethod.withIdentityProvider({
         userId,
-        identityProvider: OidcIdentityProviders.CNAV.service.code,
+        identityProvider: OidcIdentityProviders.CNAV.code,
       }),
     ];
   }
@@ -77,7 +77,7 @@ describe('Unit | UseCase | remove-authentication-method', function () {
         // then
         expect(authenticationMethodRepository.removeByUserIdAndIdentityProvider).to.have.been.calledWith({
           userId: user.id,
-          identityProvider: AuthenticationMethod.identityProviders.PIX,
+          identityProvider: NON_OIDC_IDENTITY_PROVIDERS.PIX.code,
         });
       });
     });
@@ -130,7 +130,7 @@ describe('Unit | UseCase | remove-authentication-method', function () {
         // then
         expect(authenticationMethodRepository.removeByUserIdAndIdentityProvider).to.have.been.calledWith({
           userId: user.id,
-          identityProvider: AuthenticationMethod.identityProviders.PIX,
+          identityProvider: NON_OIDC_IDENTITY_PROVIDERS.PIX.code,
         });
       });
     });
@@ -168,7 +168,7 @@ describe('Unit | UseCase | remove-authentication-method', function () {
       // then
       expect(authenticationMethodRepository.removeByUserIdAndIdentityProvider).to.have.been.calledWith({
         userId: user.id,
-        identityProvider: AuthenticationMethod.identityProviders.GAR,
+        identityProvider: NON_OIDC_IDENTITY_PROVIDERS.GAR.code,
       });
     });
   });
@@ -176,7 +176,7 @@ describe('Unit | UseCase | remove-authentication-method', function () {
   context('When type is POLE_EMPLOI', function () {
     it('should remove POLE_EMPLOI authentication method', async function () {
       // given
-      const type = OidcIdentityProviders.POLE_EMPLOI.service.code;
+      const type = OidcIdentityProviders.POLE_EMPLOI.code;
       const user = domainBuilder.buildUser();
       userRepository.get.resolves(user);
       const authenticationMethods = buildPIXAndGARAndPoleEmploiAuthenticationMethod(user.id);
@@ -188,7 +188,7 @@ describe('Unit | UseCase | remove-authentication-method', function () {
       // then
       expect(authenticationMethodRepository.removeByUserIdAndIdentityProvider).to.have.been.calledWith({
         userId: user.id,
-        identityProvider: OidcIdentityProviders.POLE_EMPLOI.service.code,
+        identityProvider: OidcIdentityProviders.POLE_EMPLOI.code,
       });
     });
   });
@@ -196,7 +196,7 @@ describe('Unit | UseCase | remove-authentication-method', function () {
   context('When type is CNAV', function () {
     it('should remove CNAV authentication method', async function () {
       // given
-      const type = OidcIdentityProviders.CNAV.service.code;
+      const type = OidcIdentityProviders.CNAV.code;
       const user = domainBuilder.buildUser();
       userRepository.get.resolves(user);
       const authenticationMethods = buildAllAuthenticationMethodsForUser(user.id);
@@ -208,7 +208,7 @@ describe('Unit | UseCase | remove-authentication-method', function () {
       // then
       expect(authenticationMethodRepository.removeByUserIdAndIdentityProvider).to.have.been.calledWith({
         userId: user.id,
-        identityProvider: OidcIdentityProviders.CNAV.service.code,
+        identityProvider: OidcIdentityProviders.CNAV.code,
       });
     });
   });

@@ -53,20 +53,24 @@
   <div class="app__main-content main-content">
 
     <div class="main-content__topbar topbar">
-      <div class="topbar__user-logged-menu"><UserLoggedMenu
-          @onCertificationCenterAccessChanged={{this.changeCurrentCertificationCenterAccess}}
-        /></div>
+      <UserLoggedMenu @onCertificationCenterAccessChanged={{this.changeCurrentCertificationCenterAccess}} />
     </div>
 
     {{#if this.showBanner}}
       <PixBanner
-        @actionLabel="documentation pour voir les nouveautés."
+        @actionLabel={{t "pages.sco.banner.url-label"}}
         @actionUrl="https://cloud.pix.fr/s/GqwW6dFDDrHezfS"
         @canCloseBanner="true"
-      >La certification Pix se déroulera du 14 novembre 2022 au 17 mars 2023 pour les lycées et du 6 mars au 16 juin
-        2023 pour les collèges. Pensez à consulter la
+      >
+        {{t "pages.sco.banner.information"}}
       </PixBanner>
 
+    {{/if}}
+
+    {{#if this.showMassImportBanner}}
+      <PixBanner @canCloseBanner="true">
+        {{t "pages.banner.information" htmlSafe=true}}
+      </PixBanner>
     {{/if}}
 
     <div class="page">

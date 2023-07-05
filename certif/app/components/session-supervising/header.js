@@ -1,16 +1,17 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
-import { inject as service } from '@ember/service';
+import { service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
 export default class Header extends Component {
-  @tracked modalDescriptionText;
-  @tracked modalCancelText;
-  @tracked modalConfirmationText;
-  @tracked modalInstructionText = 'Information';
-  @tracked isConfirmationModalDisplayed = false;
   @service router;
   @service intl;
+
+  @tracked modalDescriptionText;
+  @tracked modalCancelText;
+  @tracked modalConfirmationText = this.intl.t('common.actions.confirm');
+  @tracked modalInstructionText = this.intl.t('pages.session-supervising.candidate-in-list.default-modal-title');
+  @tracked isConfirmationModalDisplayed = false;
 
   @action
   askUserToConfirmLeaving() {

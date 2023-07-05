@@ -1,30 +1,26 @@
-const each = require('lodash/each');
-const map = require('lodash/map');
-const times = require('lodash/times');
-const pick = require('lodash/pick');
+import lodash from 'lodash';
+const { each, map, times, pick } = lodash;
+import { expect, knex, databaseBuilder, catchErr, sinon } from '../../../test-helper.js';
 
-const { expect, knex, databaseBuilder, catchErr, sinon } = require('../../../test-helper');
-
-const {
+import {
   AlreadyExistingEntityError,
   AlreadyRegisteredEmailError,
   AlreadyRegisteredUsernameError,
   NotFoundError,
   UserNotFoundError,
-} = require('../../../../lib/domain/errors');
+} from '../../../../lib/domain/errors.js';
 
-const User = require('../../../../lib/domain/models/User');
-const AuthenticationMethod = require('../../../../lib/domain/models/AuthenticationMethod');
-const UserDetailsForAdmin = require('../../../../lib/domain/models/UserDetailsForAdmin');
-const Membership = require('../../../../lib/domain/models/Membership');
-const CertificationCenter = require('../../../../lib/domain/models/CertificationCenter');
-const CertificationCenterMembership = require('../../../../lib/domain/models/CertificationCenterMembership');
-const Organization = require('../../../../lib/domain/models/Organization');
-const OrganizationLearnerForAdmin = require('../../../../lib/domain/read-models/OrganizationLearnerForAdmin');
-const OidcIdentityProviders = require('../../../../lib/domain/constants/oidc-identity-providers');
-
-const DomainTransaction = require('../../../../lib/infrastructure/DomainTransaction');
-const userRepository = require('../../../../lib/infrastructure/repositories/user-repository');
+import { User } from '../../../../lib/domain/models/User.js';
+import { NON_OIDC_IDENTITY_PROVIDERS } from '../../../../lib/domain/constants/identity-providers.js';
+import { UserDetailsForAdmin } from '../../../../lib/domain/models/UserDetailsForAdmin.js';
+import { Membership } from '../../../../lib/domain/models/Membership.js';
+import { CertificationCenter } from '../../../../lib/domain/models/CertificationCenter.js';
+import { CertificationCenterMembership } from '../../../../lib/domain/models/CertificationCenterMembership.js';
+import { Organization } from '../../../../lib/domain/models/Organization.js';
+import { OrganizationLearnerForAdmin } from '../../../../lib/domain/read-models/OrganizationLearnerForAdmin.js';
+import * as OidcIdentityProviders from '../../../../lib/domain/constants/oidc-identity-providers.js';
+import { DomainTransaction } from '../../../../lib/infrastructure/DomainTransaction.js';
+import * as userRepository from '../../../../lib/infrastructure/repositories/user-repository.js';
 
 const expectedUserDetailsForAdminAttributes = [
   'id',
@@ -104,7 +100,7 @@ describe('Integration | Infrastructure | Repository | UserRepository', function 
         // when
         const foundUser = await userRepository.findByExternalIdentifier({
           externalIdentityId,
-          identityProvider: OidcIdentityProviders.POLE_EMPLOI.service.code,
+          identityProvider: OidcIdentityProviders.POLE_EMPLOI.code,
         });
 
         // then
@@ -119,7 +115,7 @@ describe('Integration | Infrastructure | Repository | UserRepository', function 
         // when
         const foundUser = await userRepository.findByExternalIdentifier({
           externalIdentityId: badId,
-          identityProvider: OidcIdentityProviders.POLE_EMPLOI.service.code,
+          identityProvider: OidcIdentityProviders.POLE_EMPLOI.code,
         });
 
         // then
@@ -138,7 +134,7 @@ describe('Integration | Infrastructure | Repository | UserRepository', function 
         // when
         const foundUser = await userRepository.findByExternalIdentifier({
           externalIdentityId,
-          identityProvider: AuthenticationMethod.identityProviders.PIX,
+          identityProvider: NON_OIDC_IDENTITY_PROVIDERS.PIX.code,
         });
 
         // then
@@ -1182,7 +1178,7 @@ describe('Integration | Infrastructure | Repository | UserRepository', function 
 
           // then
           const pixAuthenticationMethod = userDetailsForAdmin.authenticationMethods.find(
-            ({ identityProvider }) => identityProvider === AuthenticationMethod.identityProviders.PIX
+            ({ identityProvider }) => identityProvider === NON_OIDC_IDENTITY_PROVIDERS.PIX.code
           );
           expect(userDetailsForAdmin.authenticationMethods.length).to.equal(2);
           expect(pixAuthenticationMethod).to.deep.equal({
@@ -1190,7 +1186,7 @@ describe('Integration | Infrastructure | Repository | UserRepository', function 
               shouldChangePassword: false,
             },
             id: expectedPixAuthenticationMethod.id,
-            identityProvider: AuthenticationMethod.identityProviders.PIX,
+            identityProvider: NON_OIDC_IDENTITY_PROVIDERS.PIX.code,
           });
         });
       });
@@ -1379,7 +1375,7 @@ describe('Integration | Infrastructure | Repository | UserRepository', function 
     });
 
     describe('#updateUserDetailsForAdministration', function () {
-      it('should update firstName, lastName, email and username of the user', async function () {
+      it('updates firstName, lastName, email, username and locale of the user', async function () {
         // given
         const userInDb = databaseBuilder.factory.buildUser(userToInsert);
         databaseBuilder.factory.buildAuthenticationMethod.withGarAsIdentityProvider({
@@ -1394,6 +1390,7 @@ describe('Integration | Infrastructure | Repository | UserRepository', function 
           lastName: 'nom_123',
           email: 'email_123@example.net',
           username: 'username_123',
+          locale: 'fr-FR',
         };
         await userRepository.updateUserDetailsForAdministration({
           id: userInDb.id,
@@ -1406,6 +1403,7 @@ describe('Integration | Infrastructure | Repository | UserRepository', function 
         expect(updatedUser.lastName).to.equal('nom_123');
         expect(updatedUser.email).to.equal('email_123@example.net');
         expect(updatedUser.username).to.equal('username_123');
+        expect(updatedUser.locale).to.equal('fr-FR');
       });
 
       it('should throw AlreadyExistingEntityError when username is already used', async function () {

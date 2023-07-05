@@ -1,8 +1,10 @@
-const { sinon, expect, domainBuilder, generateValidRequestAuthorizationHeader } = require('../../../test-helper');
-const assessmentController = require('../../../../lib/application/assessments/assessment-controller');
-const { AssessmentEndedError } = require('../../../../lib/domain/errors');
-const Assessment = require('../../../../lib/domain/models/Assessment');
-const { FRENCH_FRANCE, FRENCH_SPOKEN } = require('../../../../lib/domain/constants').LOCALE;
+import { sinon, expect, domainBuilder, generateValidRequestAuthorizationHeader } from '../../../test-helper.js';
+import { assessmentController } from '../../../../lib/application/assessments/assessment-controller.js';
+import { AssessmentEndedError } from '../../../../lib/domain/errors.js';
+import { Assessment } from '../../../../lib/domain/models/Assessment.js';
+import { LOCALE } from '../../../../lib/domain/constants.js';
+
+const { FRENCH_FRANCE, FRENCH_SPOKEN } = LOCALE;
 
 describe('Unit | Controller | assessment-controller-get-next-challenge', function () {
   describe('#getNextChallenge', function () {
@@ -160,15 +162,26 @@ describe('Unit | Controller | assessment-controller-get-next-challenge', functio
 
       it('should call getNextChallengeForCertificationCourse in assessmentService', async function () {
         // given
+        const locale = FRENCH_SPOKEN;
         usecases.getNextChallengeForCertification.resolves();
 
         // when
-        await assessmentController.getNextChallenge({ params: { id: 12 } }, null, dependencies);
+        await assessmentController.getNextChallenge(
+          {
+            params: { id: 12 },
+            headers: {
+              'accept-language': locale,
+            },
+          },
+          null,
+          dependencies
+        );
 
         // then
         expect(usecases.getNextChallengeForCertification).to.have.been.calledOnce;
         expect(usecases.getNextChallengeForCertification).to.have.been.calledWith({
           assessment: certificationAssessment,
+          locale,
         });
       });
 
