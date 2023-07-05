@@ -11,7 +11,7 @@
   "author": "GIP Pix",
   "engines": {
     "node": "^16.19.0",
-    "npm": ">=8.13.2 <9"
+    "npm": "^8.13.2"
   },
   "directories": {
     "doc": "doc",
