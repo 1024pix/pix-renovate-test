@@ -1,6 +1,15 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["github>1024pix/renovate-config:default"],
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["^(node|cimg/node)$"],
+      "groupName": "node",
+      "rangeStrategy": "bump",
+      "commitMessageSuffix": "to {{ prettyNewVersion }}",
+      "branchTopic": "node-{{ prettyNewVersion }}"
+    }
+  ],
   "enabled": true,
   "includeForks": true
 }
