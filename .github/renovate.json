@@ -1,6 +1,14 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["github>1024pix/renovate-config:default"],
+  "regexManagers": [
+    {
+        "fileMatch": ["^.circleci/*.yml$"],
+        "matchStrings": ["(?<depName>cimg/node):(?<currentValue>.*?)-browsers"],
+        "datasourceTemplate": "node",
+        "versioningTemplate": "node"
+    }
+  ],
   "enabled": true,
   "includeForks": true
 }
