@@ -4,9 +4,23 @@
   "regexManagers": [
     {
         "fileMatch": ["^.circleci/*.yml$"],
-        "matchStrings": ["(?<depName>cimg/node):(?<currentValue>.*?)-browsers"],
-        "datasourceTemplate": "node",
+        "matchStrings": ["(?<depName>cimg/node):(?<currentValue>.*?)-browsers\\n",
+        "(?<depName>cimg/node):(?<currentValue>.*?)\\n"],
+        "datasourceTemplate": "cimg/node",
         "versioningTemplate": "node"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["^(node|cimg/node)$"],
+      "groupName": "node",
+      "rangeStrategy": "bump",
+      "versioning": "node"
+    },
+    {
+      "matchPackageNames": ["^cimg/node$"],
+      "matchManagers": ["circleci"],
+      "enabled":false
     }
   ],
   "enabled": true,
