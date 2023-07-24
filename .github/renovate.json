@@ -2,5 +2,23 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["github>1024pix/renovate-config:default"],
   "enabled": true,
-  "includeForks": true
+  "includeForks": true,
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["^npm$"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "npm"
+    },
+    {
+      "matchPackagePatterns": ["^(node|cimg/node)$"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "node"
+    },
+    {
+      "matchPackagePatterns": ["^(node|npm|cimg/node)$"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "node-npm"
+      "enabled": false
+    },
+  ]
 }
