@@ -7,6 +7,7 @@ import { getArrayOfStrings } from './infrastructure/utils/string-utils.js';
 
 import * as url from 'url';
 
+// coucou
 dotenv.config();
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
