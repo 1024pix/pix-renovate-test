@@ -1,0 +1,31 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["github>1024pix/renovate-config:default"],
+  "enabled": true,
+  "includeForks": true,
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": [".*docker-compose.yaml"],
+      "matchStrings": [
+        "# renovate datasource=(?<datasource>.*?) depName=(?<depName>.*?)\\s*image: [a-zA-Z]+:(?<currentValue>.*)-alpine\\s"
+      ]
+    }
+  ],
+  "customDatasources": {
+    "scalingo-redis": {
+      "defaultRegistryUrlTemplate": "https://hub.docker.com/v2/namespaces/scalingo/repositories/redis/tags",
+      "format": "json",
+      "transformTemplates": [
+        "{ \"releases\": $map($$.results, function($v) { { \"version\": $substringBefore($v.name, '-') } })}"
+      ]
+    },
+    "scalingo-postgres": {
+      "defaultRegistryUrlTemplate": "https://hub.docker.com/v2/namespaces/scalingo/repositories/postgresql/tags",
+      "format": "json",
+      "transformTemplates": [
+        "{ \"releases\": $map($$.results, function($v) { { \"version\": $substringBefore($v.name, '-') } })}"
+      ]
+    }
+  }
+}
