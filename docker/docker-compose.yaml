@@ -4,6 +4,7 @@ version: '3'
 services:
 
   postgres:
+    # renovate datasource=custom.scalingo-postgres depName=postgres
     image: postgres:14.8-alpine
     container_name: pix-api-postgres
     ports:
@@ -14,6 +15,7 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
 
   redis:
+    # renovate datasource=custom.scalingo-redis depName=redis
     image: redis:7.0.12-alpine
     container_name: pix-api-redis
     ports:
