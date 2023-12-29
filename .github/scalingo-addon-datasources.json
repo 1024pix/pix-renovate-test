@@ -1,0 +1,19 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "customDatasources": {
+    "scalingo-redis": {
+      "defaultRegistryUrlTemplate": "https://hub.docker.com/v2/namespaces/scalingo/repositories/redis/tags",
+      "format": "json",
+      "transformTemplates": [
+        "{\"releases\":[{\"version\": $substringBefore($$.(results.name), '-')}]}"
+      ]
+    },
+    "scalingo-postgres": {
+      "defaultRegistryUrlTemplate": "https://hub.docker.com/v2/namespaces/scalingo/repositories/postgresql/tags",
+      "format": "json",
+      "transformTemplates": [
+        "{\"releases\":[{\"version\": $substringBefore($$.(results.name), '-')}]}"
+      ]
+    }
+  }
+}
