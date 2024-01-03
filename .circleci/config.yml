@@ -46,7 +46,7 @@ executors:
         type: string
       redis-version:
         # renovate datasource=custom.scalingo-redis depName=redis
-        default: 7.0.12
+        default: 7.2.3
         type: string
     docker:
       - image: cimg/node:<<parameters.node-version>>
@@ -79,7 +79,7 @@ executors:
         type: string
       redis-version:
         # renovate datasource=custom.scalingo-redis depName=redis
-        default: 7.0.12
+        default: 7.2.3
         type: string
     docker:
       - image: cimg/node:<<parameters.node-version>>-browsers
