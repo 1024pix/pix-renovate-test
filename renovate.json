@@ -15,25 +15,20 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": ["(^|/)(?:docker-)?compose[^/]*\\.ya?ml$"],
+      "fileMatch": ["^scalingo.json$", "(^|/)(?:docker-)?compose[^/]*\\.ya?ml$"],
       "matchStrings": [
-        "# renovate datasource=(?<datasource>.*?) depName=(?<depName>.*?)\\s*image: [a-zA-Z]+:(?<currentValue>.*)-alpine"
-      ]
-    },
-    {
-      "customType": "regex",
-      "fileMatch": ["^scalingo.json$"],
-      "matchStrings": [
-        "\"plan\": \"postgresql:postgresql-sandbox\",\\s*.*\\s.*\"version\": \"(?<currentValue>.*)\""
+        "\"plan\": \"postgresql:postgresql-sandbox\",\\s*.*\\s.*\"version\": \"(?<currentValue>.*)\"",
+        "postgres:\\s.*image: postgres:(?<currentValue>.*)-alpine"
       ],
       "depNameTemplate": "postgres",
       "datasourceTemplate": "custom.scalingo-postgres"
     },
     {
       "customType": "regex",
-      "fileMatch": ["^scalingo.json$"],
+      "fileMatch": ["^scalingo.json$", "(^|/)(?:docker-)?compose[^/]*\\.ya?ml$"],
       "matchStrings": [
-        "\"plan\": \"redis:redis-sandbox\",\\s*.*\\s.*\"version\": \"(?<currentValue>.*)\""
+        "\"plan\": \"redis:redis-sandbox\",\\s*.*\\s.*\"version\": \"(?<currentValue>.*)\"",
+        "redis:\\s.*image: redis:(?<currentValue>.*)-alpine"
       ],
       "depNameTemplate": "redis",
       "datasourceTemplate": "custom.scalingo-redis"
@@ -48,7 +43,7 @@
       ]
     },
     "scalingo-postgres": {
-      "defaultRegistryUrlTemplate": "https://hub.docker.com/v2/namespaces/scalingo/repositories/postgresql/tags",
+        "defaultRegistryUrlTemplate": "https://hub.docker.com/v2/namespaces/scalingo/repositories/postgresql/tags",
       "format": "json",
       "transformTemplates": [
         "{ \"releases\": $map($$.results, function($v) { { \"version\": $split($v.name, '.', 2) ~> $join('.') } })}"
