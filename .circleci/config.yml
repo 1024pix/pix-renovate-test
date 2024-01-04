@@ -42,7 +42,7 @@ executors:
         type: string
       postgres-version:
         # renovate datasource=custom.scalingo-postgres depName=postgres
-        default: 14.8
+        default: 14.10
         type: string
       redis-version:
         # renovate datasource=custom.scalingo-redis depName=redis
@@ -75,7 +75,7 @@ executors:
         type: string
       postgres-version:
         # renovate datasource=custom.scalingo-postgres depName=postgres
-        default: 14.8
+        default: 14.10
         type: string
       redis-version:
         # renovate datasource=custom.scalingo-redis depName=redis
@@ -97,7 +97,7 @@ executors:
         type: string
       postgres-version:
         # renovate datasource=custom.scalingo-postgres depName=postgres
-        default: 14.8
+        default: 14.10
         type: string
     docker:
       - image: cimg/node:<<parameters.node-version>>
