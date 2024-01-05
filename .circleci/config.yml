@@ -26,82 +26,37 @@ orbs:
 
 executors:
   node-docker:
-    parameters:
-      node-version:
-        # renovate datasource=node-version depName=node
-        default: 20.10.0
-        type: string
     docker:
-      - image: cimg/node:<<parameters.node-version>>
+      - image: cimg/node:20.10.0
     resource_class: small
   node-redis-postgres-docker:
-    parameters:
-      node-version:
-        # renovate datasource=node-version depName=node
-        default: 20.10.0
-        type: string
-      postgres-version:
-        # renovate datasource=custom.scalingo-postgres depName=postgres
-        default: 14.8
-        type: string
-      redis-version:
-        # renovate datasource=custom.scalingo-redis depName=redis
-        default: 7.0.12
-        type: string
     docker:
-      - image: cimg/node:<<parameters.node-version>>
-      - image: postgres:<<parameters.postgres-version>>-alpine
+      - image: cimg/node:20.10.0
+      - image: postgres:14.8-alpine
         environment:
           POSTGRES_USER: circleci
           POSTGRES_HOST_AUTH_METHOD: trust
-      - image: redis:<<parameters.redis-version>>-alpine
+      - image: redis:7.0.12-alpine
     resource_class: small
   node-browsers-docker:
-    parameters:
-      node-version:
-        # renovate datasource=node-version depName=node
-        default: 20.10.0
-        type: string
     docker:
-      - image: cimg/node:<<parameters.node-version>>-browsers
+      - image: cimg/node:20.10.0-browsers
         environment:
           JOBS: 2
     resource_class: small
   node-browsers-redis-postgres-docker:
-    parameters:
-      node-version:
-        # renovate datasource=node-version depName=node
-        default: 20.10.0
-        type: string
-      postgres-version:
-        # renovate datasource=custom.scalingo-postgres depName=postgres
-        default: 14.8
-        type: string
-      redis-version:
-        # renovate datasource=custom.scalingo-redis depName=redis
-        default: 7.0.12
-        type: string
     docker:
-      - image: cimg/node:<<parameters.node-version>>-browsers
-      - image: postgres:<<parameters.postgres-version>>-alpine
+      - image: cimg/node:20.10.0-browsers
+      - image: postgres:14.8-alpine
         environment:
           POSTGRES_USER: circleci
           POSTGRES_HOST_AUTH_METHOD: trust
-      - image: redis:<<parameters.redis-version>>-alpine
+      - image: redis:7.0.12-alpine
     resource_class: medium+
   node-postgres-docker:
-    parameters:
-      node-version:
-        # renovate datasource=node-version depName=node
-        default: 20.10.0
-        type: string
-      postgres-version:
-        # renovate datasource=custom.scalingo-postgres depName=postgres
-        default: 14.8
-        type: string
     docker:
-      - image: cimg/node:<<parameters.node-version>>
-      - image: postgres:<<parameters.postgres-version>>-alpine
+      - image: cimg/node:20.10.0
+      - image: postgres:14.8-alpine
         environment:
           POSTGRES_USER: circleci
           POSTGRES_HOST_AUTH_METHOD: trust
