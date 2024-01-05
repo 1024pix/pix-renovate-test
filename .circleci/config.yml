@@ -40,13 +40,13 @@ executors:
     resource_class: small
   node-browsers-docker:
     docker:
-      - image: cimg/node:20.10.0-browsers
+      - image: cimg/node:20.10.0
         environment:
           JOBS: 2
     resource_class: small
   node-browsers-redis-postgres-docker:
     docker:
-      - image: cimg/node:20.10.0-browsers
+      - image: cimg/node:20.10.0
       - image: postgres:14.8-alpine
         environment:
           POSTGRES_USER: circleci
