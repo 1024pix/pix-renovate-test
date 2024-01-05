@@ -32,7 +32,7 @@ executors:
   node-redis-postgres-docker:
     docker:
       - image: cimg/node:20.10.0
-      - image: postgres:14.8-alpine
+      - image: postgres:14.10-alpine
         environment:
           POSTGRES_USER: circleci
           POSTGRES_HOST_AUTH_METHOD: trust
@@ -47,7 +47,7 @@ executors:
   node-browsers-redis-postgres-docker:
     docker:
       - image: cimg/node:20.10.0-browsers
-      - image: postgres:14.8-alpine
+      - image: postgres:14.10-alpine
         environment:
           POSTGRES_USER: circleci
           POSTGRES_HOST_AUTH_METHOD: trust
@@ -56,7 +56,7 @@ executors:
   node-postgres-docker:
     docker:
       - image: cimg/node:20.10.0
-      - image: postgres:14.8-alpine
+      - image: postgres:14.10-alpine
         environment:
           POSTGRES_USER: circleci
           POSTGRES_HOST_AUTH_METHOD: trust
