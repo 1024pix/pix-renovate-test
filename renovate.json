@@ -15,20 +15,27 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": ["^scalingo.json$", "(^|/)(?:docker-)?compose[^/]*\\.ya?ml$"],
+      "fileMatch": ["^.circleci/config.yml$"],
+      "matchStrings": ["image: cimg\/node:(?<currentValue>[0-9.]*)"],
+      "depNameTemplate": "node",
+      "datasourceTemplate": "node-version"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^scalingo.json$", "(^|/)(?:docker-)?compose[^/]*\\.ya?ml$", "^.circleci/config.yml$"],
       "matchStrings": [
         "\"plan\": \"postgresql:postgresql-sandbox\",\\s*.*\\s.*\"version\": \"(?<currentValue>.*)\"",
-        "postgres:\\s.*image: postgres:(?<currentValue>.*)-alpine"
+        "image: postgres:(?<currentValue>.*)-alpine"
       ],
       "depNameTemplate": "postgres",
       "datasourceTemplate": "custom.scalingo-postgres"
     },
     {
       "customType": "regex",
-      "fileMatch": ["^scalingo.json$", "(^|/)(?:docker-)?compose[^/]*\\.ya?ml$"],
+      "fileMatch": ["^scalingo.json$", "(^|/)(?:docker-)?compose[^/]*\\.ya?ml$", "^.circleci/config.yml$"],
       "matchStrings": [
         "\"plan\": \"redis:redis-sandbox\",\\s*.*\\s.*\"version\": \"(?<currentValue>.*)\"",
-        "redis:\\s.*image: redis:(?<currentValue>.*)-alpine"
+        "image: redis:(?<currentValue>.*)-alpine"
       ],
       "depNameTemplate": "redis",
       "datasourceTemplate": "custom.scalingo-redis"
