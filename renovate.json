@@ -4,5 +4,6 @@
   "enabled": true,
   "includeForks": true,
   "commitMessagePrefix": null,
+  "commitMessageLowerCase": "never",
   "prTitle": "[BUMP] {{{commitMessageAction}}} {{{commitMessageTopic}}} {{{commitMessageExtra}}} {{{commitMessageSuffix}}}"
 }
