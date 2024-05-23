@@ -2,7 +2,7 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["github>1024pix/renovate-config:default"],
   "enabled": true,
-  "includeForks": true,
+  "forkProcessing": "enabled",
   "commitMessagePrefix": null,
   "commitMessageLowerCase": "never",
   "prTitle": "[BUMP] {{{commitMessageAction}}} {{{commitMessageTopic}}} {{{commitMessageExtra}}} {{{commitMessageSuffix}}}"
