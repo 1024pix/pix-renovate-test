@@ -1,5 +1,17 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["github>1024pix/renovate-config:default"],
+  "rangeStrategy": "pin",
+  "packageRules": [
+    {
+      "matchPackageNames": ["/^@embroider/"],
+      "groupName": "embroider"
+    },
+    {
+      "matchPackageNames": ["/eslint/"],
+      "groupName": "embroider"
+    },
+  ],
+  "includeForks": true,
   "enabled": true
 }
