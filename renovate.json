@@ -10,8 +10,8 @@
     {
       "matchPackageNames": ["/eslint/"],
       "groupName": "embroider"
-    },
+    }
   ],
-  "includeForks": true,
+  "forkProcessing": "enabled",
   "enabled": true
 }
