@@ -9,9 +9,9 @@
     },
     {
       "matchPackageNames": ["/eslint/"],
-      "groupName": "embroider"
-    },
+      "groupName": "eslint"
+    }
   ],
-  "includeForks": true,
+  "forkProcessing": "enabled",
   "enabled": true
 }
