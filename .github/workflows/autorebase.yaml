@@ -21,19 +21,19 @@ jobs:
         run: |
           set -e
 
-          PRS=$(gh pr list --state open --json number,autoMergeRequest,headRefName,baseRefName,mergeableStateStatus)
+          PRS=$(gh pr list --state open --json number,autoMergeRequest,headRefName,baseRefName,mergeStateStatus)
 
           echo "$PRS" | jq -c '.[]' | while read pr; do
               NUMBER=$(echo "$pr" | jq -r '.number')
               AUTO_MERGE=$(echo "$pr" | jq '.autoMergeRequest')
               HEAD_REF=$(echo "$pr" | jq -r '.headRefName')
               BASE_REF=$(echo "$pr" | jq -r '.baseRefName')
-              MERGEABLE_STATE_STATUS=$(echo "$pr" | jq -r '.mergeableStateStatus')
+              MERGE_STATE_STATUS=$(echo "$pr" | jq -r '.mergeStateStatus')
 
               if [[ "$AUTO_MERGE" != "null" && "$BASE_REF" == "dev" ]]; then
                   echo "🔍 PR #$NUMBER : Auto-merge activé"
 
-                  if [[ "$MERGEABLE_STATE_STATUS" == "BEHIND" ]]; then
+                  if [[ "$MERGE_STATE_STATUS" == "BEHIND" ]]; then
                       echo "🔄 PR #$NUMBER est en retard sur dev → Rebase en cours"
 
                       git fetch origin $HEAD_REF
