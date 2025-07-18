@@ -21,19 +21,21 @@ jobs:
         run: |
           set -e
 
-          PRS=$(gh pr list --state open --json number,autoMergeRequest,headRefName,baseRefName,mergeStateStatus)
+          LATEST_COMMIT_REF=$(git rev-parse HEAD)
+          PRS=$(gh pr list --state open --json number,autoMergeRequest,headRefName,baseRefName,baseRefOid)
 
           echo "$PRS" | jq -c '.[]' | while read pr; do
               NUMBER=$(echo "$pr" | jq -r '.number')
               AUTO_MERGE=$(echo "$pr" | jq '.autoMergeRequest')
               HEAD_REF=$(echo "$pr" | jq -r '.headRefName')
               BASE_REF=$(echo "$pr" | jq -r '.baseRefName')
-              MERGE_STATE_STATUS=$(echo "$pr" | jq -r '.mergeStateStatus')
+              BASE_REF_OID=$(echo "$pr" | jq -r '.baseRefOid')
 
               if [[ "$AUTO_MERGE" != "null" && "$BASE_REF" == "dev" ]]; then
                   echo "🔍 PR #$NUMBER : Auto-merge activé"
-
-                  if [[ "$MERGE_STATE_STATUS" == "BEHIND" ]]; then
+                  echo "BASE_REF $BASE_REF_OID"
+                  echo "LATEST_COMMIT_REF $LATEST_COMMIT_REF"
+                  if [[ "$BASE_REF_OID" != "$LATEST_COMMIT_REF" ]]; then
                       echo "🔄 PR #$NUMBER est en retard sur dev → Rebase en cours"
 
                       git fetch origin $HEAD_REF
