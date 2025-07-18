@@ -1,0 +1,47 @@
+name: Auto Rebase PRs with Auto-Merge Enabled
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  auto-rebase:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Auto Rebase PRs with Auto-Merge
+        run: |
+          set -e
+
+          PRS=$(gh pr list --state open --json number,autoMergeRequest,headRefName,baseRefName,mergeableState)
+
+          echo "$PRS" | jq -c '.[]' | while read pr; do
+              NUMBER=$(echo "$pr" | jq -r '.number')
+              AUTO_MERGE=$(echo "$pr" | jq '.autoMergeRequest')
+              HEAD_REF=$(echo "$pr" | jq -r '.headRefName')
+              BASE_REF=$(echo "$pr" | jq -r '.baseRefName')
+              MERGEABLE_STATE=$(echo "$pr" | jq -r '.mergeableState')
+
+              if [[ "$AUTO_MERGE" != "null" && "$BASE_REF" == "dev" ]]; then
+                  echo "🔍 PR #$NUMBER : Auto-merge activé"
+
+                  if [[ "$MERGEABLE_STATE" == "behind" ]]; then
+                      echo "🔄 PR #$NUMBER est en retard sur dev → Rebase en cours"
+
+                      git fetch origin $HEAD_REF
+                      git checkout $HEAD_REF
+                      git rebase origin/dev
+
+                      git push origin $HEAD_REF --force-with-lease
+                      echo "✅ PR #$NUMBER rebasée avec succès"
+                  else
+                      echo "✅ PR #$NUMBER est déjà à jour"
+                  fi
+              fi
+          done
