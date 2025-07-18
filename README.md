@@ -1,7 +1,8 @@
 # Pix
 
 Plateforme d'évaluation et de certification des compétences numériques pour tous.
-![Screenshot Pix App](./docs/assets/pix-app-screenshot.png)
+![Screenshot Pix App](./docs/assets/pix-app-screenshot.png) 
+
 
 ## Présentation
 
