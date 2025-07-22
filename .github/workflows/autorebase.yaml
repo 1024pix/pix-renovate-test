@@ -42,7 +42,7 @@ jobs:
                       git checkout $HEAD_REF
                       git rebase origin/dev || (echo "Conflit détecté : abandon du rebase." && git rebase --abort)
 
-                      git push origin $HEAD_REF --force-with-lease
+                      git push origin --force-with-lease
                       echo "✅ PR #$NUMBER rebasée avec succès"
                   else
                       echo "✅ PR #$NUMBER est déjà à jour"
