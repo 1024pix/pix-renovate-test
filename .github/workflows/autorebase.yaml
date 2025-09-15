@@ -31,7 +31,7 @@ jobs:
               BASE_REF=$(echo "$pr" | jq -r '.baseRefName')
               BASE_REF_OID=$(echo "$pr" | jq -r '.baseRefOid')
 
-              if [[ "$AUTO_MERGE" != "null" && "$BASE_REF" == "dev" ]]; then
+#              if [[ "$AUTO_MERGE" != "null" && "$BASE_REF" == "dev" ]]; then
                   echo "🔍 PR #$NUMBER : Auto-merge activé"
                   echo "BASE_REF $BASE_REF_OID"
                   echo "LATEST_COMMIT_REF $LATEST_COMMIT_REF"
@@ -47,5 +47,5 @@ jobs:
                   else
                       echo "✅ PR #$NUMBER est déjà à jour"
                   fi
-              fi
+#              fi
           done
